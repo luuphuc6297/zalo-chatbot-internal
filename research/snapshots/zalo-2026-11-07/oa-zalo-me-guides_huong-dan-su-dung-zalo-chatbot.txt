@@ -1,0 +1,69 @@
+ Hướng dẫn sử dụng Zalo Chatbot | Zalo Official Account 
+ Skip to main content 
+ HƯỚNG DẪN VẬN HÀNH
+ Đăng ký và Xác thực 
+ Thanh toán 
+ Thiết lập tài khoản OA 
+ Quản lý nội dung 
+ Tin nhắn 
+ Công cụ gửi tin 
+ Gọi thoại 
+ Quản lý hội thoại 
+ Nhóm Chat GMF 
+ Tối ưu vận hành 
+ Quản lý Khách hàng 
+ Biểu mẫu thu thập thông tin 
+ Báo cáo thống kê 
+ Mini App - OA Manager trên điện thoại 
+ Hướng dẫn sử dụng Zalo Chatbot 
+ Mở rộng 
+ Nhà phát triển 
+ Tối ưu vận hành 
+ Hướng dẫn sử dụng Zalo Chatbot 
+ On this page 
+ Hướng dẫn sử dụng Zalo Chatbot
+ 📌 Zalo Chatbot là gì? ​ 
+ Zalo Chatbot (Chatbot) là một công cụ tự động hóa gửi tin nhắn, giúp doanh nghiệp giao tiếp hiệu quả với khách hàng 24/7.
+ Zalo Chatbot gồm 2 thành phần chính:
+ Kịch bản là nơi chứa toàn bộ nội dung và chi tiết luồng hội thoại mà Chatbot sẽ thực hiện. Chatbot sẽ tự động phản hồi đến người dùng theo đúng lộ trình đã định sẵn. Ví dụ: Kịch bản mua hàng, kịch bản thành viên, kịch bản hỗ trợ sau mua hàng,...
+ Quy tắc tự động là thiết lập dùng để xác định thời điểm/sự kiện để Chatbot tự động kích hoạt các kịch bản hoặc thực hiện các hành động đã cài đặt.
+ ⚠️ Lưu ý: Tính năng Zalo Chatbot chỉ khả dụng đối với các OA đang sử dụng gói Tăng trưởng và Toàn diện . Mỗi gói có một số lượng kịch bản Chatbot nhất định. Tham khảo thêm tại đây .
+ 📌 Cách thiết lập Zalo Chatbot ​ 
+ Để sử dụng Zalo Chatbot, Quản trị viên của OA cần thực hiện các bước sau:
+ Bước 1. Kích hoạt tính năng Chatbot ​ 
+ Truy cập trang Zalo Chatbot tại link https://oa.zalo.me/chatbot ➡ Chọn Thiết lập ➡ Chọn Bật ➡ Chọn Xác nhận Bật 
+ Bước 2. Tạo kịch bản ​ 
+ 2.1. Chọn mục Danh sách kịch bản ➡ Chọn Thêm mới ➡ Sử dụng các kịch bản có sẵn hoặc tạo kịch bản mới.
+ 2.2. Mục kịch bản bao gồm các chuỗi tin nhắn (với tên chuỗi cụ thể) và/hoặc điều kiện để rẽ nhánh chuỗi tin nhắn.
+ Chuỗi tin nhắn bao gồm một hoặc nhiều tin nhắn với format đa dạng, được gửi đồng thời ngay khi được kích hoạt. Tạo chuỗi tin nhắn theo các bước sau: 
+ Đặt tên chuỗi tin nhắn
+ Thêm tin nhắn vào chuỗi tin nhắn. Các thành phần trong 1 tin nhắn gồm: Nội dung tin nhắn (văn bản, sticker, hình ảnh,...), nút điều hướng (mở website, thực hiện cuộc gọi,...)
+ Điều kiện giúp thiết lập quy tắc rẽ nhánh cho kịch bản. Nếu không có điều kiện, các chuỗi tin nhắn sẽ được gửi theo thứ tự tuần tự.
+ Có 2 giao diện xem kịch bản: Theo danh sách tin nhắn hoặc theo sơ đồ diagram.
+ 2.3. Kết nối các chuỗi tin nhắn và điều kiện với nhau.
+ Nhằm định hình lộ trình hội thoại, giúp Chatbot dẫn dắt người dùng thực hiện đúng các bước. Doanh nghiệp cần kết nối các chuỗi tin nhắn với nhau, có 2 loại kết nối:
+ Kết nối qua Nút bấm trong tin nhắn: Khi người dùng chủ động nhấn vào nút trong một tin nhắn, hệ thống sẽ phản hồi chuỗi tin nhắn tiếp theo tương ứng với hành động đó.
+ Kết nối qua "Hành động kế tiếp" (Hành động sẽ được thực hiện tiếp theo) của chuỗi tin: Hệ thống sẽ tự động gửi chuỗi tin nhắn đã chọn ngay sau khi chuỗi tin nhắn hiện tại kết thúc.
+ ✨Tips: Sử dụng giao diện chỉnh sửa diagram để điều chỉnh kết nối giữa các nhóm tin dễ dàng hơn, kiểm tra sơ đồ diagram trước khi xuất bản kịch bản để đảm bảo tất cả các chuỗi tin nhắn được kết nối với nhau.
+ Bước 2.4. Nhấn Xuất bản/Cập nhật để lưu lại các thay đổi.
+ Khi tất cả các thay đổi đã được lưu thành công, chấm vàng trên nút Xuất bản/Cập nhật sẽ tự động biến mất.
+ Bước 3. Tạo Quy tắc tự động ​ 
+ 3.1. Tại mục Quy tắc tự động ➡ Chọn Thêm mới 
+ 3.2. Tại mục Thiết lập sự kiện kích hoạt ( Khi ) - bước xác định thời điểm quy tắc bắt đầu hoạt động: Doanh nghiệp có thể chọn một trong các sự kiện như người dùng gửi tin nhắn đến OA, người dùng quan tâm OA, ...
+ 3.3. Xác định điều kiện bổ sung : Bổ sung các điều kiện đi kèm trước khi quy tắc được bắt đầu thực hiện. Tùy theo nhu cầu của doanh nghiệp, doanh nghiệp có thể chọn Bật/tắt để sử dụng hoặc bỏ qua bước này.
+ 3.4. Chọn hành động Chatbot cần thực hiện: Thiết lập hành động mà Chatbot cần thực hiện ngay khi thỏa điều kiện tại bước 3.2 và bước 3.3.
+ 3.5. Chọn Cập nhật để lưu lại các nội dung vừa chỉnh sửa.
+ ⚠️ Lưu ý: Kịch bản cần được gắn với Quy tắc tự động để có thể kích hoạt gửi các chuỗi tin nhắn trong kịch bản.
+ ✨ Gợi ý cách ứng dụng Zalo Chatbot ​ 
+ Zalo Chatbot là trợ thủ đắc lực trong hành trình chăm sóc và quản lý khách hàng trên Zalo OA. Từ tư vấn mua hàng, đặt bàn, đăng ký thành viên, phân loại khách hàng... Zalo Chatbot giúp doanh nghiệp duy trì phản hồi 24/7, ngay cả ngoài giờ làm việc, từ đó tối ưu toàn diện quy trình giao tiếp với khách hàng.
+ ------------------------------------------------------
+ Nếu có thắc mắc khác, vui lòng cung cấp OA ID và gửi email hoặc chat với BQT ZOA để được phản hồi sớm nhất.
+ Previous
+ Mini App - OA Manager trên điện thoại
+ Next
+ Cài đặt và quản lý Tiện ích (Extension)
+ 📌 Zalo Chatbot là gì? 
+ 📌 Cách thiết lập Zalo Chatbot Bước 1. Kích hoạt tính năng Chatbot 
+ Bước 2. Tạo kịch bản 
+ Bước 3. Tạo Quy tắc tự động 
+ ✨ Gợi ý cách ứng dụng Zalo Chatbot 

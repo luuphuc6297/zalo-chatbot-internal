@@ -1,0 +1,105 @@
+#!/usr/bin/env python3
+"""Fake `claude` CLI for scripts/tests/test_visit_model_pass.py and scripts/tests/test_analyze_visits.py. Never
+contacts Anthropic, never reads a real login.
+
+Behaviour comes from the JSON file named by $FAKE_CLAUDE_VISITS_CONFIG:
+  {"mode": "reply" | "empty" | "not_json" | "wrong_shape" | "limit" | "sleep" | "model_error",
+   "reply": <object or string>,           modes reply and sleep: the answer text (an object is JSON-encoded)
+   "replies": [<object or string>, ...],  optional, one answer per call in order (call number = lines in the log)
+   "accounts": {"<label>": "ok" | "limit"},  label = basename of $CLAUDE_CONFIG_DIR ("default" when unset);
+                                          "limit" overrides the mode for that account
+   "sleep_s": 5,
+   "log": "/path/calls.jsonl"}
+Each call appends one JSON line to the log: the argv (system prompt and user text replaced by their length), the
+system prompt, the user text after "--", stdin, the working folder and the files in it, the account label and a
+few environment variables (the API key variables and STAFF_TOKEN must arrive unset). Kept compatible with Python 3.9.
+"""
+import json
+import os
+import sys
+import time
+from pathlib import Path
+
+cfg_path = Path(os.environ["FAKE_CLAUDE_VISITS_CONFIG"])
+cfg = json.loads(cfg_path.read_text(encoding="utf-8"))
+argv = sys.argv[1:]
+cfg_dir = os.environ.get("CLAUDE_CONFIG_DIR", "")
+label = os.path.basename(cfg_dir.rstrip("/")) if cfg_dir else "default"
+
+if argv[:2] == ["auth", "status"]:
+    print(json.dumps({"loggedIn": True, "email": label + "@example.test", "subscriptionType": "max"}))
+    sys.exit(0)
+
+if not argv or argv[0] != "-p" or "--" not in argv:
+    sys.stderr.write("fake claude: expected -p ... -- <text>\n")
+    sys.exit(2)
+
+dd = argv.index("--")
+flags = argv[1:dd]
+user_text = " ".join(argv[dd + 1:])
+
+
+def flag(name):
+    return flags[flags.index(name) + 1] if name in flags and flags.index(name) + 1 < len(flags) else None
+
+
+log_path = Path(cfg["log"])
+call_no = len(log_path.read_text(encoding="utf-8").splitlines()) if log_path.exists() else 0
+cwd = os.getcwd()
+shown = list(flags)
+if "--system-prompt" in shown and shown.index("--system-prompt") + 1 < len(shown):
+    i = shown.index("--system-prompt") + 1
+    shown[i] = "<%d chars>" % len(shown[i])
+entry = {
+    "n": call_no,
+    "account": label,
+    "argv": ["-p"] + shown + ["--", "<%d chars>" % len(user_text)],
+    "flags": flags,
+    "system_prompt": flag("--system-prompt"),
+    "user_text": user_text,
+    "stdin": sys.stdin.read() if not sys.stdin.isatty() else "",
+    "cwd": cwd,
+    "cwd_files": sorted(os.listdir(cwd)),
+    "env": {k: os.environ.get(k) for k in ("ANTHROPIC_API_KEY", "ANTHROPIC_AUTH_TOKEN", "STAFF_TOKEN",
+                                           "CLAUDE_CODE_DISABLE_CLAUDE_MDS", "CLAUDE_CODE_DISABLE_AUTO_MEMORY")},
+}
+with log_path.open("a", encoding="utf-8") as f:
+    f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+
+mode = "limit" if cfg.get("accounts", {}).get(label) == "limit" else cfg.get("mode", "reply")
+
+
+def text_of(value):
+    return value if isinstance(value, str) else json.dumps(value, ensure_ascii=False)
+
+
+def result(text):
+    print(json.dumps({"type": "result", "subtype": "success", "is_error": False, "duration_ms": 5,
+                      "num_turns": 1, "result": text, "stop_reason": "end_turn",
+                      "session_id": "00000000-0000-4000-8000-0000000000%02d" % (call_no % 100),
+                      "total_cost_usd": 0.0}, ensure_ascii=False))
+    sys.exit(0)
+
+
+if mode == "limit":
+    print(json.dumps({"type": "result", "subtype": "success", "is_error": True,
+                      "result": "You've hit your session limit · resets 5pm",
+                      "session_id": "00000000-0000-4000-8000-000000000000"}))
+    sys.exit(1)
+if mode == "model_error":
+    print(json.dumps({"type": "result", "subtype": "error_during_execution", "is_error": True,
+                      "result": "API Error: overloaded", "session_id": "00000000-0000-4000-8000-000000000000"}))
+    sys.exit(1)
+if mode == "empty":
+    result("")
+if mode == "not_json":
+    result("Sorry, I can only help with spa bookings.")
+if mode == "wrong_shape":
+    result(json.dumps([{"date": "2026-10-17", "status": "completed", "cites": [1]}]))
+if mode == "sleep":
+    time.sleep(float(cfg.get("sleep_s", 5)))
+
+replies = cfg.get("replies")
+if isinstance(replies, list) and call_no < len(replies):
+    result(text_of(replies[call_no]))
+result(text_of(cfg.get("reply", {"visits": [], "packages": []})))

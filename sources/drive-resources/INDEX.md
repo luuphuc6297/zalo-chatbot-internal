@@ -1,0 +1,76 @@
+# Drive mirror: #2-thomhouse-resources (folder 16PCTq4ell01tYvITvze6r3cmwGnyc9q9), mirrored 2026-11-08
+
+Original folder names: Facial - Menu chăm sóc da cơ bản; Hair removal - Menu triệt lông; Healing - Menu giúp bạn khỏe; Thư giãn - Menu chăm sóc tóc; thomhouse-space. .DS_Store files skipped.
+
+| Local path | Bytes | Drive ID | MIME |
+|---|---|---|---|
+| thomhouse-menu/facial-cham-soc-da-co-ban/1.png | 2921400 | 1xa8Rvxeie5Zzj86KW6z6MqEcEbKhy7xh | image/png |
+| thomhouse-menu/facial-cham-soc-da-co-ban/10.png | 3853043 | 1vMXklhfNAqoVmVmJIQDh2ahcqzUH7KZw | image/png |
+| thomhouse-menu/facial-cham-soc-da-co-ban/11.png | 3933384 | 1tBiw8svw8CM6SIGmG9uUDGF-0rdNY7oB | image/png |
+| thomhouse-menu/facial-cham-soc-da-co-ban/12.png | 2836813 | 1wSywyzLaThA04bF0mk_tYz1TIH1Em-hU | image/png |
+| thomhouse-menu/facial-cham-soc-da-co-ban/13.png | 2919532 | 1ikVH-ZuIzQu4KGmaE53BNRuk9BHnrEP5 | image/png |
+| thomhouse-menu/facial-cham-soc-da-co-ban/14.png | 3168474 | 1JwrohW_0FznU7JDmTtOERtX6w_pNEAvK | image/png |
+| thomhouse-menu/facial-cham-soc-da-co-ban/15.png | 3193893 | 1kXwl8e6bN-9AZTRz07Y-pAyD2QIqyYQl | image/png |
+| thomhouse-menu/facial-cham-soc-da-co-ban/16.png | 3694721 | 1uCE360tw1EOoSwRNGoaPqyL7LvKHmTvV | image/png |
+| thomhouse-menu/facial-cham-soc-da-co-ban/17.png | 3788357 | 1IjarF1lwYdKd8jg8wbM8MJgKL6ytJoP5 | image/png |
+| thomhouse-menu/facial-cham-soc-da-co-ban/18.png | 3502083 | 1J8Cwcbb4ejSGDFe-2Bdy3l1eWzrIR2sc | image/png |
+| thomhouse-menu/facial-cham-soc-da-co-ban/19.png | 3523451 | 1v1Jx02DiWw-P9mhD3GnCROgljwBR1-ma | image/png |
+| thomhouse-menu/facial-cham-soc-da-co-ban/2.png | 2774682 | 1VOnjLPXeRFm9nfD0-7qL6yxULptMBPnP | image/png |
+| thomhouse-menu/facial-cham-soc-da-co-ban/20.png | 3750768 | 1tGW-flsDLJXps_3fd7YQj7tATrIfPRF9 | image/png |
+| thomhouse-menu/facial-cham-soc-da-co-ban/21.png | 3769441 | 1KLoJvB5qNXhnph_HdeijNAMGBsU1nWjM | image/png |
+| thomhouse-menu/facial-cham-soc-da-co-ban/3.png | 2767935 | 1fuo7Pa1sBIG1Jfj-jeG5PUwxDxSEJieJ | image/png |
+| thomhouse-menu/facial-cham-soc-da-co-ban/4.png | 3155674 | 1WSO-BzHGex1s4n4ItEhrV1NSn1qzlL39 | image/png |
+| thomhouse-menu/facial-cham-soc-da-co-ban/5.png | 3353259 | 14Dcjx6TlIK4pBARhADCk6zY9p1JHzjbL | image/png |
+| thomhouse-menu/facial-cham-soc-da-co-ban/6.png | 2788524 | 1g3_IINoBm8Y-XjdToC4rDdt5tyQR9bHh | image/png |
+| thomhouse-menu/facial-cham-soc-da-co-ban/7.png | 2858867 | 10Lca9EKqvMmlmsOg5y9XYL_u1LdTNgHP | image/png |
+| thomhouse-menu/facial-cham-soc-da-co-ban/8.png | 3003038 | 1XNOMiJ2dXBPye-MlMVqBj6OA54kQzyrZ | image/png |
+| thomhouse-menu/facial-cham-soc-da-co-ban/9.png | 3121913 | 1cW6yChv9WYU-bR6r1_JZ5jPcXgAyEK7M | image/png |
+| thomhouse-menu/hair-removal-triet-long/1.png | 3828422 | 1zt5HgoSHBY9aNPyrLOHexY_T4Oox5xjX | image/png |
+| thomhouse-menu/hair-removal-triet-long/2.png | 2295030 | 1qV9FLqX9eyonFFvD5Rr3ok4yb6tSO3Vv | image/png |
+| thomhouse-menu/hair-removal-triet-long/3.png | 63097 | 1MxW7-RF1qXKA9l1C74vsrSKRHYBAqy5I | image/png |
+| thomhouse-menu/healing-giup-ban-khoe/1.png | 4086915 | 1BH659xZ8LvNrJcXUTzBe94174gyMgNVj | image/png |
+| thomhouse-menu/healing-giup-ban-khoe/10.png | 3552400 | 1sXLVE3WYdTZgx19McFthcbGF9KsOgqlF | image/png |
+| thomhouse-menu/healing-giup-ban-khoe/11.png | 3050940 | 1B9U6bM5rsdag3GXvvuCGQqO_hrGMtMSz | image/png |
+| thomhouse-menu/healing-giup-ban-khoe/12.png | 3645148 | 146TH9-EsBZCR-oWmpEsYaAAmjywSyGly | image/png |
+| thomhouse-menu/healing-giup-ban-khoe/13.png | 3474715 | 1VIw0b_W_RljnhSoqHuhMj8t84bNl3u0K | image/png |
+| thomhouse-menu/healing-giup-ban-khoe/14.png | 2859147 | 102mexXvhtJ9GYsgChOwLPqR0hX-ASMTE | image/png |
+| thomhouse-menu/healing-giup-ban-khoe/15.png | 3169087 | 1HK2KvVkpCdK95NdTxgH2H5W-ugs2IeA_ | image/png |
+| thomhouse-menu/healing-giup-ban-khoe/16.png | 2995654 | 1ESQ0Df4qNEu2NpNdf6Faje7SuVejtKuO | image/png |
+| thomhouse-menu/healing-giup-ban-khoe/17.png | 4243473 | 1Lky1aY5EalgH4ujhgewmOcmgshAgM0X_ | image/png |
+| thomhouse-menu/healing-giup-ban-khoe/18.png | 3694955 | 1nl0E-IBcvhn4Bxp_HTa_Q76V91VbnMPP | image/png |
+| thomhouse-menu/healing-giup-ban-khoe/19.png | 3534770 | 1VyCSQFJRlOk1wDng4Im00JID0z42LGCh | image/png |
+| thomhouse-menu/healing-giup-ban-khoe/2.png | 4385335 | 1cJXzXsq0LXW2MQaHToCkD8C_tA9_3O3d | image/png |
+| thomhouse-menu/healing-giup-ban-khoe/3.png | 4352944 | 1cr0J2peWdSn1tYDGT52B_4mcMEsmWYqX | image/png |
+| thomhouse-menu/healing-giup-ban-khoe/4.png | 4575939 | 1PtKJfRp7BeuL24janZTLv6UWq7GF4_Oz | image/png |
+| thomhouse-menu/healing-giup-ban-khoe/5.png | 3421850 | 1FsAc5kGcN5NmnFwqVyBhUloAEM6LDllT | image/png |
+| thomhouse-menu/healing-giup-ban-khoe/6.png | 2642599 | 11wmX3DK2i3wKe7De6Oo2shTFuUSkYQeY | image/png |
+| thomhouse-menu/healing-giup-ban-khoe/7.png | 2459467 | 1zIqEkgd35ZdtaZ-PZzipFQzzd0n6wLhP | image/png |
+| thomhouse-menu/healing-giup-ban-khoe/8.png | 3529043 | 1JOjtO5xhFezXkntPKPiMSL1KiQokDRjX | image/png |
+| thomhouse-menu/healing-giup-ban-khoe/9.png | 3732707 | 1bytW4jmi-mkv_NMVcnUCwR7bpp_eq1Ul | image/png |
+| thomhouse-menu/thu-gian-cham-soc-toc/1.png | 2044079 | 1DO3AwEXkvvmVasnT5PhmuOWRNtVVPvmv | image/png |
+| thomhouse-menu/thu-gian-cham-soc-toc/10.png | 2137765 | 1u3go1V97jB4MNvEI4jmFypfQxjz71Xw3 | image/png |
+| thomhouse-menu/thu-gian-cham-soc-toc/11.png | 2254526 | 1ydCha0DZ3D3vaYtNSdkFuLSK0xdW0KgX | image/png |
+| thomhouse-menu/thu-gian-cham-soc-toc/12.png | 2210462 | 1Hx3aFIpFhHBBZ3nw23PD2hNuHSfZKjU2 | image/png |
+| thomhouse-menu/thu-gian-cham-soc-toc/13.png | 2507578 | 1IGNOH4AquFHnCqKm24svLQxB7nzvKNA3 | image/png |
+| thomhouse-menu/thu-gian-cham-soc-toc/14.png | 2100547 | 1WEuSs-cdCjjntkoSwFCtdfMFT2tGLu7v | image/png |
+| thomhouse-menu/thu-gian-cham-soc-toc/2.png | 2115202 | 1-MMMqFbKjQD1HlvUbEHzIqad1p6bf-d9 | image/png |
+| thomhouse-menu/thu-gian-cham-soc-toc/3.png | 1588629 | 1kZR3t390vqXiYWZbgN83lF856S0hwjIs | image/png |
+| thomhouse-menu/thu-gian-cham-soc-toc/4.png | 1515714 | 1mWaMhG_Xg_ghBeU1ZfrJDagV2Z7Upcc5 | image/png |
+| thomhouse-menu/thu-gian-cham-soc-toc/5.png | 3512999 | 1_u9Y0X6zUChwzwNb33eypzYvLLd-Rm_M | image/png |
+| thomhouse-menu/thu-gian-cham-soc-toc/6.png | 2790966 | 1Z_0wxhv0LYHFFK0NB9lsL8FlRX_ALyW7 | image/png |
+| thomhouse-menu/thu-gian-cham-soc-toc/7.png | 2774497 | 1jRHatIXjpBhKjKgrruCatxC5J6eDvLN0 | image/png |
+| thomhouse-menu/thu-gian-cham-soc-toc/8.png | 1687005 | 1_gOgHgN1M0JYNH_wtDMFKDHDXF_N4x4c | image/png |
+| thomhouse-menu/thu-gian-cham-soc-toc/9.png | 1770093 | 1bc3qhxpsxxLA0F9qfNJHLM7ovVPIhEHM | image/png |
+| thomhouse-space/IMG_7493.jpg | 1749008 | 1jJpA-RH6xkhqfeyotH1eBHWeOSNDgWcc | image/jpeg |
+| thomhouse-space/IMG_7516.jpg | 3130587 | 1x4jwmYUwNOHfcRMBDx5dPGLntYeSeeaB | image/jpeg |
+| thomhouse-space/IMG_7518.jpg | 2295813 | 1lGhmwjyrOlHvLZJ9kCKgNnH5jLkhzbqv | image/jpeg |
+| thomhouse-space/IMG_7530.jpg | 1320297 | 12T2-y2-PLxi_GfuM0eX90JdyzSN2p22n | image/jpeg |
+| thomhouse-space/IMG_7545.jpg | 2549322 | 1Opnp9x-VMcD64mJ-hHdVnqPyy8pwrJMr | image/jpeg |
+| thomhouse-space/IMG_7560.jpg | 2622162 | 1caJEuwtyzeTHcFjKV6nAx5oZW-BrcgxJ | image/jpeg |
+| thomhouse-space/IMG_7861.jpg | 2350068 | 1YjPOssHLheoEjB3gBkmnKEdGdPipOwey | image/jpeg |
+| thomhouse-space/IMG_7864.jpg | 1412889 | 1hiHIcvx-xQs68i141QQ_qSG3QbwaM_u4 | image/jpeg |
+| thomhouse-space/IMG_7874.jpg | 2024786 | 1NGMrFsKxutycscXhaN5awz9zkgPNv3BT | image/jpeg |
+| thomhouse-space/IMG_7882.jpg | 2348607 | 1W3UBN_6zzRdWexnxMzNnaErjPGC_f2UU | image/jpeg |
+| thomhouse-space/IMG_7890.jpg | 1848298 | 1bZ0SxtPUXbfj0xju2-iXEgvb00bfjo2K | image/jpeg |
+| thomhouse-space/IMG_7891.jpg | 1278916 | 13G5415r9VB00olFMhUjlQsT1bmqmstdU | image/jpeg |
+| voice-chi-Thom.m4a | 267889 | 1LMnjmjkIAwwA8jUEGxXYdhV-gtmMsgFD | audio/x-m4a |

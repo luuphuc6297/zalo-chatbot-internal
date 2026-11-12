@@ -1,0 +1,90 @@
+ Bảng giá và hướng dẫn tính giá ZBS Template Message | Zalo Business Solutions 
+ Giải pháp 
+ Đối tác 
+ Tài nguyên 
+ Liên hệ 
+ Loading...
+ Loading...
+ Business Message 
+ Giới thiệu Tài liệu hướng dẫn Bảng giá Chính sách dịch vụ 
+ Bảng giá
+ Ước tính đơn giá Template
+ Chọn loại Template và nút thao tác tương ứng để ước tính chi phí dự kiến.
+ Chọn loại Template Xem bảng giá 
+ Template tuỳ chỉnh
+ Từ -đ/tin
+ Template xác thực
+ Từ -đ/tin
+ Template đánh giá dịch vụ
+ Từ -đ/tin
+ Template yêu cầu chuyển khoản
+ Từ -đ/tin
+ Template voucher
+ Từ -đ/tin
+ Nút thao tác Xem bảng giá 
+ Nút thao tác 1 
+ Nút thao tác 2 
+ Nút thao tác 3 
+ Thêm thành phần đặc biệt Xem bảng giá 
+ Thêm hình ảnh 
+ Xem trước Template
+ Xác nhận đơn hàng
+ Cám ơn < customer_name > đã tin tưởng. Chúng tôi đã nhận được yêu cầu đặt hàng từ bạn. Thông tin chi tiết đơn hàng:
+ Mã đơn
+ < order_code > 
+ Trạng thái
+ < payment_status > 
+ Giá tiền
+ < cost > 
+ Ghi chú
+ < note > 
+ Template tuỳ chỉnh - VNĐ Đơn giá dự kiến  Khi gửi tin qua UID, đối tác sẽ được áp dụng mức trợ giá thấp hơn đơn giá gửi qua SĐT. Mức ưu đãi này sẽ thay đổi dựa trên phân loại, thành phần (component), CTA,… của ZBS Template Message được tạo. Và có thể sẽ thay đổi cho đến khi có thông báo mới. 
+ Gửi qua SĐT - VNĐ/tin Gửi qua UID - VNĐ/tin 
+ Đơn giá tính theo loại Template
+ Đơn giá theo loại Template ở trạng thái xử lý thành công như sau:
+ Loại mẫu Template
+ Đơn giá (VNĐ) 
+ Template xác thực
+ 300
+ Template yêu cầu chuyển khoản
+ 300
+ Template voucher
+ 300
+ Template vé xe khách (Beta) 
+ 300
+ Template hành trình dành cho ngành hàng đặc biệt (*)
+ Từ 200
+ Các loại còn lại
+ 200
+ (*) Ghi chú: Đơn giá của Template hành trình áp dụng cho ngành hàng đặc biệt (nhóm ngành Giao hàng, vận chuyển hàng hóa; Vận chuyển hành khách) đạt nguyên tắc và điều kiện áp dụng theo từng thời điểm.
+ Vui lòng liên hệ kênh hỗ trợ support@zalo.solutions để biết thông tin chi tiết.
+ Đơn giá tính trên nút thao tác
+ Mỗi nút thao tác là đường dẫn (link) dưới dạng nút trong Template. Tuỳ theo mục đích sử dụng nút thao tác sẽ được áp dụng giá như sau:
+ Hạng mục sử dụng
+ Đơn giá (VNĐ) 
+ (**) Ghi chú: Nút đầu tiên thuộc hạng mục/phân loại tương ứng: 0 VNĐ
+ Từ nút thứ 2 thuộc hạng mục/phân loại này áp dụng đơn giá 100 VNĐ cho mỗi nút.
+ Đơn giá thành phần đặc biệt
+ Mỗi thành phần đặc biệt được gắn trong Template tùy theo mục đích sử dụng, được áp dụng với mức giá như sau:
+ Thành phần
+ Giá (VNĐ) 
+ Hình ảnh
+ NaN
+ Nút phản hồi (Beta)
+ 100
+ Đơn giá dịch vụ ZBS Template Message nâng cao
+ Dịch vụ
+ Giá (VNĐ) 
+ Lệnh cấp quyền gọi
+ 400
+ *Đơn giá chưa bao gồm thuế GTGT. Vui lòng tham khảo Chính sách & Điều khoản Zalo Business Solutions để biết thêm chi tiết.
+ Trung tâm giải pháp Zalo dành cho Doanh nghiệp
+ © Zalo Platforms
+ Giải pháp
+ Zalo Official Account Business Message Zalo Mini App Zalo AI 
+ Tài nguyên
+ Thông tin liên hệ
+ Email: support@zalo.solutions 
+ Địa chỉ: UOA Tower, 6 Tân Trào, Phường Tân Mỹ, Thành phố Hồ Chí Minh, Việt Nam 
+ Quản lý tài khoản 
+ Quản lý tài khoản 

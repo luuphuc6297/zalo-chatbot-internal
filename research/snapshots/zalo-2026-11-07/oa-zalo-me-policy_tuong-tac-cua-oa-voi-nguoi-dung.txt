@@ -1,0 +1,59 @@
+ Chính sách về tương tác của OA với người dùng | Zalo Official Account 
+ Skip to main content 
+ CHÍNH SÁCH
+ Chính sách về đăng ký và sử dụng tài khoản OA 
+ Chính sách về đặt tên OA 
+ Chính sách về thông tin giới thiệu và hình ảnh OA 
+ Chính sách xác thực tài khoản 
+ Chính sách về tính năng quản lý nhóm (GMF) 
+ Chính sách về việc khóa Official Account (gọi tắt là OA) 
+ Chính sách phát triển Tiện ích (Extension) 
+ Chính sách kiểm duyệt thông tin Tiện ích (Extension) 
+ Chính sách sử dụng Tiện ích (Extension) 
+ Chính sách xử lý tranh chấp thương hiệu 
+ Chính sách đăng ký URL tùy biến 
+ Chính sách về tương tác của OA với người dùng 
+ Chính sách về tương tác của OA với người dùng 
+ On this page 
+ Chính sách về tương tác của OA với người dùng
+ I. Điều kiện áp dụng ​ 
+ Chính sách này áp dụng cho tất cả các tài khoản Zalo Official Account (gọi tắt là OA) tương tác với người dùng Zalo.
+ Bên cạnh việc tuân thủ các nội dung được nêu trong Chính sách này, Doanh nghiệp chủ quản hoặc đơn vị chủ quản của tài khoản OA cần tuân thủ các chính sách và quy định chung từ nền tảng Zalo Official Account.
+ 🚩 Lưu ý: BQT ZOA có toàn quyền sửa đổi, bổ sung bất kỳ hoặc toàn bộ nội dung của chính sách này tại bất cứ thời điểm nào mà không cần báo trước hoặc cần có sự đồng ý của OA.
+ II. Cơ chế kiểm soát tương tác từ OA: ​ 
+ Nền tảng Zalo OA rà soát hoạt động của các OA và gửi cảnh báo khi phát hiện dấu hiệu hoặc hành vi vi phạm chính sách gửi tin nhắn (nội dung, tần suất, ngữ cảnh, ... không phù hợp), gây phiền hà, hoặc có tỷ lệ báo xấu, khiếu nại nghiêm trọng từ người dùng.
+ Người dùng Zalo có toàn quyền chủ động chặn nhận tương tác của OA bất kỳ lúc nào.
+ III. Quy định và xử lý vi phạm gửi tin nhắn ​ 
+ 1/ Quy định ​ 
+ Zalo Official Account không cho phép việc OA gửi tin nhắn, bằng cách thủ công hoặc tự động, có nội dung, tần suất, ngữ cảnh không phù hợp, cũng như sử dụng tin nhắn để quấy rối, gây phiền và tác động tiêu cực đến người dùng.
+ Các hành vi nghiêm cấm bao gồm nhưng không giới hạn:
+ Gửi tin nhắn đến người dùng với nội dung phản cảm, nhạy cảm, vi phạm thuần phong mỹ tục, vi phạm quy định của các Cơ quan Nhà nước, vi phạm luật pháp nước Cộng hòa xã hội chủ nghĩa Việt Nam.
+ Gửi tin nhắn đến người dùng với tần suất, nội dung, ngữ cảnh không phù hợp, hoặc không liên quan đến người dùng.
+ Gửi tin nhắn với nội dung sai lệch, chưa được kiểm chứng, không rõ ràng, không có thật, không phù hợp với ngành nghề doanh nghiệp đã đăng ký với BQT ZOA.
+ Gửi tin nhắn với nội dung có dấu hiệu giả mạo cá nhân/tổ chức, lừa đảo, gian lận.
+ Sử dụng sai mục đích các loại tin của Zalo Official Account. Tham khảo mục đích sử dụng các loại tin tại đây .
+ Hạn mức tin nhắn có mục đích truyền thông mà mỗi OA được phép gửi tới một người quan tâm được giới hạn ở mức tối đa 01 tin/ngày và 30 tin/tháng.
+ Với việc OA vi phạm quy định này, chúng tôi có toàn quyền thực hiện các biện pháp xử lý phù hợp nhằm đảm bảo trải nghiệm của người dùng Zalo.
+ 2/ Xử lý vi phạm ​ 
+ Trong trường hợp OA bị ghi nhận tỷ lệ báo xấu bất thường từ người dùng, quản trị viên (admin) của OA sẽ nhận được cảnh báo từ Zalo Official Acount, thông qua tin nhắn đến từ OA Zalo Official Account để yêu cầu phối hợp rà soát, kiểm tra và khắc phục.
+ Dựa trên số lần vi phạm được ghi nhận trong 12 tuần gần nhất, chúng tôi sẽ tiến hành xử lý OA với các mức xử lý như sau:
+ Diễn giải cách áp dụng các mức xử lý vi phạm:
+ 🚩 Lưu ý: 
+ Hệ thống sẽ tự động phát hiện và chặn các luồng gửi tin có dấu hiệu gây phiền tới người dùng.
+ Trong trường hợp nhận được khiếu nại gay gắt từ phía người dùng Zalo hoặc phát hiện OA đang vi phạm nghiêm trọng chính sách/quy định của Zalo Official Account, chúng tôi có quyền khóa tạm thời/vĩnh viễn OA hoặc thực hiện các biện pháp xử lý bổ sung khác. Tham khảo thêm Chính sách về việc khóa Official Account tại đây .
+ 3/ OA cần làm gì để tránh vi phạm quy định về gửi tin nhắn từ Zalo Official Account? ​ 
+ Quý đối tác là doanh nghiệp chủ quản hoặc đơn vị chủ quản của tài khoản OA cần đảm bảo tính chuyên nghiệp trong việc gửi tin nhắn để tránh vi phạm quy định về gửi tin và nhận báo xấu từ người dùng.
+ Chúng tôi khuyến nghị Quý đối tác nên thực hiện các biện pháp sau:
+ Gửi tin nhắn đến người dùng với tần suất hợp lý, nội dung rõ ràng, đúng chính tả, đúng thông tin người nhận, phù hợp với nhu cầu trao đổi thông tin, sử dụng sản phẩm/dịch vụ của người dùng.
+ Xây dựng quy trình ghi nhận, theo dõi các phản hồi tiêu cực, báo xấu từ người dùng nhằm có sự điều chỉnh kịp thời. Lắng nghe và tôn trọng ý kiến của người dùng, cải thiện nội dung và tần suất gửi tin nhắn để phù hợp với các đối tượng người nhận khác nhau. Ngừng gửi tin nhắn ngay lập tức nếu người dùng không còn nhu cầu tiếp tục nhận tin.
+ Trong trường hợp OA thực hiện gửi tin nhắn qua Zalo OA OpenAPI, vui lòng kiểm tra kỹ danh sách người nhận tin để đảm bảo tin nhắn được gửi đến đúng đối tượng người nhận.
+ Sử dụng đúng mục đích các loại tin của Zalo Official Account.
+ -------------------------------------
+ Nếu có thắc mắc khác, vui lòng cung cấp OA ID và gửi email hoặc chat với BQT ZOA để được phản hồi sớm nhất.
+ Previous
+ Chính sách đăng ký URL tùy biến
+ I. Điều kiện áp dụng 
+ II. Cơ chế kiểm soát tương tác từ OA: 
+ III. Quy định và xử lý vi phạm gửi tin nhắn 1/ Quy định 
+ 2/ Xử lý vi phạm 
+ 3/ OA cần làm gì để tránh vi phạm quy định về gửi tin nhắn từ Zalo Official Account? 

@@ -1,0 +1,8 @@
+{
+  "name": "thomhouse-pnpm",
+  "private": true,
+  "description": "The pnpm the installer puts into ~/ThomHouse/runtime with npm ci. Keep the version equal to packageManager of the root package.json; scripts/release/refresh_pins.py writes package-lock.json beside this file.",
+  "dependencies": {
+    "pnpm": "10.32.1"
+  }
+}

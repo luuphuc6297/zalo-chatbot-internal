@@ -1,0 +1,51 @@
+# Files that make_release.py packs into a release (docs/contracts.md 16.2.3). One glob per line: * and ? stay
+# inside one folder, **/ is any number of folders, a trailing /** is everything below. "(except GLOB)" removes the
+# paths that GLOB matches from that line; "(optional)" allows a line that matches no file, any other line that
+# matches nothing fails the build. Files matching **/__pycache__/**, **/*.pyc, **/*.test.ts, **/*.test.tsx and
+# **/.DS_Store are dropped silently.
+package.json
+pnpm-lock.yaml
+pnpm-workspace.yaml
+apps/server/src/**
+apps/server/migrations/*.sql
+apps/server/scripts/**
+apps/server/package.json
+apps/server/tsconfig.json
+apps/server/wrangler.toml
+apps/server/.dev.vars.example
+apps/console/src/**
+apps/console/index.html
+apps/console/package.json
+apps/console/tsconfig.json
+apps/console/vite.config.ts
+apps/console/.env.example
+apps/desktop/main.js
+apps/desktop/preload.js
+apps/desktop/package.json
+apps/runner/runner/**
+apps/runner/.env.example
+apps/zalo-bridge/bridge/**
+apps/zalo-bridge/.env.example
+scripts/start_local.sh
+scripts/stop_local.sh
+scripts/seed_dev.py
+scripts/build_menu_images.py
+scripts/runner/claude_pool.py
+scripts/analyze_contacts.py
+scripts/import_visits.py
+scripts/analyze_visits.py
+scripts/visit_rules.py
+scripts/contact_facts_rules.py
+scripts/visit_model_pass.py
+data/services.json
+data/business-facts.json
+data/menu-images.json
+data/reply-templates.json
+design/system-prompt-draft.md
+design/tools-schema.json
+tools/zalo-agent/package.json
+tools/zalo-agent/package-lock.json
+tools/openmausbot/package.json
+tools/openmausbot/package-lock.json
+install/**                            (except install/tests/**)
+docs/cai-dat-may-moi.md

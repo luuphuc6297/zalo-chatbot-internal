@@ -1,0 +1,57 @@
+ Biểu mẫu thu thập thông tin | Zalo Official Account 
+ Skip to main content 
+ HƯỚNG DẪN VẬN HÀNH
+ Đăng ký và Xác thực 
+ Thanh toán 
+ Thiết lập tài khoản OA 
+ Quản lý nội dung 
+ Tin nhắn 
+ Công cụ gửi tin 
+ Gọi thoại 
+ Quản lý hội thoại 
+ Nhóm Chat GMF 
+ Tối ưu vận hành 
+ Quản lý Khách hàng 
+ Biểu mẫu thu thập thông tin 
+ Báo cáo thống kê 
+ Mini App - OA Manager trên điện thoại 
+ Hướng dẫn sử dụng Zalo Chatbot 
+ Mở rộng 
+ Nhà phát triển 
+ Tối ưu vận hành 
+ Biểu mẫu thu thập thông tin 
+ On this page 
+ Biểu mẫu thu thập thông tin
+ Biểu mẫu thu thập thông tin là công cụ cho phép khách hàng chia sẻ thông tin với OA, hỗ trợ Doanh nghiệp xây dựng hồ sơ khách hàng trên CRM tại OA Manager. OA có thể linh hoạt tùy chỉnh nội dung biểu mẫu và các trường thông tin cần khách hàng cung cấp theo nhu cầu doanh nghiệp. 
+ ⚠️ Lưu ý: Để sử dụng tính năng này, OA cần đăng ký Gói dịch vụ phù hợp. Chi tiết vui lòng xem tại đây .
+ Thiết lập thông tin biểu mẫu ​ 
+ Bước 1: Thiết lập trường thông tin khách hàng
+ Trường thông tin cần được tạo trước tại tab  Khách hàng . Truy cập mục  Trường thông tin KH hoặc nhấn vào  https://oa.zalo.me/manage/customerfield để tạo. Xem thêm hướng dẫn  Quản lý thông tin Khách hàng tại đây .
+ Bước 2:  Cài đặt biểu mẫu: Trên tab  Quản lý ➞ chọn  Thiết lập công cụ chat. 
+ 👉 Chọn  Biểu mẫu thu thập thông tin , hoặc truy cập  https://oa.zalo.me/manage/chatsetting-form ,  bao gồm: 
+ Chỉnh sửa các trường thông tin trong biểu mẫu gửi tới khách hàng: Nhấn  Chỉnh sửa tại (1) trong hình bên dưới. Admin OA có thể tuỳ chỉnh biểu mẫu thu thập thông tin: tên và hình của biểu mẫu, nội dung trên biểu mẫu và thêm/bớt các trường thông tin đã tạo vào biểu mẫu.
+ Chỉnh sửa nội dung tin nhắn gửi kèm biểu mẫu tới khách hàng: Thao tác như (2) trong hình bên dưới để thêm hình banner và nội dung của tin nhắn gửi biểu mẫu.
+ Tại (3), chia sẻ biểu mẫu tới khách hàng, xem thêm hướng dẫn chi tiết ở bên dưới.
+ Gửi biểu mẫu đến khách hàng ​ 
+ 1/ Chia sẻ biểu mẫu tới đa nền tảng với QR/ link ​ 
+ OA có thể chia sẻ biểu mẫu rộng rãi tới khách hàng trên các nền tảng qua tính năng  Chia sẻ link và  Mã QR .
+ 2/ Gửi biểu mẫu qua OA Manager ngay tại khung chat ​ 
+ Tại khung Chat 1:1 , admin OA gửi biểu mẫu cho khách hàng bằng cách chọn Gửi biểu mẫu thu thập thông tin . Khi khách hàng điền biểu mẫu và gửi, thông tin sẽ được tự động cập nhật. Admin OA xem thông tin tại mục  Khách hàng .
+ Admin OA có thể chủ động xem và chỉnh sửa thông tin khách hàng bất cứ khi nào, bằng cách chọn Xem và chỉnh sửa thông tin . Các thông tin hiển thị để chỉnh sửa sẽ cần được thiết lập tại mục  Quản lý ➞ Thiết lập công cụ chat ➞ Hiển thị thông tin khách hàng . Xem hướng dẫn tiếp theo.
+ Hiển thị thông tin khách hàng ​ 
+ Các thông tin được khách hàng cung cấp theo biểu mẫu sẽ được lưu trữ và hiển thị ở mục Khách hàng , đồng thời hiển thị ngay trên khung Chat 1:1 .
+   👉 Thiết lập các trường thông tin được hiển thị: 
+ Trên tab  Quản lý ➞ Thiết lập công cụ chat ➞ Hiển thị thông tin khách hàng hoặc truy cập   https://oa.zalo.me/manage/chatsetting 
+ Tại đây, admin OA có thể tuỳ chỉnh hiển thị thông tin khách hàng trong khung Chat 1:1 , thêm tối đa 15 trường thông tin và 5 trường đầu tiên sẽ được ghim lên đầu khung chat. ​  
+ Thông tin đã chia sẻ qua biểu mẫu được hiển thị ở Chat 1:1 với khách hàng.
+ ​
+  –---------------
+ ​Nếu cần hỗ trợ thêm, vui lòng cung cấp OA ID và  gửi email hoặc  chat với BQT ZOA để được phản hồi sớm nhất.
+ Previous
+ Quản lý Khách hàng
+ Next
+ Báo cáo thống kê
+ Thiết lập thông tin biểu mẫu 
+ Gửi biểu mẫu đến khách hàng 1/ Chia sẻ biểu mẫu tới đa nền tảng với QR/ link 
+ 2/ Gửi biểu mẫu qua OA Manager ngay tại khung chat 
+ Hiển thị thông tin khách hàng 

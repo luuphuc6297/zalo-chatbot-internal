@@ -1,0 +1,377 @@
+#!/usr/bin/env python3
+"""Fake `openmausbot` CLI (the rooms platform) for runner tests. Never contacts a platform server.
+
+The runner calls the CLI with a minimal environment, so the behaviour file sits in the data folder:
+  $OMB_DATA_DIR/fake-openmausbot.json
+    {"mode": "reply" | "reply_with_ticket_leak" | "reply_with_mention" | "no_profile_call" | "sleep" | "error" |
+             "wrong_bot" | "empty" | "sentinel" | "garbage" | "idle",
+     "reply": "...", "sleep_s": 30, "log": "/path/calls.jsonl", "home": "<THOMHOUSE_BOT_HOME>",
+     "fail": {"team": 1, "bots": 1, "channels": 1, "send": 1, "wait": 1, "interrupt": 1},  exit code of that command
+     "use_tools_server": false,     true: the bots call the tools server of config.json (mcpServers.thom) for real
+     "bot_ids": {"Bot dịch vụ": "bot_lead"},      id given to a bot `team apply` creates (defaults: bot_lead,
+                                                   bot_customer); an existing record of bots.json keeps its id
+     "skip_bots": ["Bot dịch vụ"]}                 bots `team apply` does not create (a platform that lost one)
+State (rooms, messages, send ids, room jobs, interrupts) is kept in $OMB_DATA_DIR/fake-state.json. As the platform,
+`team apply` keeps its bot records in $OMB_DATA_DIR/bots.json (an array of {id, name, title, section, chiefOfStaff,
+cwd}), and `bots` lists them. As the platform, the lead bot's room turn runs in $OMB_DATA_DIR/workspaces/<its id>:
+when its instructions say the reply rules are in the project file (they contain KHONG-CO-QUY-TAC) and that folder
+has no CLAUDE.md starting with the rules header, the lead answers KHONG-CO-QUY-TAC.
+
+Commands, each with --json:
+  team apply FILE [--wait-idle D] [--dry-run]       creates the bots and the rooms of the file
+  bots                                              {"bots": [{"id", "name", "title", "section", "chiefOfStaff"}]}
+  channels                                          {"channels": [{"id", "name", "memberIds"}]}
+  send --channel ID (TEXT | -) [--send-id ID]       a text that starts with "@Bot dịch vụ" starts a room job
+  wait --channel ID [--for job] [--since MS] [--timeout D]
+  interrupt --channel ID [--tree]
+  messages --channel ID
+Exit codes as the real CLI: 0 done, 1 failed, 2 usage, 4 timeout. Every call is logged as one JSON line:
+{"argv", "stdin", "env_names", "path_first", "data_dir"}.
+"""
+import fcntl, json, os, re, subprocess, sys, time
+from pathlib import Path
+
+LEAD, CUSTOMER = "Bot dịch vụ", "Bot khách hàng"
+DEFAULT_IDS = {LEAD: "bot_lead", CUSTOMER: "bot_customer"}
+RULES_MARKER, RULES_SENTINEL = "# Quy tắc trả lời khách của thom house", "KHONG-CO-QUY-TAC"
+SOUL_MAX_BYTES = 24000
+DEFAULT_REPLY = ("Dạ chị Lan ơi, gội đầu dưỡng sinh bên em giá 199.000đ ạ.\n"
+                 "Chị muốn ghé hôm nào để em giữ chỗ cho chị ạ?")
+BRIEFING = "Xưng hô: chị Lan\nTình trạng: khách quen, đã đến 7 lần\nMức chi tiêu: vừa"
+TICKET_RE = re.compile(r"\[phiếu: (tk_[0-9a-f]{32})\]")
+DURATION_RE = re.compile(r"^(\d+(?:\.\d+)?)(ms|s|m|h|d)?$")
+UNIT_S = {"ms": 0.001, "s": 1, "m": 60, "h": 3600, "d": 86400}
+FLAGS = ("--json", "--tree", "--dry-run")
+
+DATA = Path(os.environ["OMB_DATA_DIR"])
+cfg = json.loads((DATA / "fake-openmausbot.json").read_text(encoding="utf-8"))
+argv = sys.argv[1:]
+stdin_data = sys.stdin.read()
+
+if cfg.get("log"):
+    with open(cfg["log"], "a", encoding="utf-8") as f:
+        f.write(json.dumps({"argv": argv, "stdin": stdin_data, "env_names": sorted(os.environ),
+                            "path_first": os.environ.get("PATH", "").split(os.pathsep)[0],
+                            "data_dir": str(DATA)}, ensure_ascii=False) + "\n")
+
+
+class State:
+    """fake-state.json under an exclusive lock. Never held while sleeping."""
+
+    def __enter__(self):
+        self.lock = open(DATA / "fake-state.lock", "w")
+        fcntl.flock(self.lock, fcntl.LOCK_EX)
+        try:
+            self.data = json.loads((DATA / "fake-state.json").read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            self.data = {"channels": {}, "messages": {}, "sends": {}, "jobs": {}, "clock": 0, "applies": 0,
+                         "team": {}, "interrupts": [], "tool_results": []}
+        return self.data
+
+    def __exit__(self, *exc):
+        (DATA / "fake-state.json").write_text(json.dumps(self.data, ensure_ascii=False), encoding="utf-8")
+        fcntl.flock(self.lock, fcntl.LOCK_UN)
+        self.lock.close()
+
+
+def tick(st):
+    """A strictly increasing millisecond clock, so that message order is never ambiguous."""
+    st["clock"] = max(int(time.time() * 1000), st["clock"] + 1)
+    return st["clock"]
+
+
+def out(obj, code=0):
+    print(obj if isinstance(obj, str) else json.dumps(obj, ensure_ascii=False))
+    sys.exit(code)
+
+
+def parse(args):
+    opts, pos, i = {}, [], 0
+    while i < len(args):
+        a = args[i]
+        if a in FLAGS:
+            opts[a] = True
+        elif a.startswith("--"):
+            opts[a] = args[i + 1] if i + 1 < len(args) else ""
+            i += 1
+        else:
+            pos.append(a)
+        i += 1
+    return opts, pos
+
+
+def duration_s(text, default):
+    m = DURATION_RE.match(text or "")
+    return float(m.group(1)) * UNIT_S[m.group(2) or "ms"] if m else default
+
+
+def injected_failure(name):
+    code = (cfg.get("fail") or {}).get(name)
+    if code:
+        out({"success": False, "error": "injected failure: " + name}, int(code))
+
+
+def read_registry():
+    try:
+        data = json.loads((DATA / "bots.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return []
+    return [r for r in data if isinstance(r, dict)] if isinstance(data, list) else []
+
+
+def write_registry(records):
+    path = DATA / "bots.json"
+    tmp = DATA / ".bots.json.tmp"
+    tmp.write_text(json.dumps(records, ensure_ascii=False), encoding="utf-8")
+    os.chmod(tmp, 0o600)
+    os.replace(tmp, path)
+
+
+def lead_sees_rules(st):
+    """Whether the lead bot's room turn would find its reply rules: always when they are in its instructions,
+    else only through CLAUDE.md in its platform workspace (never its configured cwd)."""
+    if not (st.get("team") or {}).get("rules_in_project_file"):
+        return True
+    lead = next((r for r in read_registry() if r.get("name") == LEAD), None)
+    if lead is None:
+        return False
+    try:
+        return (DATA / "workspaces" / lead["id"] / "CLAUDE.md").read_text(encoding="utf-8").startswith(RULES_MARKER)
+    except OSError:
+        return False
+
+
+def channel_name(st, ch):
+    for name, c in st["channels"].items():
+        if c["id"] == ch:
+            return name
+    return None
+
+
+def call_tools_server(bot, calls):
+    """Run the real tools server of config.json once, as the platform does per bot turn. Returns one
+    {"tool", "is_error", "text"} per call."""
+    server = json.loads((DATA / "config.json").read_text(encoding="utf-8"))["mcpServers"]["thom"]
+    cwd = DATA / "workspaces" / bot
+    cwd.mkdir(parents=True, exist_ok=True)
+    lines = [{"jsonrpc": "2.0", "id": 1, "method": "initialize", "params": {"protocolVersion": "2025-06-18"}},
+             {"jsonrpc": "2.0", "method": "notifications/initialized"}]
+    for i, (name, args) in enumerate(calls):
+        lines.append({"jsonrpc": "2.0", "id": 10 + i, "method": "tools/call",
+                      "params": {"name": name, "arguments": args}})
+    p = subprocess.run([server["command"], *server.get("args", [])],
+                       input="".join(json.dumps(l, ensure_ascii=False) + "\n" for l in lines),
+                       capture_output=True, text=True, encoding="utf-8", timeout=40, cwd=str(cwd),
+                       env={"PATH": os.environ.get("PATH", ""), **(server.get("env") or {})})
+    by_id = {}
+    for line in p.stdout.splitlines():
+        try:
+            msg = json.loads(line)
+        except ValueError:
+            continue
+        by_id[msg.get("id")] = msg
+    results = []
+    for i, (name, _) in enumerate(calls):
+        res = (by_id.get(10 + i) or {}).get("result") or {}
+        text = ((res.get("content") or [{}])[0]).get("text", "")
+        results.append({"tool": name, "is_error": bool(res.get("isError", True)), "text": text,
+                        "stderr": p.stderr[-400:]})
+    return results
+
+
+def bots_work(ticket):
+    """What the two bots do during a room job: the customer bot reads the profile, the lead bot quotes a price.
+    Returns the reply text built from the tool results, or None when the tools are not called for real."""
+    mode = cfg.get("mode", "reply")
+    if mode == "no_profile_call" or not ticket:
+        return None
+    if not cfg.get("use_tools_server"):
+        path = Path(cfg["home"]) / "rooms" / "tickets" / (ticket + ".calls.jsonl")
+        with open(path, "a", encoding="utf-8") as f:
+            f.write(json.dumps({"tool": "get_customer_profile", "is_error": False, "bot": "bot_customer",
+                                "at": int(time.time() * 1000)}) + "\n")
+        return None
+    results = call_tools_server("bot_customer", [("get_customer_profile", {"ticket": ticket})])
+    results += call_tools_server("bot_lead", [("quote_price", {"service_id": "svc_goi_dau", "ticket": ticket})])
+    with State() as st:
+        st["tool_results"].extend(results)
+    try:
+        profile, price = json.loads(results[0]["text"]), json.loads(results[1]["text"])
+        return "Dạ {} {} ơi, gội đầu dưỡng sinh bên em giá {} ạ.".format(
+            profile["address_term"], profile["name_to_use"], price["price_text"])
+    except (ValueError, KeyError, TypeError):
+        return "Dạ em chưa tra được thông tin, chị chờ em một chút ạ."
+
+
+def cmd_team_apply(opts, pos):
+    injected_failure("team")
+    try:
+        doc = json.loads(Path(pos[2]).read_text(encoding="utf-8"))
+    except (OSError, ValueError, IndexError):
+        out({"success": False, "error": "team file is not readable"}, 2)
+    bots = doc.get("bots") or []
+    names = [b.get("name") for b in bots]
+    if doc.get("version") != 1 or len(set(names)) != len(names):
+        out({"success": False, "error": "invalid team file"}, 2)
+    for b in bots:
+        if len((b.get("soul") or "").encode("utf-8")) > SOUL_MAX_BYTES:
+            out({"success": False, "error": "soul is too long: " + str(b.get("name"))}, 2)
+    if opts.get("--dry-run"):
+        out({"success": True, "dryRun": True})
+    with State() as st:
+        st["applies"] += 1
+        st["team"] = {"defaults": doc.get("defaults"), "teams": [t.get("name") for t in doc.get("teams") or []],
+                      "bots": [{k: v for k, v in b.items() if k != "soul"} for b in bots],
+                      "soul_bytes": {b.get("name"): len((b.get("soul") or "").encode("utf-8")) for b in bots},
+                      "wait_idle": opts.get("--wait-idle"),
+                      "rules_in_project_file": any(RULES_SENTINEL in (b.get("soul") or "")
+                                                   for b in bots if b.get("name") == LEAD)}
+        ids, skip = {**DEFAULT_IDS, **(cfg.get("bot_ids") or {})}, set(cfg.get("skip_bots") or [])
+        registry = read_registry()
+        by_name = {r.get("name"): r for r in registry}
+        for b in bots:
+            name = b.get("name")
+            if name in skip:
+                continue
+            rec = by_name.get(name)
+            if rec is None:
+                rec = {"id": ids.get(name) or "bot_{}".format(len(registry) + 1), "name": name}
+                registry.append(rec)
+                by_name[name] = rec
+            rec.update({"title": b.get("title"), "section": (doc.get("defaults") or {}).get("team"),
+                        "chiefOfStaff": bool(b.get("chief")), "cwd": b.get("cwd")})
+        write_registry(registry)
+        for room in doc.get("rooms") or []:
+            if room["name"] not in st["channels"]:
+                ch = "ch_{}".format(len(st["channels"]) + 1)
+                st["channels"][room["name"]] = {"id": ch, "members": room.get("members") or [],
+                                                "responder": room.get("responder")}
+                st["messages"][ch] = []
+    out({"success": True, "dryRun": False})
+
+
+def cmd_bots(opts, pos):
+    injected_failure("bots")
+    out({"bots": [{"id": r.get("id"), "name": r.get("name"), "title": r.get("title"), "section": r.get("section"),
+                   "chiefOfStaff": bool(r.get("chiefOfStaff"))} for r in read_registry()]})
+
+
+def cmd_channels(opts, pos):
+    injected_failure("channels")
+    with State() as st:
+        chans = [{"id": c["id"], "name": name, "memberIds": ["bot_lead", "bot_customer"]}
+                 for name, c in st["channels"].items()]
+    out({"channels": chans})
+
+
+def cmd_send(opts, pos):
+    injected_failure("send")
+    ch, sid = opts.get("--channel"), opts.get("--send-id")
+    text = stdin_data if "-" in pos else (opts.get("--text") or (pos[1] if len(pos) > 1 else ""))
+    with State() as st:
+        if ch not in st["messages"]:
+            out({"success": False, "error": "channel not found"}, 1)
+        if sid and sid in st["sends"]:
+            out(st["sends"][sid])                       # same send id: same result, no second message
+        at = tick(st)
+        mid = "m_{}".format(at)
+        st["messages"][ch].append({"id": mid, "at": at, "role": "user", "kind": "text", "text": text})
+        result = {"success": True, "channelId": ch, "taskId": "task_" + ch, "messageId": mid, "at": at}
+        if text.startswith("@" + LEAD):
+            m = TICKET_RE.search(text)
+            st["jobs"][ch] = {"at": at, "taskId": result["taskId"], "ticket": m.group(1) if m else None}
+        if sid:
+            st["sends"][sid] = result
+    out(result)
+
+
+def cmd_wait(opts, pos):
+    injected_failure("wait")
+    ch, mode = opts.get("--channel"), cfg.get("mode", "reply")
+    with State() as st:
+        job = st["jobs"].get(ch)
+        history = list(st["messages"].get(ch) or [])
+    if job is None or mode == "idle":
+        out({"status": "settled", "state": "idle", "targetType": "channel", "targetId": ch, "messages": history,
+             "hasMore": False})
+    if mode == "garbage":
+        out("Waiting for the room job... this is not JSON")
+    if mode == "error":
+        with State() as st:
+            st["jobs"].pop(ch, None)
+        out({"status": "settled", "state": "idle", "exitCode": 1, "targetType": "channel", "targetId": ch,
+             "messages": history, "hasMore": False}, 1)
+    if mode == "sleep":
+        sleep_s, timeout_s = float(cfg.get("sleep_s", 30)), duration_s(opts.get("--timeout"), 1800.0)
+        if sleep_s > timeout_s:
+            time.sleep(timeout_s)
+            out({"status": "timeout", "state": "running", "targetType": "channel", "targetId": ch}, 4)
+        time.sleep(sleep_s)
+
+    ticket = job.get("ticket")
+    built = bots_work(ticket)
+    reply = cfg.get("reply") or built or DEFAULT_REPLY
+    speaker = {"botId": "bot_lead", "name": LEAD, "color": "pink", "since": job["at"] + 1}
+    with State() as st:
+        sees_rules = lead_sees_rules(st)
+    if not sees_rules:
+        reply = RULES_SENTINEL
+    elif mode == "reply_with_ticket_leak":
+        reply += "\n[phiếu: {}]".format(ticket)
+    elif mode == "reply_with_mention":
+        reply = "@{} cho mình hỏi hồ sơ của khách này".format(CUSTOMER)
+    elif mode == "empty":
+        reply = "   "
+    elif mode == "sentinel":
+        reply = "KHONG-CO-QUY-TAC"
+    elif mode == "wrong_bot":
+        reply, speaker = BRIEFING, {"botId": "bot_customer", "name": CUSTOMER, "color": "blue"}
+    with State() as st:
+        msgs = st["messages"][ch]
+        msgs.append({"id": "m_{}".format(tick(st)), "at": st["clock"], "role": "bot", "kind": "activity",
+                     "from": {"botId": "bot_lead", "name": LEAD, "color": "pink"},
+                     "tool": {"name": "coordinate_bots", "ok": True}})
+        msgs.append({"id": "m_{}".format(tick(st)), "at": st["clock"], "role": "bot", "kind": "text", "text": reply,
+                     "from": speaker})
+        msgs.append({"id": "m_{}".format(tick(st)), "at": st["clock"], "role": "bot", "kind": "digest",
+                     "text": "Finished one room job.", "from": speaker})
+        st["jobs"].pop(ch, None)
+        now, history, name = st["clock"], list(msgs), channel_name(st, ch)
+    out({"status": "settled", "state": "completed", "targetType": "channel", "targetId": ch,
+         "taskId": job["taskId"],
+         "target": {"id": ch, "name": name, "memberIds": ["bot_lead", "bot_customer"], "working": False},
+         "messages": history, "hasMore": False,
+         "job": {"scope": "job", "since": job["at"], "now": now, "state": "completed", "reason": LEAD + " finished",
+                 "roots": ["node_1"],
+                 "nodes": [{"id": "node_1", "rootId": "node_1", "depth": 0, "botId": "bot_lead", "botName": LEAD,
+                            "status": "completed", "outcome": "done", "executions": 2, "result": reply},
+                           {"id": "node_2", "rootId": "node_1", "depth": 1, "botId": "bot_customer",
+                            "botName": CUSTOMER, "status": "completed", "outcome": "done", "executions": 1,
+                            "result": BRIEFING}],
+                 "counts": {"queued": 0, "running": 0, "waiting": 0, "needsInput": 0, "completed": 2, "failed": 0,
+                            "cancelled": 0}}})
+
+
+def cmd_interrupt(opts, pos):
+    injected_failure("interrupt")
+    ch = opts.get("--channel")
+    with State() as st:
+        had_job = st["jobs"].pop(ch, None) is not None
+        st["interrupts"].append({"channel": ch, "tree": bool(opts.get("--tree")), "had_job": had_job})
+    out({"success": True, "interrupted": 1 if had_job else 0})
+
+
+def cmd_messages(opts, pos):
+    with State() as st:
+        history = list(st["messages"].get(opts.get("--channel")) or [])
+    out({"messages": history, "hasMore": False})
+
+
+opts, pos = parse(argv)
+if pos[:2] == ["team", "apply"]:
+    cmd_team_apply(opts, pos)
+commands = {"bots": cmd_bots, "channels": cmd_channels, "send": cmd_send, "wait": cmd_wait,
+            "interrupt": cmd_interrupt, "messages": cmd_messages}
+if pos and pos[0] in commands:
+    commands[pos[0]](opts, pos)
+out({"success": False, "error": "unknown command"}, 2)

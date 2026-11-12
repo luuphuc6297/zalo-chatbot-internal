@@ -1,0 +1,579 @@
+{
+  "status": "draft_unapproved",
+  "generated_on": "2026-11-07",
+  "schema_note": "Mỗi mục có value (null nếu tài liệu không có), status (documented | conflict | derived_unapproved | missing) và sources [{path, line, quote}]. 'documented' nghĩa là có trong tài liệu, chưa có nghĩa là chủ doanh nghiệp đã duyệt. 'derived_unapproved' là nội dung do người soạn tài liệu (trợ lý AI) tự suy ra, không có trên menu.",
+  "facts": {
+    "business_name": {
+      "value": "thom house healing studio",
+      "status": "documented",
+      "sources": [
+        {
+          "path": "sources/drive/raw-content/batch-01-relaxation-menu.md",
+          "line": 11,
+          "quote": "thom house healing studio - Since 2019"
+        },
+        {
+          "path": "sources/drive/README.md",
+          "line": 115,
+          "quote": "Tên: thom house healing studio"
+        }
+      ],
+      "note": "Cách viết tên có xung đột, xem brand_name_spelling."
+    },
+    "brand_name_spelling": {
+      "value": null,
+      "status": "conflict",
+      "sources": [
+        {
+          "path": "sources/drive/documentation/06-brand-voice-identity.md",
+          "line": 18,
+          "quote": "Mặc định: dùng thom house (chữ thường, không dấu)"
+        },
+        {
+          "path": "sources/drive/documentation/06-brand-voice-identity.md",
+          "line": 19,
+          "quote": "Ngoại lệ: dùng Thơm House ... Fanpage Facebook"
+        },
+        {
+          "path": "sources/drive/documentation/06-brand-voice-identity.md",
+          "line": 20,
+          "quote": "Không dùng: \"Thom House\" (hoa không dấu)"
+        },
+        {
+          "path": "sources/drive/documentation/06-brand-voice-identity.md",
+          "line": 226,
+          "quote": "Made by Thom House team — chữ hoa có dấu"
+        },
+        {
+          "path": "sources/drive/raw-content/batch-05-hair-care-menu.md",
+          "line": 63,
+          "quote": "Hãy để Thom House giúp bạn chăm sóc cho da đầu"
+        },
+        {
+          "path": "sources/drive/README.md",
+          "line": 88,
+          "quote": "thomhouse (thường) vs Thơm House (hoa, có dấu)"
+        }
+      ],
+      "note": "Tài liệu 06 quy định một cách viết nhưng chính tài liệu 06 và menu tóc dùng 'Thom House' (hoa, không dấu) mà 06 cấm. README ghi là câu hỏi còn chờ chủ doanh nghiệp xác nhận."
+    },
+    "founded_year": {
+      "value": 2019,
+      "status": "documented",
+      "sources": [
+        {
+          "path": "sources/drive/raw-content/batch-01-relaxation-menu.md",
+          "line": 11,
+          "quote": "Since 2019"
+        }
+      ]
+    },
+    "founder": {
+      "value": "Thơm (founder, không phải bác sĩ hay lương y)",
+      "status": "documented",
+      "sources": [
+        {
+          "path": "sources/drive/raw-content/batch-02-health-menu.md",
+          "line": 290,
+          "quote": "Thơm hiểu rằng mỗi cơ thể sẽ tích tụ hàn tà"
+        },
+        {
+          "path": "sources/drive/documentation/11-deep-knowledge-techniques-herbs.md",
+          "line": 11,
+          "quote": "Chị Thơm là founder, KHÔNG phải bác sĩ/lương y"
+        }
+      ]
+    },
+    "address": {
+      "value": "72 đường số 37, phường Tân Hưng, quận 7, TP. Hồ Chí Minh",
+      "status": "conflict",
+      "sources": [
+        {
+          "path": "sources/drive/raw-content/batch-01-relaxation-menu.md",
+          "line": 14,
+          "quote": "72 đường số 37, phường Tân Hưng, quận 7"
+        },
+        {
+          "path": "sources/drive/raw-content/batch-02-health-menu.md",
+          "line": 15,
+          "quote": "72 đường số 37, phường Tân Hưng quận 7"
+        },
+        {
+          "path": "sources/drive/raw-content/batch-05-hair-care-menu.md",
+          "line": 14,
+          "quote": "72 đường số 37, phường Tân Hưng quận 7"
+        },
+        {
+          "path": "sources/drive/raw-content/batch-03-women-health-menu.md",
+          "line": 164,
+          "quote": "72 đường số 37, phường Tân Kiểng quận 7"
+        },
+        {
+          "path": "sources/drive/documentation/13-critical-chatbot-fixes.md",
+          "line": 174,
+          "quote": "72 đường số 37, phường Tân Hưng, quận 7, TP. Hồ Chí Minh"
+        }
+      ],
+      "note": "Một slide menu phụ nữ ghi Tân Kiểng. Ngoài tài liệu: theo Nghị quyết 1685/NQ-UBTVQH15 (16/6/2025), các phường Tân Phong, Tân Quy, Tân Kiểng và Tân Hưng được nhập thành phường Tân Hưng mới, hoạt động từ 01/7/2025 (nguồn: english.luatvietnam.vn, truy cập 2026-11-07; chưa đọc được văn bản trên cổng chính thức). Việc bỏ cấp quận khỏi địa chỉ là chưa xác minh (từ hiểu biết trước). Chủ doanh nghiệp cần chốt cách ghi địa chỉ hiện hành."
+    },
+    "google_maps_link": {
+      "value": "https://maps.app.goo.gl/Xo43VT6JYEtxxCNf9",
+      "status": "documented",
+      "sources": [
+        {
+          "path": "sources/drive/documentation/13-critical-chatbot-fixes.md",
+          "line": 176,
+          "quote": "Bản đồ: https://maps.app.goo.gl/Xo43VT6JYEtxxCNf9"
+        },
+        {
+          "path": "sources/drive/thomhouse-knowledge-bundle.txt",
+          "line": 55,
+          "quote": "https://maps.app.goo.gl/Xo43VT6JYEtxxCNf9"
+        }
+      ],
+      "note": "Link không có trên menu gốc; chưa mở link để kiểm điểm đến. Cần chủ doanh nghiệp xác nhận."
+    },
+    "opening_hours": {
+      "value": null,
+      "status": "conflict",
+      "sources": [
+        {
+          "path": "sources/drive/thomhouse-knowledge-bundle.txt",
+          "line": 57,
+          "quote": "Giờ hoạt động: 9h–24h (giá đặc biệt sau 20h30)"
+        },
+        {
+          "path": "sources/drive/documentation/13-critical-chatbot-fixes.md",
+          "line": 330,
+          "quote": "Giờ hoạt động: 9h – 24h (giá đặc biệt sau 20h30)"
+        },
+        {
+          "path": "sources/drive/documentation/13-critical-chatbot-fixes.md",
+          "line": 178,
+          "quote": "Giờ hoạt động: [chờ chị xác nhận giờ chính xác]"
+        },
+        {
+          "path": "sources/drive/documentation/13-critical-chatbot-fixes.md",
+          "line": 191,
+          "quote": "Có thể studio mở 9h – 24h với 2 mức giá. Chờ chị xác nhận"
+        },
+        {
+          "path": "sources/drive/documentation/13-critical-chatbot-fixes.md",
+          "line": 486,
+          "quote": "(9h–20h30 / 9h–22h / 9h–24h?)"
+        },
+        {
+          "path": "sources/drive/raw-content/batch-01-relaxation-menu.md",
+          "line": 80,
+          "quote": "9h – 24h | 30 phút | 199,000 VNĐ"
+        }
+      ],
+      "note": "Menu chỉ cho biết khung giá (9h–20h30, sau 20h30; riêng Massage chân 9h–24h). Giờ mở cửa, giờ nhận khách cuối và ngày nghỉ chưa được xác nhận."
+    },
+    "price_time_windows": {
+      "value": {
+        "day": "09:00-20:30",
+        "night": "sau 20:30 (giờ kết thúc không ghi)",
+        "foot_massage": "09:00-24:00, một giá"
+      },
+      "status": "documented",
+      "sources": [
+        {
+          "path": "sources/drive/raw-content/batch-01-relaxation-menu.md",
+          "line": 154,
+          "quote": "trước/sau 20h30 (riêng Massage chân: 9h–24h"
+        },
+        {
+          "path": "sources/drive/raw-content/batch-05-hair-care-menu.md",
+          "line": 41,
+          "quote": "9h – 20h30 | 139,000 VNĐ"
+        }
+      ],
+      "note": "Chưa rõ giá tính theo giờ bắt đầu hay giờ kết thúc buổi."
+    },
+    "hotline_phone": {
+      "value": null,
+      "status": "missing",
+      "sources": [
+        {
+          "path": "sources/drive/documentation/13-critical-chatbot-fixes.md",
+          "line": 179,
+          "quote": "Hotline: [chờ chị xác nhận]"
+        }
+      ]
+    },
+    "facebook_fanpage": {
+      "value": "Thơm House",
+      "status": "documented",
+      "sources": [
+        {
+          "path": "sources/drive/raw-content/batch-02-health-menu.md",
+          "line": 11,
+          "quote": "Fanpage Thơm House"
+        }
+      ],
+      "note": "Chỉ có tên Fanpage, không có URL."
+    },
+    "beacons_link": {
+      "value": "beacons.ai/thomhouseq7",
+      "status": "documented",
+      "sources": [
+        {
+          "path": "sources/drive/documentation/07-customer-journey.md",
+          "line": 31,
+          "quote": "Beacons (beacons.ai/thomhouseq7)"
+        },
+        {
+          "path": "sources/drive/_intake-log.md",
+          "line": 197,
+          "quote": "em chưa truy cập được"
+        }
+      ],
+      "note": "Người soạn tài liệu chưa mở được link; nội dung trang chưa được kiểm."
+    },
+    "zalo_oa": {
+      "value": null,
+      "status": "missing",
+      "sources": [
+        {
+          "path": "sources/drive/documentation/13-critical-chatbot-fixes.md",
+          "line": 490,
+          "quote": "Có Zalo OA / chương trình thành viên không?"
+        },
+        {
+          "path": "sources/drive/documentation/07-customer-journey.md",
+          "line": 64,
+          "quote": "Inbox Fanpage / Zalo / Hotline"
+        }
+      ],
+      "note": "Tài liệu nhắc Zalo như một kênh nhưng không có tên, ID hay link Zalo OA."
+    },
+    "website_email": {
+      "value": null,
+      "status": "missing",
+      "sources": [
+        {
+          "path": "sources/drive/documentation/13-critical-chatbot-fixes.md",
+          "line": 489,
+          "quote": "Có website chính thức không?"
+        }
+      ]
+    },
+    "booking_channels": {
+      "value": [
+        "Inbox Fanpage Thơm House",
+        "Zalo (chưa có định danh)",
+        "Hotline (chưa có số)",
+        "Chatbot thu thập: dịch vụ, ngày giờ mong muốn, tên và số điện thoại để team xác nhận"
+      ],
+      "status": "documented",
+      "sources": [
+        {
+          "path": "sources/drive/documentation/07-customer-journey.md",
+          "line": 64,
+          "quote": "Inbox Fanpage / Zalo / Hotline"
+        },
+        {
+          "path": "sources/drive/documentation/12-chatbot-response-formatting.md",
+          "line": 540,
+          "quote": "Cho mình biết dịch vụ bạn muốn đặt"
+        },
+        {
+          "path": "sources/drive/documentation/12-chatbot-response-formatting.md",
+          "line": 542,
+          "quote": "Tên + số điện thoại để team xác nhận"
+        }
+      ],
+      "note": "Không có quy trình xác nhận lịch, thời gian giữ chỗ hay người chịu trách nhiệm xác nhận."
+    },
+    "response_time_target": {
+      "value": "Trả lời inbox trong vòng 2 giờ (giờ làm việc)",
+      "status": "derived_unapproved",
+      "sources": [
+        {
+          "path": "sources/drive/documentation/07-customer-journey.md",
+          "line": 69,
+          "quote": "Trả lời inbox khách trong vòng 2 giờ (giờ làm việc)"
+        }
+      ]
+    },
+    "cancellation_policy": {
+      "value": null,
+      "status": "missing",
+      "sources": []
+    },
+    "rescheduling_policy": {
+      "value": null,
+      "status": "missing",
+      "sources": []
+    },
+    "late_arrival_policy": {
+      "value": null,
+      "status": "missing",
+      "sources": []
+    },
+    "deposit_policy": {
+      "value": null,
+      "status": "missing",
+      "sources": []
+    },
+    "payment_methods": {
+      "value": null,
+      "status": "missing",
+      "sources": []
+    },
+    "refund_policy": {
+      "value": null,
+      "status": "missing",
+      "sources": []
+    },
+    "gift_cards": {
+      "value": null,
+      "status": "missing",
+      "sources": [
+        {
+          "path": "sources/drive/knowledge-base/03-pricing-structure.md",
+          "line": 384,
+          "quote": "Có giá thành viên / khách quen / gift card không?"
+        }
+      ]
+    },
+    "membership": {
+      "value": null,
+      "status": "missing",
+      "sources": [
+        {
+          "path": "sources/drive/knowledge-base/03-pricing-structure.md",
+          "line": 384,
+          "quote": "Có giá thành viên / khách quen / gift card không?"
+        }
+      ]
+    },
+    "multi_session_packages": {
+      "value": null,
+      "status": "missing",
+      "sources": [
+        {
+          "path": "sources/drive/knowledge-base/03-pricing-structure.md",
+          "line": 382,
+          "quote": "Có gói liệu trình theo buổi (5, 10 buổi)"
+        }
+      ]
+    },
+    "combos": {
+      "value": [
+        {
+          "name": "Yoni Retreat tặng Nắn chỉnh thu hẹp sàn chậu",
+          "price_vnd": 3500000
+        }
+      ],
+      "status": "documented",
+      "sources": [
+        {
+          "path": "sources/drive/raw-content/batch-03-women-health-menu.md",
+          "line": 131,
+          "quote": "Tặng nắn chỉnh sàn chậu"
+        },
+        {
+          "path": "sources/drive/knowledge-base/03-pricing-structure.md",
+          "line": 383,
+          "quote": "Có combo chính thức ghép menu thư giãn + menu khỏe không?"
+        }
+      ],
+      "note": "Con số 'tiết kiệm 500k (~12.5%)' là phép tính của người soạn tài liệu (03-pricing-structure.md:234-235), không có trên menu."
+    },
+    "promotions": {
+      "value": null,
+      "status": "missing",
+      "sources": [
+        {
+          "path": "sources/drive/raw-content/batch-04-skincare-menu.md",
+          "line": 80,
+          "quote": "SHR phục hồi da nhanh chóng (theo thời gian khuyến mại)"
+        },
+        {
+          "path": "sources/drive/documentation/07-customer-journey.md",
+          "line": 50,
+          "quote": "Quảng cáo \"giảm 50%\", \"sale 199k\" — đi ngược tone"
+        },
+        {
+          "path": "sources/drive/documentation/07-customer-journey.md",
+          "line": 233,
+          "quote": "Spam khuyến mại / \"ưu đãi khách cũ\" liên tục"
+        }
+      ],
+      "note": "Không có chương trình khuyến mại nào được ghi. Tài liệu hướng dẫn tránh quảng cáo giảm giá; điều kiện 'thời gian khuyến mại' của bước SHR chưa rõ."
+    },
+    "follow_up_guidance": {
+      "value": [
+        {
+          "when": "trong 24h sau buổi",
+          "what": "tin cảm ơn, hỏi cảm giác, gửi lưu ý tự chăm sóc"
+        },
+        {
+          "when": "sau 2-3 ngày",
+          "what": "theo dõi cảm giác khách"
+        },
+        {
+          "when": "khoảng 1 tháng",
+          "what": "một tin hỏi thăm nhẹ; không phản hồi thì không nhắn thêm"
+        },
+        {
+          "when": "trước 1 tuần",
+          "what": "không hỏi 'khi nào quay lại'"
+        }
+      ],
+      "status": "derived_unapproved",
+      "sources": [
+        {
+          "path": "sources/drive/documentation/07-customer-journey.md",
+          "line": 180,
+          "quote": "Tin nhắn cảm ơn trong vòng 24h"
+        },
+        {
+          "path": "sources/drive/documentation/07-customer-journey.md",
+          "line": 182,
+          "quote": "Theo dõi cảm giác khách sau 2-3 ngày"
+        },
+        {
+          "path": "sources/drive/documentation/07-customer-journey.md",
+          "line": 226,
+          "quote": "đã 1 tháng kể từ buổi của bạn"
+        },
+        {
+          "path": "sources/drive/documentation/07-customer-journey.md",
+          "line": 228,
+          "quote": "Nếu khách không phản hồi → không nhắn thêm"
+        },
+        {
+          "path": "sources/drive/documentation/07-customer-journey.md",
+          "line": 231,
+          "quote": "Khi nào chị quay lại? sớm hơn 1 tuần"
+        }
+      ],
+      "note": "Là hướng dẫn trong tài liệu, chưa phải lịch đã duyệt. Mẫu tin sau buổi có câu coi mệt hoặc căng bụng dưới là bình thường (07:203, 07:220), cần duyệt lại."
+    },
+    "pregnancy_policy": {
+      "value": null,
+      "status": "derived_unapproved",
+      "sources": [
+        {
+          "path": "sources/drive/documentation/11-deep-knowledge-techniques-herbs.md",
+          "line": 1226,
+          "quote": "Đa số dịch vụ thom house KHÔNG phù hợp với mẹ bầu"
+        },
+        {
+          "path": "sources/drive/documentation/11-deep-knowledge-techniques-herbs.md",
+          "line": 1240,
+          "quote": "LUÔN yêu cầu xác nhận với KTV trước khi đặt lịch"
+        }
+      ],
+      "note": "Bảng an toàn thai kỳ do người soạn tài liệu tự viết, không có trên menu; có chỗ tự mâu thuẫn (11:1236 vs 11:1421). Cần chủ doanh nghiệp và người có chuyên môn duyệt."
+    },
+    "postpartum_policy": {
+      "value": "Tài liệu khuyên đợi 2-3 tháng sau sinh trước dịch vụ tác động vùng bụng, vùng kín",
+      "status": "derived_unapproved",
+      "sources": [
+        {
+          "path": "sources/drive/documentation/11-deep-knowledge-techniques-herbs.md",
+          "line": 1247,
+          "quote": "< 2-3 tháng sau sinh: KHÔNG nên làm Yoni Retreat"
+        },
+        {
+          "path": "sources/drive/documentation/13-critical-chatbot-fixes.md",
+          "line": 457,
+          "quote": "em khuyến khích đợi 2-3 tháng"
+        }
+      ]
+    },
+    "staff_gender": {
+      "value": null,
+      "status": "missing",
+      "sources": []
+    },
+    "male_customers_served": {
+      "value": null,
+      "status": "missing",
+      "sources": [
+        {
+          "path": "sources/drive/knowledge-base/03-pricing-structure.md",
+          "line": 386,
+          "quote": "Trẻ em / nam giới có được phục vụ không"
+        }
+      ]
+    },
+    "children_served": {
+      "value": null,
+      "status": "missing",
+      "sources": [
+        {
+          "path": "sources/drive/knowledge-base/02-services/hair-care-menu.md",
+          "line": 172,
+          "quote": "Có gội đầu cho nam giới / trẻ em không?"
+        }
+      ]
+    },
+    "parking": {
+      "value": null,
+      "status": "missing",
+      "sources": []
+    },
+    "invoice_vat": {
+      "value": null,
+      "status": "missing",
+      "sources": []
+    },
+    "assistant_persona_name": {
+      "value": null,
+      "status": "conflict",
+      "sources": [
+        {
+          "path": "sources/drive/documentation/13-critical-chatbot-fixes.md",
+          "line": 65,
+          "quote": "2 tên xuất hiện không nhất quán: Thị Thư và Nhã Trúc"
+        },
+        {
+          "path": "sources/drive/documentation/13-critical-chatbot-fixes.md",
+          "line": 75,
+          "quote": "Tạm thời ... em dùng trợ lý thom house"
+        }
+      ]
+    },
+    "assistant_pronouns": {
+      "value": null,
+      "status": "conflict",
+      "sources": [
+        {
+          "path": "sources/drive/documentation/13-critical-chatbot-fixes.md",
+          "line": 23,
+          "quote": "Chatbot xưng: em"
+        },
+        {
+          "path": "sources/drive/documentation/13-critical-chatbot-fixes.md",
+          "line": 36,
+          "quote": "trong chat tư vấn 1:1, dùng em / anh-chị"
+        },
+        {
+          "path": "sources/drive/documentation/06-brand-voice-identity.md",
+          "line": 53,
+          "quote": "Khách = bạn (không chị, anh, quý khách)"
+        },
+        {
+          "path": "sources/drive/documentation/06-brand-voice-identity.md",
+          "line": 54,
+          "quote": "Người nói = mình (không em, spa, thom house)"
+        },
+        {
+          "path": "sources/drive/documentation/06-brand-voice-identity.md",
+          "line": 250,
+          "quote": "Khi viết caption, content, tin nhắn cho khách"
+        },
+        {
+          "path": "sources/drive/documentation/12-chatbot-response-formatting.md",
+          "line": 90,
+          "quote": "Bạn ơi, thom house healing studio có 5 nhóm"
+        }
+      ]
+    }
+  }
+}

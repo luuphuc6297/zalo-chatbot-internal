@@ -1,0 +1,9 @@
+packages:
+  - "apps/server"
+  - "apps/console"
+  - "apps/desktop"
+onlyBuiltDependencies:
+  - electron
+  - esbuild
+  - workerd
+  - sharp

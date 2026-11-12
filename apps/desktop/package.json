@@ -1,0 +1,15 @@
+{
+  "name": "@thomhouse/desktop",
+  "private": true,
+  "main": "main.js",
+  "scripts": {
+    "setup": "install-electron",
+    "dev": "install-electron && THOMHOUSE_CONSOLE_URL=http://localhost:5173 electron .",
+    "start": "install-electron && electron .",
+    "check": "node --check main.js && node --check preload.js",
+    "smoke": "install-electron && THOMHOUSE_DESKTOP_SMOKE=1 electron ."
+  },
+  "devDependencies": {
+    "electron": "45.2.3"
+  }
+}

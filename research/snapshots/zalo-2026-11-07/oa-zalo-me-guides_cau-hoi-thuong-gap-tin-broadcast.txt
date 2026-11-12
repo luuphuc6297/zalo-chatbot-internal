@@ -1,0 +1,76 @@
+ Câu hỏi thường gặp | Zalo Official Account 
+ Skip to main content 
+ HƯỚNG DẪN VẬN HÀNH
+ Đăng ký và Xác thực 
+ Thanh toán 
+ Thiết lập tài khoản OA 
+ Quản lý nội dung 
+ Tin nhắn 
+ Tổng quan các loại tin nhắn trên Zalo Official Account 
+ Tin Tư vấn 
+ Tin Broadcast 
+ ZBS Template Message 
+ Câu hỏi thường gặp 
+ Công cụ gửi tin 
+ Gọi thoại 
+ Quản lý hội thoại 
+ Nhóm Chat GMF 
+ Tối ưu vận hành 
+ Mở rộng 
+ Nhà phát triển 
+ Tin nhắn 
+ Câu hỏi thường gặp 
+ On this page 
+ Câu hỏi thường gặp
+ ⚠ Lưu ý: 
+ Từ ngày 01/06/2026 , Zalo OA cập nhật danh mục Gói dịch vụ mới (Cơ bản/ Tiêu chuẩn/ Tăng trưởng/ Toàn diện) . Các OA đang sử dụng Gói cũ (Dùng thử, Nâng cao, Premium) vẫn giữ nguyên hạn mức cũ cho đến khi hết thời hạn gói. Để sử dụng các tính năng này, OA cần đăng ký Gói dịch vụ phù hợp. Chi tiết vui lòng xem tại đây .
+ Hạn mức nhận tin Broadcast của người quan tâm OA: Thiết lập lại vào ngày 01 hàng tháng.
+ Hạn mức OA gửi tin Broadcast, số Bài viết xuất bản, Tin Tư vấn sẽ được thiết lập lại cùng ngày đăng ký Gói của tháng kế tiếp. Ví dụ: đăng ký Gói ngày 22/06, hạn mức được thiết lập lại vào 0h ngày 22/07; đăng ký Gói ngày 31/01, hạn mức được thiết lập lại vào 0h ngày 28/02 (nếu năm không nhuận) hoặc 0h ngày 29/02 (nếu năm nhuận) .
+ 1. Thay đổi hạn mức tin Broadcast ​ 
+ Hạn mức Broadcast sẽ khác nhau theo từng Gói dịch vụ OA, cụ thể về số Broadcast người quan tâm tiếp nhận mỗi tháng như sau:
+ Đối với các Gói dịch vụ mới (áp dụng từ 01/06/2026): 
+ Gói Cơ bản & Tiêu chuẩn: Tính năng Broadcast không khả dụng.
+ Gói Tăng trưởng & Toàn diện: Người quan tâm nhận tối đa 04 tin Broadcast miễn phí/ tháng .
+ Đối với các Gói dịch vụ cũ (đăng ký trước 01/06/2026 và còn thời hạn sử dụng): 
+ Gói Dùng thử, Nâng cao & Premium: Người quan tâm nhận tối đa 04 tin Broadcast miễn phí/ tháng .
+ ⚠️ Lưu ý: Tin Broadcast được tính là tin nhắn có mục đích truyền thông . Hạn mức gửi nhận tối đa không được vượt quá quy định chung về Tin nhắn của nền tảng (tối đa 01 tin/ ngày và 30 tin/ tháng cho các tin có mục đích truyền thông). Trường hợp OA đã sử dụng hết hạn mức truyền thông cho các loại tin khác (VD: ZBS Template Message - tin Hậu mãi), người quan tâm sẽ không thể nhận thêm tin Broadcast, chi tiết xem thêm tại đây .
+ 2. Cách tính số lượng người nhận tin Broadcast của tôi (“Đã gửi”/ “Đã nhận”) ​ 
+ Khi người quan tâm OA đã nhận đủ hạn mức tin Broadcast trong tháng, OA sẽ không thể gửi thêm tin đến họ. OA chỉ có thể tiếp tục gửi tin đến những người quan tâm mới và còn hạn mức nhận tin.
+ Dưới đây là ví dụ minh họa cho Gói Tăng trưởng : người quan tâm có thể nhận 01 tin Broadcast/ ngày và tối đa 04 tin Broadcast miễn phí/ tháng.
+ Ngày 01 của tháng, OA sử dụng Gói Tăng trưởng có 10 người quan tâm và thực hiện gửi 02 tin Broadcast trong ngày cho 10 người này.
+ - Tin 01 gửi thành công tới tất cả 10 người. 
+ - Tin 02 gửi không thành công vì mỗi người chỉ nhận được tối đa 01 tin Broadcast/ ngày. 
+ Ngày 02, 03 & 04, OA tiếp tục gửi 01 tin Broadcast/ ngày đến tất cả 10 người quan tâm.
+ - Tất cả 03 tin Broadcast đều gửi thành công đến 10 người quan tâm. 
+ Ngày 05 OA tiếp tục gửi 01 tin Broadcast miễn phí đến tất cả 10 người quan tâm.
+ - Tin Broadcast báo lỗi “Không gửi được” vì 10 người này đã nhận đủ 04 tin Broadcast miễn phí/ tháng. 
+ Ngày 06 OA có thêm 01 người quan tâm tâm mới và OA gửi 01 tin Broadcast miễn phí đến tất cả 11 người quan tâm.
+ - Tin Broadcast chỉ gửi được đến 01 người quan tâm mới do người này còn hạn mức nhận Broadcast. 
+ 3. “Chọn đối tượng gửi” là tất cả nhưng số lượng người nhận lại ít hơn tổng số người quan tâm ​ 
+ Khi sử dụng tính năng “Chọn đối tượng gửi”, tin Broadcast của anh/chị chỉ được gửi đến người quan tâm có hoạt động trên Zalo trong 30 ngày trở lại. Từ đó, số lượng người nhận sẽ tiếp tục điều chỉnh theo:
+ Nhóm đối tượng được lựa chọn (ví dụ độ tuổi, giới tính).
+ Hạn mức nhận tin nhắn có mục đích truyền thông (bao gồm tin Broadcast) của người quan tâm.
+ 4. Xem trước tin Broadcast sẽ gửi ​ 
+ Anh/chị có thể xem trước nội dung hình ảnh/ hiển thị của tin Broadcast sẽ gửi đến người theo dõi khi thực hiện gửi tin tại bước “Xem trước”. Xem thêm  hướng dẫn gửi tin Broadcast .
+ Bước 1 : Vào mục Nội dung → Tạo broadcast → Chọn broadcast cần gửi
+ Bước 2:  Chọn Xem trước → Chọn tài khoản → Gửi ngay 
+ 5. Gửi Broadcast cho người nằm ngoài danh sách quan tâm ​ 
+ Hiện tại OA chỉ có thể gửi thành công đến người đang quan tâm OA tại thời điểm gửi tin Broadcast.
+ 6. Không thể gửi Broadcast theo danh sách số điện thoại sẵn có ​ 
+ OA chỉ có thể gửi tin Broadcast theo 01 (một) số điều kiện lọc cụ thể. OA có thể sử dụng tính năng gắn nhãn người dùng để tạo nhóm người nhận theo nhu cầu của doanh nghiệp. Xem thêm  hướng dẫn quản lý nhãn .
+ 7. Tin Broadcast báo lỗi “không gửi được” ​ 
+ Các Broadcast chưa được gửi thành công sẽ có trạng thái là “Không gửi được”, hệ thống sẽ hiển thị kèm lý do theo từng trường hợp.
+ Lý do phổ biến: OA hết hạn mức gửi nhận tin Broadcast. Cụ thể: Hạn mức tin Broadcast mà mỗi OA được phép gửi tới một người quan tâm được giới hạn ở mức tối đa 01 tin/ ngày và 04 tin miễn phí/ tháng .
+ ------------------------------------------------------
+ Nếu có thắc mắc khác, vui lòng cung cấp OA ID và  gửi email hoặc  chat với BQT ZOA để được phản hồi sớm nhất.
+ Previous
+ ZBS Template Message
+ Next
+ Công cụ gửi tin theo chiến dịch
+ 1. Thay đổi hạn mức tin Broadcast 
+ 2. Cách tính số lượng người nhận tin Broadcast của tôi (“Đã gửi”/ “Đã nhận”) 
+ 3. “Chọn đối tượng gửi” là tất cả nhưng số lượng người nhận lại ít hơn tổng số người quan tâm 
+ 4. Xem trước tin Broadcast sẽ gửi 
+ 5. Gửi Broadcast cho người nằm ngoài danh sách quan tâm 
+ 6. Không thể gửi Broadcast theo danh sách số điện thoại sẵn có 
+ 7. Tin Broadcast báo lỗi “không gửi được” 

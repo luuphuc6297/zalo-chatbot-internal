@@ -1,0 +1,16 @@
+{
+  "name": "lulu-thomhouse",
+  "private": true,
+  "packageManager": "pnpm@10.32.1",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev:server": "pnpm -C apps/server dev",
+    "dev:console": "pnpm -C apps/console dev",
+    "dev:desktop": "pnpm -C apps/desktop dev",
+    "typecheck": "pnpm -C apps/server typecheck && pnpm -C apps/console typecheck",
+    "test": "pnpm -C apps/server test && pnpm -C apps/console typecheck && pnpm -C apps/console test && python3 -m unittest discover -s apps/runner/tests -t apps/runner && python3 -m unittest discover -s apps/zalo-bridge/tests -t apps/zalo-bridge && python3 -m unittest discover -s scripts/tests -t scripts/tests",
+    "check:desktop": "pnpm -C apps/desktop check"
+  }
+}

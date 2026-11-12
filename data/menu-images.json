@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "generated_on": "2026-11-08",
+  "note": "Menu slide index for the chatbot (task B, menu images). Every slide was opened and read by eye on 2026-11-08, cross-checked with research/menu-audit/*.md. A slide key is '<group>/<n>'. The bot may attach only slides with has_medical_claim = false; claim slides are sent by staff only. The JPEG copies the bridge sends are built by scripts/build_menu_images.py into ~/.thomhouse-bot/menu-images/<group>/<n>.jpg (manifest.json there). Prices printed on slides are not catalog prices: the bot quotes prices only from tools.",
+  "source_root": "sources/drive-resources/thomhouse-menu",
+  "key_format": "<group>/<n>",
+  "max_images_per_send": 10,
+  "overview_groups": ["facial", "healing", "thu-gian-toc", "hair-removal"],
+  "groups": {
+    "facial": {
+      "label": "Chăm sóc da cơ bản",
+      "dir": "facial-cham-soc-da-co-ban",
+      "catalog_group": "skin",
+      "slide_count": 21,
+      "cover": [1],
+      "price_list": [2, 4, 6, 8, 10, 12, 14, 16, 18, 20],
+      "services": {
+        "goi-mun-5-in-1": [4, 5],
+        "xoa-tham-quang-mat-co-ban": [8, 9],
+        "xoa-tham-quang-mat-dien-xung-truong": [8, 9]
+      },
+      "unmatched_services": [
+        { "name": "Detox da", "slides": [2, 3] },
+        { "name": "Massage mặt thư giãn", "slides": [6, 7] },
+        { "name": "Cấp dinh dưỡng cơ bản", "slides": [10, 11] },
+        { "name": "Cấp dinh dưỡng bằng công nghệ Plasma fusion", "slides": [12, 13] },
+        { "name": "Lăn dưỡng", "slides": [14, 15] },
+        { "name": "Inner Fill nâng cấp da", "slides": [16, 17] },
+        { "name": "Bio PDRN Nuôi da căng bóng", "slides": [18, 19] },
+        { "name": "Bio PDRN Nuôi da căng bóng full", "slides": [20, 21] }
+      ],
+      "review_note": "Bộ 21 ảnh khác bộ 5 ảnh mà catalog đã chép: 8 dịch vụ trên ảnh chưa có trong catalog, và thời lượng của 3 dịch vụ chung bị lệch. Chủ studio chưa xác nhận bộ nào đang bán (research/menu-audit/facial.md)."
+    },
+    "healing": {
+      "label": "Giúp bạn khỏe",
+      "dir": "healing-giup-ban-khoe",
+      "catalog_group": "health",
+      "slide_count": 19,
+      "cover": [1],
+      "price_list": [2, 5, 8, 11, 14, 17],
+      "services": {
+        "thai-han-giai-cam": [2, 3, 4],
+        "detox-mui-co-the": [5, 6, 7],
+        "dau-that-lung-moi-goi": [8, 9, 10],
+        "thieu-mau-nao": [11, 12, 13],
+        "giai-moi-dung-lau": [14, 15, 16],
+        "dien-chan-ngua-dot-quy": [17, 18, 19]
+      },
+      "unmatched_services": [],
+      "review_note": "Giá và thời lượng khớp catalog. Ảnh in tên 'Ngừa đột quỵ' và 'Detox cơ thể', catalog ghi 'Diện chẩn ngừa đột quỵ' và 'Detox mùi cơ thể'. Slide 16 in đúng các bước của slide 13 (research/menu-audit/healing.md)."
+    },
+    "thu-gian-toc": {
+      "label": "Thư giãn và chăm sóc tóc",
+      "dir": "thu-gian-cham-soc-toc",
+      "catalog_group": "hair",
+      "slide_count": 14,
+      "cover": [1],
+      "price_list": [2, 5, 8, 10, 13, 14],
+      "services": {
+        "detox-da-dau": [2, 3, 4],
+        "goi-dau-thu-gian": [5, 6, 7],
+        "cham-soc-nan-toc": [8, 9]
+      },
+      "unmatched_services": [
+        { "name": "Peel peptide da đầu", "slides": [10, 11, 12] },
+        { "name": "Mặt nạ tóc Bồ kết", "slides": [13] },
+        { "name": "Mặt nạ cho mặt Mask dẻo Hàn Quốc Collagen", "slides": [13] },
+        { "name": "Mặt nạ Phục hồi PDRN", "slides": [13] },
+        { "name": "Option Detox da đầu", "slides": [14] },
+        { "name": "Option Massage mặt", "slides": [14] },
+        { "name": "Option Massage tay", "slides": [14] },
+        { "name": "Option Massage cổ, vai, gáy", "slides": [14] },
+        { "name": "Option Massage chân", "slides": [14] }
+      ],
+      "review_note": "Ba dịch vụ tóc khớp catalog. Slide 10 đến 14 chưa được chép vào catalog (research/menu-audit/thugian-hairremoval.md)."
+    },
+    "hair-removal": {
+      "label": "Triệt lông",
+      "dir": "hair-removal-triet-long",
+      "catalog_group": null,
+      "slide_count": 3,
+      "cover": [1],
+      "price_list": [2],
+      "services": {},
+      "unmatched_services": [
+        { "name": "Triệt lông Nách", "slides": [2] },
+        { "name": "Triệt lông Mép - Cằm - Trán", "slides": [2] },
+        { "name": "Triệt lông Viền bi - Ngực", "slides": [2] },
+        { "name": "Triệt lông Mặt - Tay - Cổ - Nữa Chân", "slides": [2] },
+        { "name": "Triệt lông Bikini - Chân - Bụng - Lưng", "slides": [2] },
+        { "name": "Triệt lông Full body", "slides": [2] }
+      ],
+      "review_note": "Catalog chưa có dòng nào cho triệt lông. Slide 3 là phiếu thông tin khách nội bộ, không gửi cho khách."
+    }
+  },
+  "slides": [
+    { "key": "facial/1", "group": "facial", "n": 1, "file": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/1.png", "kind": "cover", "title": "Menu chăm sóc da", "service_ids": [], "unmatched_names": [], "has_medical_claim": false, "claim_note": null, "note": "Header in 'thom house facial studio', khác tên trong business-facts." },
+    { "key": "facial/2", "group": "facial", "n": 2, "file": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/2.png", "kind": "service", "title": "Detox da", "service_ids": [], "unmatched_names": ["Detox da"], "has_medical_claim": false, "claim_note": null, "note": "60-75 phút, 389,000 VNĐ; chưa có trong catalog." },
+    { "key": "facial/3", "group": "facial", "n": 3, "file": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/3.png", "kind": "process", "title": "Quy trình Detox da", "service_ids": [], "unmatched_names": ["Detox da"], "has_medical_claim": false, "claim_note": null, "note": null },
+    { "key": "facial/4", "group": "facial", "n": 4, "file": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/4.png", "kind": "service", "title": "Mụn signature – Gói mụn 5in1", "service_ids": ["goi-mun-5-in-1"], "unmatched_names": [], "has_medical_claim": false, "claim_note": null, "note": "Ảnh in 60-90 phút, catalog ghi 90 phút." },
+    { "key": "facial/5", "group": "facial", "n": 5, "file": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/5.png", "kind": "process", "title": "Quy trình Chăm da 5in1", "service_ids": ["goi-mun-5-in-1"], "unmatched_names": [], "has_medical_claim": true, "claim_note": "Hứa tác dụng lên mụn: 'khô còi mụn nhanh chóng', 'giảm viêm đỏ', 'kháng viêm'; khẳng định 'lành tính'.", "note": null },
+    { "key": "facial/6", "group": "facial", "n": 6, "file": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/6.png", "kind": "service", "title": "Massage mặt thư giãn", "service_ids": [], "unmatched_names": ["Massage mặt thư giãn"], "has_medical_claim": false, "claim_note": null, "note": "60 phút, 289,000 VNĐ; chưa có trong catalog." },
+    { "key": "facial/7", "group": "facial", "n": 7, "file": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/7.png", "kind": "process", "title": "Quy trình Massage mặt thư giãn", "service_ids": [], "unmatched_names": ["Massage mặt thư giãn"], "has_medical_claim": false, "claim_note": null, "note": null },
+    { "key": "facial/8", "group": "facial", "n": 8, "file": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/8.png", "kind": "service", "title": "Xoá thâm quầng mắt (Cơ bản; Công nghệ điện xung trường)", "service_ids": ["xoa-tham-quang-mat-co-ban", "xoa-tham-quang-mat-dien-xung-truong"], "unmatched_names": [], "has_medical_claim": false, "claim_note": null, "note": "Ảnh in 45 và 60 phút, catalog ghi 60 và 90 phút." },
+    { "key": "facial/9", "group": "facial", "n": 9, "file": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/9.png", "kind": "process", "title": "Mô tả và quy trình Xóa thâm quầng mắt", "service_ids": ["xoa-tham-quang-mat-co-ban", "xoa-tham-quang-mat-dien-xung-truong"], "unmatched_names": [], "has_medical_claim": true, "claim_note": "In 'hiệu quả gấp 10 lần điện di ion bình thường' và 'khí huyết không còn tắt nghẽn, giảm ngay tình trạng thâm đen'.", "note": null },
+    { "key": "facial/10", "group": "facial", "n": 10, "file": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/10.png", "kind": "service", "title": "Cấp dinh dưỡng cơ bản", "service_ids": [], "unmatched_names": ["Cấp dinh dưỡng cơ bản"], "has_medical_claim": false, "claim_note": null, "note": "60-75 phút, 599,000 VNĐ; chưa có trong catalog." },
+    { "key": "facial/11", "group": "facial", "n": 11, "file": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/11.png", "kind": "process", "title": "Quy trình Cấp dinh dưỡng cơ bản", "service_ids": [], "unmatched_names": ["Cấp dinh dưỡng cơ bản"], "has_medical_claim": true, "claim_note": "In 'Lâm sàn trong 7 năm qua' (từ của ngành y) và bước 'Xịt tế bào gốc'.", "note": null },
+    { "key": "facial/12", "group": "facial", "n": 12, "file": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/12.png", "kind": "service", "title": "Cấp dinh dưỡng bằng công nghệ Plasma fusion", "service_ids": [], "unmatched_names": ["Cấp dinh dưỡng bằng công nghệ Plasma fusion"], "has_medical_claim": false, "claim_note": null, "note": "Mức 'Dịch chiết tế bào gốc' in khoảng giá 1,500,000 - 2,500,000 VNĐ; chưa có trong catalog." },
+    { "key": "facial/13", "group": "facial", "n": 13, "file": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/13.png", "kind": "process", "title": "Quy trình Cấp dinh dưỡng bằng công nghệ Plasma fusion", "service_ids": [], "unmatched_names": ["Cấp dinh dưỡng bằng công nghệ Plasma fusion"], "has_medical_claim": true, "claim_note": "Hứa 'phục hồi liên kết collagen và elastine' và 'đào thải khí tắt nghẽn'.", "note": null },
+    { "key": "facial/14", "group": "facial", "n": 14, "file": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/14.png", "kind": "service", "title": "Lăn dưỡng", "service_ids": [], "unmatched_names": ["Lăn dưỡng"], "has_medical_claim": true, "claim_note": "Mức giá tên 'Giảm mụn, sẹo / nám, nếp nhăn' hứa giảm sẹo và nám.", "note": "Chưa có trong catalog." },
+    { "key": "facial/15", "group": "facial", "n": 15, "file": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/15.png", "kind": "process", "title": "Quy trình Lăn dưỡng", "service_ids": [], "unmatched_names": ["Lăn dưỡng"], "has_medical_claim": true, "claim_note": "Hứa 'phục hồi cấu trúc da suy', 'lớp bảo vệ hoàn hảo', 'giảm sẹo nhẹ'.", "note": null },
+    { "key": "facial/16", "group": "facial", "n": 16, "file": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/16.png", "kind": "service", "title": "Inner Fill nâng cấp da", "service_ids": [], "unmatched_names": ["Inner Fill nâng cấp da"], "has_medical_claim": false, "claim_note": null, "note": "60-75 phút, 6,500,000 VNĐ; chưa có trong catalog." },
+    { "key": "facial/17", "group": "facial", "n": 17, "file": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/17.png", "kind": "process", "title": "Quy trình Inner Fill nâng cấp da", "service_ids": [], "unmatched_names": ["Inner Fill nâng cấp da"], "has_medical_claim": true, "claim_note": "Bước 'Inner fill hoạt chất theo chỉ định' dùng từ y khoa 'chỉ định'.", "note": null },
+    { "key": "facial/18", "group": "facial", "n": 18, "file": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/18.png", "kind": "service", "title": "Bio PDRN Nuôi da căng bóng", "service_ids": [], "unmatched_names": ["Bio PDRN Nuôi da căng bóng"], "has_medical_claim": true, "claim_note": "In 'Có hiệu quả trong việc điều trị mụn trứng cá và sắc tố'.", "note": "Chưa có trong catalog." },
+    { "key": "facial/19", "group": "facial", "n": 19, "file": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/19.png", "kind": "process", "title": "Quy trình Bio PDRN", "service_ids": [], "unmatched_names": ["Bio PDRN Nuôi da căng bóng"], "has_medical_claim": false, "claim_note": null, "note": null },
+    { "key": "facial/20", "group": "facial", "n": 20, "file": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/20.png", "kind": "service", "title": "Bio PDRN Nuôi da căng bóng full", "service_ids": [], "unmatched_names": ["Bio PDRN Nuôi da căng bóng full"], "has_medical_claim": true, "claim_note": "In 'Có hiệu quả trong việc điều trị mụn trứng cá và sắc tố'.", "note": "Chưa có trong catalog." },
+    { "key": "facial/21", "group": "facial", "n": 21, "file": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/21.png", "kind": "process", "title": "Quy trình Bio PDRN full", "service_ids": [], "unmatched_names": ["Bio PDRN Nuôi da căng bóng full"], "has_medical_claim": true, "claim_note": "Nêu liệu pháp và máy chưa xác minh: 'Carboxy Therapy', 'Bắn trẻ hoá IPL'.", "note": null },
+
+    { "key": "healing/1", "group": "healing", "n": 1, "file": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/1.png", "kind": "cover", "title": "Menu giúp bạn khỏe", "service_ids": [], "unmatched_names": [], "has_medical_claim": false, "claim_note": null, "note": "Tên nhóm 'giúp bạn khỏe' là lời hứa nhẹ về sức khỏe, không nêu bệnh." },
+    { "key": "healing/2", "group": "healing", "n": 2, "file": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/2.png", "kind": "service", "title": "Thải hàn giải cảm", "service_ids": ["thai-han-giai-cam"], "unmatched_names": [], "has_medical_claim": true, "claim_note": "Tên 'giải cảm' hứa chữa cảm.", "note": "Ảnh bìa in thiếu dấu: 'Thải hàn giai cam'." },
+    { "key": "healing/3", "group": "healing", "n": 3, "file": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/3.png", "kind": "process", "title": "Quy trình thải hàn giải cảm", "service_ids": ["thai-han-giai-cam"], "unmatched_names": [], "has_medical_claim": true, "claim_note": "Tiêu đề 'thải hàn giải cảm' hứa chữa cảm; bước 'trục hàn'.", "note": null },
+    { "key": "healing/4", "group": "healing", "n": 4, "file": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/4.png", "kind": "other", "title": "Thải hàn – giải cảm: Chăm sóc cơ thể từ gốc", "service_ids": ["thai-han-giai-cam"], "unmatched_names": [], "has_medical_claim": true, "claim_note": "Quy triệu chứng (dễ cảm gió, đau đầu) cho nhiễm hàn; 'đã chăm sóc dứt điểm'; 'hiệu quả được duy trì lâu dài'.", "note": null },
+    { "key": "healing/5", "group": "healing", "n": 5, "file": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/5.png", "kind": "service", "title": "Detox cơ thể", "service_ids": ["detox-mui-co-the"], "unmatched_names": [], "has_medical_claim": false, "claim_note": null, "note": "Chữ 'Detox' có thể bị hiểu là thải độc; ảnh bìa chỉ in tên, giá và thời gian." },
+    { "key": "healing/6", "group": "healing", "n": 6, "file": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/6.png", "kind": "other", "title": "Detox cơ thể: Chăm sóc từ bên trong", "service_ids": ["detox-mui-co-the"], "unmatched_names": [], "has_medical_claim": true, "claim_note": "Giải thích mùi cơ thể bằng 'độc tố dễ tích tụ'; hệ bạch huyết là 'đường ống thải độc'; 'làm sạch từ bên trong'.", "note": null },
+    { "key": "healing/7", "group": "healing", "n": 7, "file": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/7.png", "kind": "process", "title": "Quy trình detox cơ thể", "service_ids": ["detox-mui-co-the"], "unmatched_names": [], "has_medical_claim": false, "claim_note": null, "note": "Bước 3 in 'toàn thán'." },
+    { "key": "healing/8", "group": "healing", "n": 8, "file": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/8.png", "kind": "service", "title": "Đau thắt lưng mỏi gối", "service_ids": ["dau-that-lung-moi-goi"], "unmatched_names": [], "has_medical_claim": false, "claim_note": null, "note": "Tên dịch vụ nêu triệu chứng đau; ảnh bìa không in câu hứa chữa." },
+    { "key": "healing/9", "group": "healing", "n": 9, "file": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/9.png", "kind": "other", "title": "Đau thắt lưng, mỏi gối: Chăm sóc từ bên trong", "service_ids": ["dau-that-lung-moi-goi"], "unmatched_names": [], "has_medical_claim": true, "claim_note": "Quy đau lưng cho thận ('chính khí của thận đang suy yếu'); hứa 'giảm đau mỏi rõ rệt'.", "note": null },
+    { "key": "healing/10", "group": "healing", "n": 10, "file": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/10.png", "kind": "process", "title": "Quy trình đau thắt lưng, mỏi gối", "service_ids": ["dau-that-lung-moi-goi"], "unmatched_names": [], "has_medical_claim": true, "claim_note": "Bước 'bổ khí thận', 'thải dịch phù nề', 'bộ bổ thận' hứa tác động lên thận và phù nề.", "note": null },
+    { "key": "healing/11", "group": "healing", "n": 11, "file": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/11.png", "kind": "service", "title": "Thiếu máu não – tê tay, căng thẳng khó ngủ", "service_ids": ["thieu-mau-nao"], "unmatched_names": [], "has_medical_claim": true, "claim_note": "Tên dịch vụ là tên bệnh 'Thiếu máu não'.", "note": null },
+    { "key": "healing/12", "group": "healing", "n": 12, "file": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/12.png", "kind": "other", "title": "Thiếu máu não – tê tay – căng thẳng, khó ngủ: Chăm sóc vai cổ chuyên sâu", "service_ids": ["thieu-mau-nao"], "unmatched_names": [], "has_medical_claim": true, "claim_note": "Tiêu đề là tên bệnh; nói liệu trình tác động 'tuần hoàn và thần kinh'.", "note": null },
+    { "key": "healing/13", "group": "healing", "n": 13, "file": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/13.png", "kind": "process", "title": "Quy trình chăm sóc vai cổ chuyên sâu", "service_ids": ["thieu-mau-nao"], "unmatched_names": [], "has_medical_claim": false, "claim_note": null, "note": null },
+    { "key": "healing/14", "group": "healing", "n": 14, "file": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/14.png", "kind": "service", "title": "Giải mỏi đứng lâu – chăm sóc chân giãn tĩnh mạch", "service_ids": ["giai-moi-dung-lau"], "unmatched_names": [], "has_medical_claim": true, "claim_note": "Tên gắn dịch vụ với bệnh 'giãn tĩnh mạch'.", "note": "Ảnh bìa in 'giãn tinh mạch'." },
+    { "key": "healing/15", "group": "healing", "n": 15, "file": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/15.png", "kind": "other", "title": "Giải mỏi đứng lâu: Chăm sóc chân giãn tĩnh mạch", "service_ids": ["giai-moi-dung-lau"], "unmatched_names": [], "has_medical_claim": true, "claim_note": "Tiêu đề nêu bệnh 'giãn tĩnh mạch'; hứa 'hỗ trợ lưu thông'.", "note": null },
+    { "key": "healing/16", "group": "healing", "n": 16, "file": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/16.png", "kind": "process", "title": "Quy trình chăm sóc chân", "service_ids": ["giai-moi-dung-lau"], "unmatched_names": [], "has_medical_claim": false, "claim_note": null, "note": "Sáu bước giống hệt slide 13; bản đối chiếu nghi slide này chép nhầm." },
+    { "key": "healing/17", "group": "healing", "n": 17, "file": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/17.png", "kind": "service", "title": "Ngừa đột quỵ", "service_ids": ["dien-chan-ngua-dot-quy"], "unmatched_names": [], "has_medical_claim": true, "claim_note": "Tên 'Ngừa đột quỵ' hứa phòng một bệnh nguy hiểm.", "note": null },
+    { "key": "healing/18", "group": "healing", "n": 18, "file": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/18.png", "kind": "other", "title": "Ngừa đột quỵ: Chăm sóc lưu thông và phòng ngừa từ sớm", "service_ids": ["dien-chan-ngua-dot-quy"], "unmatched_names": [], "has_medical_claim": true, "claim_note": "Hứa 'phòng ngừa từ sớm'; nói về 'tuần hoàn máu não'.", "note": null },
+    { "key": "healing/19", "group": "healing", "n": 19, "file": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/19.png", "kind": "process", "title": "Quy trình ngừa đột quỵ", "service_ids": ["dien-chan-ngua-dot-quy"], "unmatched_names": [], "has_medical_claim": true, "claim_note": "Bước 'xoá tắt nghẽn mạch máu', 'bộ huyệt chống đột quỵ', 'Thải độc'.", "note": null },
+
+    { "key": "thu-gian-toc/1", "group": "thu-gian-toc", "n": 1, "file": "sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/1.png", "kind": "cover", "title": "Menu chăm sóc tóc", "service_ids": [], "unmatched_names": [], "has_medical_claim": false, "claim_note": null, "note": null },
+    { "key": "thu-gian-toc/2", "group": "thu-gian-toc", "n": 2, "file": "sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/2.png", "kind": "service", "title": "Detox da đầu", "service_ids": ["detox-da-dau"], "unmatched_names": [], "has_medical_claim": false, "claim_note": null, "note": null },
+    { "key": "thu-gian-toc/3", "group": "thu-gian-toc", "n": 3, "file": "sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/3.png", "kind": "other", "title": "Detox da đầu: giới thiệu", "service_ids": ["detox-da-dau"], "unmatched_names": [], "has_medical_claim": true, "claim_note": "Dọa bệnh ('sẽ rất dễ bệnh đấy'); khẳng định 'lành tính'.", "note": null },
+    { "key": "thu-gian-toc/4", "group": "thu-gian-toc", "n": 4, "file": "sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/4.png", "kind": "process", "title": "Quy trình Detox da đầu", "service_ids": ["detox-da-dau"], "unmatched_names": [], "has_medical_claim": false, "claim_note": null, "note": "Bước 6 in 'Xã phục hồi'." },
+    { "key": "thu-gian-toc/5", "group": "thu-gian-toc", "n": 5, "file": "sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/5.png", "kind": "service", "title": "Gội đầu thư giãn", "service_ids": ["goi-dau-thu-gian"], "unmatched_names": [], "has_medical_claim": false, "claim_note": null, "note": null },
+    { "key": "thu-gian-toc/6", "group": "thu-gian-toc", "n": 6, "file": "sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/6.png", "kind": "other", "title": "Gội đầu thư giãn: giới thiệu", "service_ids": ["goi-dau-thu-gian"], "unmatched_names": [], "has_medical_claim": true, "claim_note": "Dọa bệnh ('dễ nhiễm lạnh lại hay sinh bệnh', 'ngấm lạnh sương ốm').", "note": null },
+    { "key": "thu-gian-toc/7", "group": "thu-gian-toc", "n": 7, "file": "sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/7.png", "kind": "process", "title": "Quy trình Gội Đầu Thư Giãn", "service_ids": ["goi-dau-thu-gian"], "unmatched_names": [], "has_medical_claim": false, "claim_note": null, "note": null },
+    { "key": "thu-gian-toc/8", "group": "thu-gian-toc", "n": 8, "file": "sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/8.png", "kind": "service", "title": "Chăm sóc nan tóc", "service_ids": ["cham-soc-nan-toc"], "unmatched_names": [], "has_medical_claim": false, "claim_note": null, "note": null },
+    { "key": "thu-gian-toc/9", "group": "thu-gian-toc", "n": 9, "file": "sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/9.png", "kind": "process", "title": "Quy trình Chăm Sóc Nan Tóc", "service_ids": ["cham-soc-nan-toc"], "unmatched_names": [], "has_medical_claim": true, "claim_note": "Bước 'Ủ dược liệu kích mọc tóc' và 'muối thảo dược giảm rụng' hứa mọc tóc, giảm rụng.", "note": null },
+    { "key": "thu-gian-toc/10", "group": "thu-gian-toc", "n": 10, "file": "sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/10.png", "kind": "service", "title": "Peel peptide da đầu", "service_ids": [], "unmatched_names": ["Peel peptide da đầu"], "has_medical_claim": false, "claim_note": null, "note": "15 phút, 299,000 VNĐ; chưa có trong catalog." },
+    { "key": "thu-gian-toc/11", "group": "thu-gian-toc", "n": 11, "file": "sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/11.png", "kind": "other", "title": "Peel peptide da đầu: giới thiệu", "service_ids": [], "unmatched_names": ["Peel peptide da đầu"], "has_medical_claim": true, "claim_note": "Giải thích rụng tóc bằng 'tác nhân gây rụng ẩn sâu trong tế bào'; nêu ngứa, mẩn đỏ.", "note": null },
+    { "key": "thu-gian-toc/12", "group": "thu-gian-toc", "n": 12, "file": "sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/12.png", "kind": "process", "title": "Quy trình Peel da đầu", "service_ids": [], "unmatched_names": ["Peel peptide da đầu"], "has_medical_claim": true, "claim_note": "Hứa 'kích hoạt nan tóc'; tên máy 'Điện tim sát khuẩn' chưa xác minh.", "note": null },
+    { "key": "thu-gian-toc/13", "group": "thu-gian-toc", "n": 13, "file": "sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/13.png", "kind": "price_list", "title": "Mask collection", "service_ids": [], "unmatched_names": ["Mặt nạ tóc Bồ kết", "Mặt nạ cho mặt Mask dẻo Hàn Quốc Collagen", "Mặt nạ Phục hồi PDRN"], "has_medical_claim": true, "claim_note": "Hứa 'giảm gãy rụng', 'tái tạo da, làm dịu tổn thương'; nhãn 'Lành tính an toàn', 'Cho mọi loại da & tóc'.", "note": null },
+    { "key": "thu-gian-toc/14", "group": "thu-gian-toc", "n": 14, "file": "sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/14.png", "kind": "price_list", "title": "Option nâng cấp", "service_ids": [], "unmatched_names": ["Option Detox da đầu", "Option Massage mặt", "Option Massage tay", "Option Massage cổ, vai, gáy", "Option Massage chân"], "has_medical_claim": true, "claim_note": "Hứa 'giảm đau cổ vai gáy', 'cải thiện lưu thông máu', 'cải thiện giấc ngủ'.", "note": "Option Massage cổ, vai, gáy và Massage chân trùng tên dịch vụ trong catalog nhưng là mục cộng thêm." },
+
+    { "key": "hair-removal/1", "group": "hair-removal", "n": 1, "file": "sources/drive-resources/thomhouse-menu/hair-removal-triet-long/1.png", "kind": "cover", "title": "Triệt lông", "service_ids": [], "unmatched_names": [], "has_medical_claim": false, "claim_note": null, "note": null },
+    { "key": "hair-removal/2", "group": "hair-removal", "n": 2, "file": "sources/drive-resources/thomhouse-menu/hair-removal-triet-long/2.png", "kind": "price_list", "title": "Bảng giá triệt lông (suất lẻ và combo 20 buổi)", "service_ids": [], "unmatched_names": ["Triệt lông Nách", "Triệt lông Mép - Cằm - Trán", "Triệt lông Viền bi - Ngực", "Triệt lông Mặt - Tay - Cổ - Nữa Chân", "Triệt lông Bikini - Chân - Bụng - Lưng", "Triệt lông Full body"], "has_medical_claim": false, "claim_note": null, "note": "12 mức giá chưa có trong catalog; giá combo Nách chờ chủ studio xác nhận." },
+    { "key": "hair-removal/3", "group": "hair-removal", "n": 3, "file": "sources/drive-resources/thomhouse-menu/hair-removal-triet-long/3.png", "kind": "other", "title": "Phiếu thông tin khách", "service_ids": [], "unmatched_names": [], "has_medical_claim": false, "claim_note": null, "note": "Phiếu nội bộ, không gửi cho khách; không nằm trong bìa, bảng giá hay dịch vụ nào." }
+  ]
+}

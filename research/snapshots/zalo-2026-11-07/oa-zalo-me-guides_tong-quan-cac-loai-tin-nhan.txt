@@ -1,0 +1,114 @@
+ Tổng quan các loại tin nhắn trên Zalo Official Account | Zalo Official Account 
+ Skip to main content 
+ HƯỚNG DẪN VẬN HÀNH
+ Đăng ký và Xác thực 
+ Thanh toán 
+ Thiết lập tài khoản OA 
+ Quản lý nội dung 
+ Tin nhắn 
+ Tổng quan các loại tin nhắn trên Zalo Official Account 
+ Tin Tư vấn 
+ Tin Broadcast 
+ ZBS Template Message 
+ Câu hỏi thường gặp 
+ Công cụ gửi tin 
+ Gọi thoại 
+ Quản lý hội thoại 
+ Nhóm Chat GMF 
+ Tối ưu vận hành 
+ Mở rộng 
+ Nhà phát triển 
+ Tin nhắn 
+ Tổng quan các loại tin nhắn trên Zalo Official Account 
+ On this page 
+ Tổng quan các loại tin nhắn trên Zalo Official Account
+ Các thông tin trong bài viết này có hiệu lực từ ngày 01/01/2026 . 
+ 📌 Tổng quan ​ 
+ User ID (UID) trong Zalo Official Account là định danh của một người dùng đối với một tài khoản OA.
+ Tin nhắn là tương tác gửi từ Zalo OA Doanh nghiệp đến người dùng Zalo cá nhân. Tin nhắn trên Zalo Official Account gồm 2 loại chính:
+ Tin nhắn Cơ bản là tin nhắn cho phép OA sử dụng để giao tiếp với người dùng, bao gồm:
+ Tin Tư vấn
+ Tin gửi từ OA vào Nhóm chat GMF
+ Tin Broadcast
+ ZBS Template Message là giải pháp tin nhắn cho Doanh nghiệp theo mẫu (template) gửi đến người dùng qua UID và qua số điện thoại (SĐT) trên Zalo. ZBS Template Message có 2 loại chính: Tin Giao dịch và Tin Hậu mãi .
+ Tương tác của người dùng với OA được hiểu là mọi hành động người dùng thực hiện với OA theo các hình thức được nền tảng công nhận để xác định quyền gửi tin nhắn của OA, bao gồm:
+ Gửi tin nhắn đến OA
+ Gửi tin trong nhóm chat GMF
+ Gọi thoại đến OA
+ Đồng ý nhận cuộc gọi từ OA
+ Bình luận (comment) bài viết OA
+ Tương tác với OA Chatbot
+ Nhấn Menu hoặc CTA query
+ Quan tâm OA
+ Nhấn nút "Nhắn tin" trên trang Thông tin OA
+ Nhấn vào Widget của OA
+ 🚩 Lưu ý: 
+ OA cần sử dụng các loại tin theo đúng mục đích được quy định, tránh làm phiền người dùng và tuân thủ các quy định về tương tác của OA. Hệ thống có cơ chế xác định và tự động hạn chế các luồng gửi tin có dấu hiệu gây phiền tới người dùng.
+ Hạn mức nhận tin nhắn có mục đích truyền thông của người quan tâm OA không được quá hạn mức do nền tảng quy định theo chính sách từng thời kỳ. Xem chi tiết tại đây .
+ 👉 Xem chi tiết Chính sách về tương tác của OA với người dùng tại đây .
+ 📌 Tin nhắn Cơ bản ​ 
+ 1. Tin Tư vấn ​ 
+ Mục đích sử dụng: Phản hồi trực tiếp tới khách hàng và hỗ trợ tư vấn, giải đáp về sản phẩm, dịch vụ khi khách hàng yêu cầu.
+ Điều kiện để gửi tin: Người dùng có phát sinh tương tác với OA và đang không chặn OA, chi tiết như sau:
+ Khi người dùng thực hiện một trong các tương tác:
+ Gửi tin nhắn đến OA
+ Gửi tin nhắn trong nhóm chat GMF
+ Gọi thoại đến OA
+ Đồng ý nhận cuộc gọi từ OA
+ Bình luận (comment) bài viết của OA
+ Tương tác với OA Chatbot
+ Nhấn Menu hoặc CTA query hoặc Widget của OA
+ 👉 OA có thể gửi tin Tư vấn đến người dùng.
+ Khi người dùng thực hiện một trong các tương tác:
+ Quan tâm OA
+ Nhấn nút Nhắn tin trên trang Thông tin OA
+ 👉 OA có thể gửi lời chào ngay sau khi người dùng thực hiện hành động.
+ Công cụ gửi tin: Trang Quản lý OA - OA Manager (trên Web và Mini App), OA OpenAPI, chi tiết như sau:
+ Công cụ Trang Quản lý OA - OA Manager có thể gửi tin Tư vấn đến người dùng trong vòng 365 ngày kể từ tương tác cuối của người dùng.
+ Công cụ OA OpenAPI có thể gửi tin Tư vấn đến người dùng trong vòng 07 ngày kể từ tương tác cuối của người dùng.
+ Hiển thị tin trên thiết bị của người dùng: Hiển thị trên điện thoại và máy tính.
+ Thời gian gửi tin: 24/24
+ Thông báo đến người dùng: 24/24
+ Chi phí: 
+ Tin Tư vấn gửi trong khung 48 giờ kể từ tương tác cuối của người dùng hoàn toàn miễn phí.
+ Tin Tư vấn ngoài khung 48 giờ kể từ tương tác cuối của người dùng, giá tin Tư vấn ngoài khung được tính theo bảng giá tại đây .
+ 👉 Chi tiết tài liệu kỹ thuật để gửi tin Tư vấn qua OpenAPI tại đây .
+ 2. Tin gửi từ OA vào Nhóm chat GMF ​ 
+ Mục đích sử dụng: Giao tiếp với người dùng đang tham gia Nhóm chat GMF của OA.
+ Điều kiện để gửi tin: OA đang sử dụng Nhóm chat GMF. Xem thêm tại đây .
+ Công cụ gửi tin: Trang Quản lý OA - OA Manager (trên Web và Mini App), OA OpenAPI.
+ Chi phí: Miễn phí. Vui lòng tham khảo Bảng giá mới nhất tại đây .
+ Hiển thị tin trên thiết bị của người dùng: Hiển thị trên điện thoại và máy tính.
+ Thời gian gửi tin: 24/24
+ Thông báo đến người dùng: 24/24
+ 👉 Chi tiết tài liệu kỹ thuật để gửi tin từ OA đến Nhóm chat GMF qua OpenAPI tại đây .
+ 3. Tin Broadcast ​ 
+ Mục đích sử dụng: Cập nhật đồng loạt đến khách hàng những thông tin chung, nội dung hữu ích hoặc thông tin về sản phẩm, dịch vụ.
+ Điều kiện để gửi tin: Người dùng đang quan tâm OA.
+ Công cụ gửi tin: Trang Quản lý OA - OA Manager trên Web.
+ Chi phí: Số lượng tin người dùng có thể nhận trong tháng áp dụng theo hạn mức tin Broadcast của Gói dịch vụ OA. Xem thêm tại đây .
+ Hiển thị tin trên thiết bị của người dùng: Hiển thị trên điện thoại và máy tính.
+ Thời gian gửi tin: Từ 6h00 đến 19h59.
+ Thông báo đến người dùng: Từ 6h00 đến 19h59.
+ 👉Xem thêm chi tiết về tin Broadcast tại đây .
+ 📌 ZBS Template Message ​ 
+ ZBS Template Message là giải pháp tin nhắn cho Doanh nghiệp theo mẫu (template). ZBS Template Message có 2 loại chính: Tin Giao dịch và Tin Hậu mãi 
+ Để đăng ký ZBS Template Message, OA có thể đăng ký bằng 02 cách sau:
+ Công cụ Tạo mẫu tin tại tài khoản ZBS: xem chi tiết tại đây .
+ Công cụ OpenAPI: xem chi tiết tại đây .
+ Template được đăng ký và kiểm duyệt theo quy định có thể được gửi đến người dùng bằng hai phương thức: gửi qua UID hoặc gửi qua SĐT trên Zalo , chi tiết như sau:
+ Gửi qua UID trên công cụ OpenAPI: xem chi tiết tại đây .
+ Gửi qua SĐT trên công cụ OpenAPI: xem chi tiết tại đây .
+ Gửi qua UID và SĐT trên công cụ OAM: xem chi tiết tại đây .
+ Hình ảnh trong bài viết chỉ có tính chất minh họa, giao diện thực tế có thể điểu chỉnh để đảm bảo trải nghiệm người dùng cuối. 
+ ------------------
+ Nếu có thắc mắc khác, vui lòng cung cấp OA ID và gửi email hoặc chat với BQT ZOA để được phản hồi sớm nhất.
+ Previous
+ Thẻ tương tác
+ Next
+ Tin Tư vấn
+ 📌 Tổng quan 
+ 📌 Tin nhắn Cơ bản 1. Tin Tư vấn 
+ 2. Tin gửi từ OA vào Nhóm chat GMF 
+ 3. Tin Broadcast 
+ 📌 ZBS Template Message 

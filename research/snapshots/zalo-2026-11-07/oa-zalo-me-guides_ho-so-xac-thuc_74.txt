@@ -1,0 +1,65 @@
+ Hồ sơ xác thực | Zalo Official Account 
+ Skip to main content 
+ HƯỚNG DẪN VẬN HÀNH
+ Đăng ký và Xác thực 
+ Khởi tạo Zalo Official Account 
+ Lựa chọn danh mục 
+ Hướng dẫn đặt tên Zalo OA 
+ Lý do OA bị khóa và cách khắc phục 
+ Hướng dẫn xác thực 
+ Hồ sơ xác thực 
+ Xác thực theo lĩnh vực hoạt động 
+ Xử lý hồ sơ bị từ chối 
+ Hỗ trợ tạo, xác thực, cài đặt OA cho chuỗi cửa hàng 
+ Thanh toán 
+ Thiết lập tài khoản OA 
+ Quản lý nội dung 
+ Tin nhắn 
+ Công cụ gửi tin 
+ Gọi thoại 
+ Quản lý hội thoại 
+ Nhóm Chat GMF 
+ Tối ưu vận hành 
+ Mở rộng 
+ Nhà phát triển 
+ Đăng ký và Xác thực 
+ Hồ sơ xác thực 
+ On this page 
+ Hồ sơ xác thực Zalo OA
+ Vui lòng tham khảo hướng dẫn dưới đây để chuẩn bị đầy đủ tài liệu xác thực Zalo OA. Các hồ sơ hợp lệ sẽ được kiểm duyệt trong khoảng 1-2 ngày làm việc. Việc chuẩn bị đúng và đủ ngay từ đầu sẽ giúp tiết kiệm tối đa thời gian cho Quý khách.
+ I. Tài liệu bắt buộc ​ 
+ Admin OA cần chuẩn bị bản scan hoặc ảnh chụp rõ nét bản gốc của 1 trong 2 loại tài liệu sau:
+ [ Công văn xác thực theo mẫu tải  tại đây ]
+ II. Tài liệu bổ sung ​ 
+ Các trường hợp sau đây cần bổ sung 01 Yếu tố kinh doanh để được hỗ trợ xác thực:
+ 👉 Trường hợp 1: OA hoạt động trong ngành, nghề kinh doanh có điều kiện ​ 
+ Bổ sung Yếu tố kinh doanh theo ngành, nghề : Giấy phép hoạt động trong ngành nghề đầu tư, kinh doanh có điều kiện theo danh sách đính kèm.
+ 👉 Trường hợp 2 : Tên OA khác với tên trên Giấy đăng ký kinh doanh (bao gồm tên được đặt theo tên thương hiệu/ nhãn hiệu hoặc tên sản phẩm/ dịch vụ ) ​ 
+ Bổ sung Yếu tố kinh doanh theo tên sản phẩm/ dịch vụ : Giấy tờ hoặc thông tin liên quan xác minh tên sản phẩm/ dịch vụ của doanh nghiệp hoặc doanh nghiệp được kinh doanh theo hợp đồng/ uỷ quyền.
+ Nếu sản phẩm/ dịch vụ do doanh nghiệp phân phối, được nhượng quyền/ ủy quyền... , vui lòng gửi kèm Yếu tố kinh doanh là Hợp đồng phân phối/ đại lý/ nhượng quyền/ ủy quyền, và đặt tên OA như sau:
+ Phân phối độc quyền : Tên OA = Tên sản phẩm
+ Phân phối không độc quyền : Tên OA = [Tiền tố] + [Tên sản phẩm] + [Tên doanh nghiệp]. Trong đó, tiền tố là các từ như: Nhà phân phối (NPP), ...
+ Đại lý/ tổng đại lý (Ô tô & xe máy, Bảo hiểm, Kinh doanh xổ số,…) : Tên OA = [Tiền tố] + [Tên sản phẩm] + [Tên doanh nghiệp]. Trong đó, tiền tố là các từ Đại lý, Tổng đại lý, ...
+ Nếu sản phẩm/ dịch vụ của doanh nghiệp , vui lòng gửi kèm Yếu tố kinh doanh là một (01) trong các giấy tờ, thông tin theo hướng dẫn sau:
+ Lưu ý: 
+ Giấy phép/ giấy chứng nhận/ hợp đồng phải còn hiệu lực và thể hiện đầy đủ các nội dung cần thiết để hỗ trợ xác minh. Các thông tin bảo mật có thể bôi đen hoặc làm mờ.
+ Đối với các nhãn hiệu không đăng ký ở Việt Nam, giấy tờ phải là hình chụp/ scan của bản gốc bằng tiếng Anh hoặc bản dịch thuật tiếng Việt công chứng.
+ Doanh nghiệp hoạt động lĩnh vực Y tế & Dược phẩm (phòng khám đa khoa/ chuyên khoa/ y học cổ truyền, nha khoa,...), admin OA cần cung cấp Giấy phép hoạt động khám bệnh, chữa bệnh do Bộ Y Tế hoặc Sở Y Tế cấp, để hỗ trợ xác thực;
+ Doanh nghiệp hoạt động lĩnh vực Tài chính & Ngân hàng, admin OA vui lòng sử dụng email doanh nghiệp cấp để gửi thông tin OA và họ tên, chức danh đến oa@zalo.me để hỗ trợ xác minh;
+ Doanh nghiệp hoạt động lĩnh vực dịch vụ cầm đồ cần phải ghi rõ lĩnh vực “Dịch vụ cầm đồ” trong tên OA hoặc thông tin giới thiệu OA và cung cấp kèm Giấy chứng nhận đủ điều kiện an ninh, trật tự trong bộ hồ sơ xác thực.
+ Quy trình xét duyệt xác thực OA:   ​ 
+ BQT Zalo OA sẽ xét duyệt yêu cầu xác thực OA theo quy trình và chính sách trong vòng 2-3 ngày làm việc, tuy nhiên trong một số trường hợp, có thể mất nhiều thời gian hơn;
+ Trong quá trình xét duyệt, BQT Zalo OA có thể yêu cầu OA cung cấp thêm thông tin hoặc các giấy tờ khác với mục đích đảm bảo Doanh nghiệp/HKD đã đăng ký thành lập và đang hoạt động theo quy định của pháp luật Việt Nam;
+ Kết quả xét duyệt xác thực sẽ được gửi tin nhắn thông báo đến Quản trị viên OA từ  “Zalo Official Account”  và thông báo mục “Tin nhắn hệ thống” trên OA Manager  tại đây 
+ Trường hợp bị từ chối xác thực, admin OA cần đọc kỹ nội dung thông báo để hiểu rõ lý do và thực hiện điều chỉnh theo hướng dẫn (nếu có) trước khi gửi lại hồ sơ xác thực trong vòng 14 ngày. Tham khảo Hướng dẫn xử lý hồ sơ bị từ chối   tại đây .
+ Tham khảo Chính sách xác thực tài khoản   tại đây .
+ ----------------------------------------
+ Nếu có thắc mắc khác hoặc khiếu nại, vui lòng gửi email đến  oa@zalo.me để được giải đáp.
+ Previous
+ Hướng dẫn xác thực
+ Next
+ Y tế & Dược phẩm
+ I. Tài liệu bắt buộc 
+ II. Tài liệu bổ sung 👉 Trường hợp 1: OA hoạt động trong ngành, nghề kinh doanh có điều kiện 
+ 👉 Trường hợp 2 : Tên OA khác với tên trên Giấy đăng ký kinh doanh (bao gồm tên được đặt theo tên thương hiệu/ nhãn hiệu hoặc tên sản phẩm/ dịch vụ ) 
+ Quy trình xét duyệt xác thực OA:   

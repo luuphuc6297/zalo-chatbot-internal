@@ -1,0 +1,18 @@
+.secrets/
+.venv/
+results/
+node_modules/
+.dev.vars
+.env
+.env.*
+!.env.example
+!.dev.vars.example
+dist/
+.wrangler/
+*.tsbuildinfo
+__pycache__/
+.DS_Store
+tools/zalo-agent/
+
+# Third-party repositories cloned for research, each with its own git history
+sources/repos/

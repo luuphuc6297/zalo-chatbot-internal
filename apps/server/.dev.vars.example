@@ -1,0 +1,16 @@
+# Copy to .dev.vars (gitignored) for `wrangler dev`. Placeholders only; never commit real values.
+RUNNER_TOKEN=dev-runner-token-change-me
+STAFF_TOKEN=dev-staff-token-change-me
+ZALO_APP_ID=dev-app-id
+ZALO_OA_ID=dev-oa-id
+ZALO_OA_SECRET_KEY=dev-oa-secret
+ZALO_APP_SECRET_KEY=dev-app-secret
+# Enables /dev/* (still needs the STAFF_TOKEN bearer). Never set in Cloudflare.
+ENV=dev
+# Personal Zalo channel (docs/contracts.md "Personal Zalo channel"). The same value goes to the bridge as
+# ZALO_WEBHOOK_SECRET for `zalo-agent listen --webhook`. Generate one: openssl rand -hex 32
+ZALO_PERSONAL_WEBHOOK_SECRET=dev-personal-webhook-secret-change-me
+# Optional: the personal account's ownId; webhook events of another account are ignored.
+# ZALO_PERSONAL_ACCOUNT_ID=
+# Local app on the personal account: sends to OA users are refused, personal customers go through the bridge.
+ZALO_MODE=personal

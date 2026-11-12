@@ -1,0 +1,186 @@
+#!/bin/bash
+# thom house launcher, rendered from install/thomhouse.sh.in by release.write_launcher (docs/contracts.md 16.4.2).
+# Only APP_HOME and BOT_HOME are written in; nothing version-specific is (rev F10). At every run it reads PY_VERSION
+# from $APP_HOME/app/install/versions.env as text. When runtime/python is missing, does not run or is older than
+# 3.11 it runs the bash doctor (16.7 checks 1 to 5) and exits 1; otherwise it starts the CLI with a clean
+# environment (env -i), also when that Python prints another version than PY_VERSION (doctor check 5 reports it).
+# THOMHOUSE_APP_HOME and THOMHOUSE_BOT_HOME of the caller are ignored; other THOMHOUSE_* settings pass through.
+# THOMHOUSE_TOOL_PATH (tests only) replaces /usr/bin:/bin:/usr/sbin:/sbin at the end of the PATH.
+
+APP_HOME="@APP_HOME@"
+BOT_HOME="@BOT_HOME@"
+
+set -u
+umask 077
+SYSTEM_PATH="${THOMHOUSE_TOOL_PATH:-/usr/bin:/bin:/usr/sbin:/sbin}"
+PATH="$SYSTEM_PATH"
+export PATH
+
+say() { printf '%s\n' "$*"; }
+
+tilde() {
+  case "$1" in
+    "$HOME") printf '~' ;;
+    "$HOME"/*) printf '~%s' "${1#"$HOME"}" ;;
+    *) printf '%s' "$1" ;;
+  esac
+}
+
+VERSIONS_ENV=""
+venv() {
+  local line
+  while IFS= read -r line; do
+    case "$line" in
+      "$1="*) printf '%s' "${line#*=}"; return 0 ;;
+    esac
+  done <<EOF
+$VERSIONS_ENV
+EOF
+  printf '%s' "${2:-}"
+}
+
+first_version() { sed -n 's/[^0-9]*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/p' | head -n 1; }
+
+run_version() {
+  [ -x "$1" ] || return 0
+  "$1" --version 2>&1 </dev/null | first_version
+}
+
+num() {
+  local n="${1%%[!0-9]*}"
+  printf '%s' "${n:-0}"
+}
+
+ver_ge() {
+  local a1 a2 a3 b1 b2 b3
+  [ -n "$1" ] || return 1
+  IFS=. read -r a1 a2 a3 <<EOF
+$1
+EOF
+  IFS=. read -r b1 b2 b3 <<EOF
+$2
+EOF
+  a1="$(num "${a1:-}")"; a2="$(num "${a2:-}")"; a3="$(num "${a3:-}")"
+  b1="$(num "${b1:-}")"; b2="$(num "${b2:-}")"; b3="$(num "${b3:-}")"
+  [ "$a1" -gt "$b1" ] && return 0
+  [ "$a1" -lt "$b1" ] && return 1
+  [ "$a2" -gt "$b2" ] && return 0
+  [ "$a2" -lt "$b2" ] && return 1
+  [ "$a3" -ge "$b3" ]
+}
+
+tool_found() {
+  local d IFS=:
+  for d in $PATH; do
+    [ -x "$d/$1" ] && return 0
+  done
+  return 1
+}
+
+build_env() {
+  local u np name
+  u="${USER:-$(id -un 2>/dev/null)}"
+  np="${no_proxy:-${NO_PROXY:-}}"
+  for name in 127.0.0.1 localhost ::1; do
+    case ",$np," in
+      *",$name,"*) ;;
+      *) np="${np:+$np,}$name" ;;
+    esac
+  done
+  ENV_ARGS=(HOME="$HOME" USER="$u" LOGNAME="$u" LANG=en_US.UTF-8 TERM="${TERM:-xterm-256color}"
+    TMPDIR="${TMPDIR:-/tmp}"
+    PATH="$APP_HOME/runtime/node/bin:$APP_HOME/runtime/python/bin:$APP_HOME/runtime/bin:$SYSTEM_PATH"
+    THOMHOUSE_APP_HOME="$APP_HOME" THOMHOUSE_BOT_HOME="$BOT_HOME"
+    DISABLE_UPDATES=1 ZALO_AGENT_NO_UPDATE_CHECK=1 WRANGLER_SEND_METRICS=false PROFILE_LLM_ENABLED=false)
+  for name in http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY ZALO_CONFIG_DIR; do
+    if [ -n "${!name:-}" ]; then ENV_ARGS+=("$name=${!name}"); fi
+  done
+  for name in $(compgen -e); do
+    case "$name" in
+      THOMHOUSE_APP_HOME | THOMHOUSE_BOT_HOME) ;;
+      THOMHOUSE_*) ENV_ARGS+=("$name=${!name}") ;;
+    esac
+  done
+  ENV_ARGS+=(no_proxy="$np" NO_PROXY="$np")
+}
+
+# ---------------------------------------------------------------- bash doctor (16.7 checks 1 to 5)
+# Keep this block identical in selfextract.sh.in and thomhouse.sh.in (test_release_launcher checks it).
+DOCTOR_TOOLS="curl shasum tar lsof ssh-keygen pbcopy pbpaste open sips hdiutil launchctl sw_vers sysctl"
+doctor_line() {
+  if [ -n "${4:-}" ]; then say "[$1] $2: $3 Cách sửa: $4"; else say "[$1] $2: $3"; fi
+}
+free_gb() {
+  local kb
+  kb="$(df -Pk "$HOME" 2>/dev/null | awk 'NR==2 {print $4}')"
+  printf '%s' $(( $(num "$kb") * 1024 / 1000000000 ))
+}
+bash_doctor() {
+  local rc=0 os v gb missing t pyv fix
+  os="$(uname -s 2>/dev/null)"
+  if [ "$os" = Darwin ]; then
+    v="$(sw_vers -productVersion 2>/dev/null)"
+    if ver_ge "$v" "$MACOS_MIN"; then
+      doctor_line "ĐẠT" "Hệ điều hành" "macOS $v"
+    else
+      doctor_line "LỖI" "Hệ điều hành" "macOS $v, chatbot cần $MACOS_MIN trở lên." \
+        "anh cập nhật macOS trong Cài đặt hệ thống rồi chạy lại."
+      rc=1
+    fi
+  else
+    doctor_line "LỖI" "Hệ điều hành" "${os:-?} chưa được hỗ trợ." "chatbot chỉ chạy trên máy Mac."
+    rc=1
+  fi
+  if [ "$(sysctl -n hw.optional.arm64 2>/dev/null)" = 1 ]; then
+    doctor_line "ĐẠT" "Chip" "Apple Silicon"
+  else
+    doctor_line "CHÚ Ý" "Chip" "máy Intel chưa được chạy thử." \
+      "nếu gặp lỗi, anh gửi kết quả lệnh này cho người phụ trách."
+  fi
+  gb="$(free_gb)"
+  if [ "$gb" -ge "$(num "$DISK_MIN_GB")" ]; then
+    doctor_line "ĐẠT" "Dung lượng trống" "$gb GB"
+  else
+    doctor_line "LỖI" "Dung lượng trống" "chỉ còn $gb GB, cần ít nhất $DISK_MIN_GB GB." \
+      "anh xóa bớt tệp rồi chạy lại."
+    rc=1
+  fi
+  missing=""
+  for t in $DOCTOR_TOOLS; do
+    tool_found "$t" || missing="${missing:+$missing, }$t"
+  done
+  if [ -z "$missing" ]; then
+    doctor_line "ĐẠT" "Công cụ của macOS" "đủ"
+  else
+    doctor_line "LỖI" "Công cụ của macOS" "thiếu $missing." "đây là lỗi lạ trên macOS; anh báo người phụ trách."
+    rc=1
+  fi
+  pyv="$(run_version "$APP_HOME/runtime/python/bin/python3")"
+  if [ -n "$pyv" ] && { [ -z "$PY_VERSION" ] || [ "$pyv" = "$PY_VERSION" ]; }; then
+    doctor_line "ĐẠT" "Python" "$pyv"
+  else
+    if [ -f "$APP_HOME/installed.json" ]; then
+      fix="bash $(tilde "$APP_HOME")/app/install/bootstrap.sh --python-only"
+    else
+      fix="anh chạy lại file thomhouse-$1.command."
+    fi
+    doctor_line "LỖI" "Python" "chưa có Python $PY_VERSION." "$fix"
+    rc=1
+  fi
+  return $rc
+}
+# ---------------------------------------------------------------- end of the bash doctor
+
+VERSIONS_ENV="$(cat "$APP_HOME/app/install/versions.env" 2>/dev/null)"
+MACOS_MIN="$(venv MACOS_MIN 13.5)"
+DISK_MIN_GB="$(venv DISK_MIN_GB 3)"
+PY_VERSION="$(venv PY_VERSION)"
+PY="$APP_HOME/runtime/python/bin/python3"
+FOUND="$(run_version "$PY")"
+if ! ver_ge "$FOUND" 3.11.0; then
+  VERSION="$(sed -n 's/.*"version"[^"]*"\([0-9][0-9.]*\)".*/\1/p' "$APP_HOME/app/VERSION.json" 2>/dev/null | head -n 1)"
+  bash_doctor "${VERSION:-<bản>}"
+  exit 1
+fi
+build_env
+exec /usr/bin/env -i "${ENV_ARGS[@]}" "$PY" -I "$APP_HOME/app/install/thomhouse.py" "$@"

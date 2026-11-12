@@ -1,0 +1,248 @@
+#!/usr/bin/env python3
+"""Fake `zalo-agent` CLI for bridge tests. Never contacts Zalo and never reads ~/.zalo-agent-cli.
+
+Behaviour comes from the JSON file in $FAKE_ZALO_CONFIG (re-read on every call):
+  {"send": "ok" | "ok_split" | "not_logged_in" | "timeout" | "garbled" | "zalo_error" | "partial" | "transport"
+           | "usage" | "crash",
+   "sleep_s": 5, "logged_in": true, "version": "2.5.9",
+   "log": "/path/calls.jsonl", "state": "/path/daemon.json", "daemon_log": "/path/daemon.log",
+   "daemon_fails": "Daemon process exited before becoming ready.",
+   "send_image": "ok" | "no_ids" | "not_logged_in" | "zalo_error" | "transport" | "timeout" | "too_many" | "garbled",
+   "label_list": "ok" | "not_logged_in" | "zalo_error" | "timeout" | "garbled" | "crash" | "no_label_data" | "array",
+   "labels": [{"id": 1, "text": "Khách hàng", "conversations": ["2000000000000002", "g3000000000000003"]}]}
+A label may carry "drop": ["conversations"] to leave keys out; an entry that is not an object is printed as it is.
+`label list` prints {"labelData": <labels>, "version": n, "lastUpdateTime": ms} like src/commands/label.js (the
+answer of zca-js getLabels); "label_sleep_s" delays it (and is the length of the "timeout" mode).
+Output mirrors the real engine in --json mode: one JSON value on stdout; failures print {"error": ...} and the
+send action still exits 0, like src/commands/msg.js.
+"""
+import hashlib, json, os, sys, time
+from pathlib import Path
+
+cfg = json.loads(Path(os.environ["FAKE_ZALO_CONFIG"]).read_text())
+argv = sys.argv[1:]
+
+
+def stdin_is_devnull():
+    try:
+        return os.fstat(0).st_rdev == os.stat("/dev/null").st_rdev
+    except OSError:
+        return True   # closed
+
+
+secret = os.environ.get("ZALO_WEBHOOK_SECRET")
+entry = {"argv": argv, "stdin_devnull": stdin_is_devnull(), "own_process_group": os.getpgrp() == os.getpid(),
+         "env": {"webhook_secret_sha": hashlib.sha256(secret.encode()).hexdigest() if secret else None,
+                 "runner_token": "RUNNER_TOKEN" in os.environ,
+                 "staff_token": "STAFF_TOKEN" in os.environ,
+                 "personal_secret": "ZALO_PERSONAL_WEBHOOK_SECRET" in os.environ,
+                 "no_update_check": os.environ.get("ZALO_AGENT_NO_UPDATE_CHECK"),
+                 "send_format": os.environ.get("ZALO_SEND_FORMAT")}}
+if cfg.get("log"):
+    with open(cfg["log"], "a") as f:
+        f.write(json.dumps(entry) + "\n")
+
+
+def out(obj, code=0):
+    print(json.dumps(obj, indent=2))
+    sys.exit(code)
+
+
+if argv == ["--version"]:
+    print(cfg.get("version", "2.5.9"))
+    sys.exit(0)
+
+args = list(argv)
+json_mode = "--json" in args
+if json_mode:
+    args.remove("--json")
+account = None
+if "--account" in args:
+    i = args.index("--account")
+    account = args[i + 1]
+    del args[i:i + 2]
+
+OWN_ID = "1000000000000001"     # fake id
+state_path = Path(cfg.get("state", "/nonexistent"))
+
+
+def daemon_state():
+    try:
+        return json.loads(state_path.read_text())
+    except (OSError, ValueError):
+        return {"running": False}
+
+
+if args[:1] == ["status"]:
+    li = cfg.get("logged_in", True)
+    out({"loggedIn": li, "ownId": OWN_ID if li else None,
+         "activeAccount": {"ownId": OWN_ID, "name": "Fake", "proxy": None} if cfg.get("has_account", True) else None,
+         "daemon": daemon_state()})
+
+if args[:1] == ["listen"]:
+    log_path = cfg.get("daemon_log", "/nonexistent/daemon.log")
+    if not cfg.get("has_account", True):
+        out({"error": "No active account. Please login first. You can also pass --account <ID>."}, 1)
+    st = daemon_state()
+    if "--status" in args:
+        out({"accountId": OWN_ID, "running": bool(st.get("running")), "pid": st.get("pid"),
+             "channelPort": 50000 if st.get("running") else None, "stages": [], "logPath": log_path,
+             "health": {"socket": {"state": "up", "forSec": 5, "reconnects": 0},
+                        "webhook": {"pending": 0, "dead": 0, "deliveredTotal": 3, "consecutiveFailures": 0},
+                        "uptimeSec": 5, "warnings": []} if st.get("running") else None})
+    if "--stop" in args:
+        if st.get("running"):
+            state_path.write_text(json.dumps({"running": False}))
+            out({"accountId": OWN_ID, "stopped": True, "pid": st.get("pid"), "graceful": True})
+        out({"accountId": OWN_ID, "stopped": False, "pid": None, "graceful": False})
+    if "-d" in args:
+        if st.get("running"):
+            out({"error": f"Another listen daemon is already running for account {OWN_ID} (PID {st['pid']})."}, 1)
+        if cfg.get("daemon_fails"):
+            out({"error": f"Failed to start background listener: {cfg['daemon_fails']}"}, 1)
+        filtered = [a for a in argv if a not in ("-d", "--daemon")]
+        with open(log_path, "a") as f:
+            f.write(f"\n--- [2026-11-08T00:00:00.000Z] starting daemon: /fake/zalo-agent {' '.join(filtered)} ---\n")
+        state_path.write_text(json.dumps({"running": True, "pid": 4242}))
+        out({"accountId": OWN_ID, "pid": 4242, "channelPort": 50000, "logPath": log_path})
+    out({"error": "fake: unsupported listen call"}, 1)
+
+if args[:2] == ["msg", "send"]:
+    rest = args[2:]
+    if "--" in rest:
+        i = rest.index("--")
+        opts, pos = rest[:i], rest[i + 1:]
+    else:
+        opts, pos = [], []
+        skip = False
+        for j, a in enumerate(rest):
+            if skip:
+                skip = False
+                opts.append(a)
+                continue
+            if a.startswith("-"):
+                if a in ("-t", "--type"):
+                    skip = True
+                    opts.append(a)
+                    continue
+                sys.stderr.write(f"error: unknown option '{a}'\n")
+                sys.exit(1)
+            pos.append(a)
+    if len(pos) != 2:
+        sys.stderr.write("error: missing required argument 'message'\n")
+        sys.exit(1)
+    thread_id, text = pos
+    mode = cfg.get("send", "ok")
+    if mode == "usage":
+        sys.stderr.write("error: unknown option '--bogus'\n")
+        sys.exit(1)
+    if not cfg.get("logged_in", True) or mode == "not_logged_in":
+        sys.stderr.write("AutoLogin failed: Đăng nhập thất bại\n")
+        out({"error": "Not logged in. Run: zalo-agent login"})
+    if mode == "timeout":
+        time.sleep(float(cfg.get("sleep_s", 30)))
+        out({"message": {"msgId": 1}, "attachment": []})
+    if mode == "garbled":
+        print("  ✓ Message sent")
+        sys.exit(0)
+    if mode == "crash":
+        sys.stderr.write("TypeError: cannot read properties of undefined\n")
+        sys.exit(1)
+    if mode == "zalo_error":
+        out({"error": "Tham số không hợp lệ"})
+    if mode == "transport":
+        out({"error": "fetch failed: socket hang up"})
+    if mode == "partial":
+        out({"error": "Zalo error (part 2 of 2 failed; the 1 earlier part(s) were already delivered)"})
+    n = int(time.time() * 1000)
+    body = {"message": {"msgId": 7100000000000 + (n % 100000), "cliMsgId": str(n)}, "attachment": [],
+            "cliMsgId": str(n)}
+    if mode == "ok_split":
+        body["splitInto"] = 2
+        body["parts"] = [{"msgId": "1", "cliMsgId": "2"}, {"msgId": "3", "cliMsgId": "4"}]
+    if cfg.get("sent_log"):
+        with open(cfg["sent_log"], "a") as f:
+            f.write(json.dumps({"thread_id": thread_id, "text": text, "msgId": str(body["message"]["msgId"]),
+                                "account": account}) + "\n")
+    out(body)
+
+if args[:2] == ["msg", "send-image"]:
+    # Mirrors src/commands/msg.js send-image in --json mode: success prints the zca-js answer plus
+    # `sent: [{msgId, cliMsgId}]`, one per image; a failure prints {"error": ...} and exits 1.
+    # cfg "send_image": "ok" | "no_ids" | "not_logged_in" | "zalo_error" | "transport" | "timeout" | "too_many" | "garbled"
+    rest = args[2:]
+    if "--" not in rest:
+        sys.stderr.write("error: missing required argument 'paths'\n")
+        sys.exit(1)
+    i = rest.index("--")
+    opts, pos = rest[:i], rest[i + 1:]
+    if len(pos) < 2:
+        sys.stderr.write("error: missing required argument 'paths'\n")
+        sys.exit(1)
+    thread_id, paths = pos[0], pos[1:]
+    mode = cfg.get("send_image", "ok")
+    if not cfg.get("logged_in", True) or mode == "not_logged_in":
+        sys.stderr.write("AutoLogin failed: Đăng nhập thất bại\n")
+        out({"error": "Not logged in. Run: zalo-agent login"}, 1)
+    if mode == "timeout":
+        time.sleep(float(cfg.get("sleep_s", 30)))
+    if mode == "garbled":
+        print("  ✓ Image(s) sent")
+        sys.exit(0)
+    missing = [p for p in paths if not os.path.isfile(p)]
+    if missing:
+        out({"error": f"ENOENT: no such file or directory, open '{os.path.basename(missing[0])}'"}, 1)
+    if mode == "too_many":
+        out({"error": "Exceed maximum file of 3"}, 1)
+    if mode == "zalo_error":
+        out({"error": "Tham số không hợp lệ"}, 1)
+    if mode == "transport":
+        out({"error": "fetch failed: socket hang up"}, 1)
+    n = int(time.time() * 1000)
+    ids = [str(7200000000000 + (n % 100000) * 10 + k) for k in range(len(paths))]
+    attachment = [{"msgId": m, "cliMsgId": str(n + k)} for k, m in enumerate(ids)]
+    body = {"message": None, "attachment": attachment, "sent": [] if mode == "no_ids" else attachment, "viaDaemon": False}
+    if mode == "no_ids":
+        body["attachment"] = [{} for _ in paths]
+    if cfg.get("sent_log"):
+        with open(cfg["sent_log"], "a") as f:
+            f.write(json.dumps({"thread_id": thread_id, "images": [os.path.relpath(p, os.path.dirname(os.path.dirname(p))) for p in paths],
+                                "msgIds": ids, "opts": opts, "account": account}) + "\n")
+    out(body)
+
+if args[:2] == ["label", "list"]:
+    # Mirrors src/commands/label.js `list` in --json mode: output(await getApi().getLabels()); a failure prints
+    # {"error": "Get labels failed: ..."} and still exits 0.
+    mode = cfg.get("label_list", "ok")
+    if mode == "timeout" or cfg.get("label_sleep_s"):
+        time.sleep(float(cfg.get("label_sleep_s", 30)))
+    if not cfg.get("logged_in", True) or mode == "not_logged_in":
+        sys.stderr.write("AutoLogin failed: Đăng nhập thất bại\n")
+        out({"error": "Get labels failed: Not logged in. Run: zalo-agent login"})
+    if mode == "zalo_error":
+        out({"error": "Get labels failed: Tham số không hợp lệ"})
+    if mode == "garbled":
+        print("  ● Labels: 3")
+        sys.exit(0)
+    if mode == "crash":
+        sys.stderr.write("TypeError: cannot read properties of undefined\n")
+        sys.exit(1)
+    if mode == "no_label_data":
+        out({"version": 7, "lastUpdateTime": 1790000000000})
+    if mode == "array":
+        out(cfg.get("labels", []))
+    labels = []
+    for n, label in enumerate(cfg.get("labels", [])):
+        if not isinstance(label, dict):     # a malformed entry, passed through as it is
+            labels.append(label)
+            continue
+        full = {"id": n + 1, "text": "", "conversations": [], "color": "#77D9A0", "emoji": "", "offset": n,
+                "createTime": 1790000000000 + n}
+        full.update(label)
+        for k in label.get("drop", []):
+            full.pop(k, None)
+        full.pop("drop", None)
+        labels.append(full)
+    out({"labelData": labels, "version": 7, "lastUpdateTime": 1790000000000})
+
+out({"error": f"fake: unsupported command {args}"}, 1)

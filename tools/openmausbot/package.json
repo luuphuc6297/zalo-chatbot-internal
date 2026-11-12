@@ -1,0 +1,6 @@
+{
+  "private": true,
+  "dependencies": {
+    "openmausbot": "0.1.154"
+  }
+}

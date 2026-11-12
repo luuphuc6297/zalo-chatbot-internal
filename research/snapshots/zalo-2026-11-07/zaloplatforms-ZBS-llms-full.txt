@@ -1,0 +1,3250 @@
+# ZBS Template Message — Toàn văn tài liệu
+
+> Toàn bộ nội dung tài liệu ZBS Template Message. Nguồn: https://docs.zaloplatforms.com
+
+# Giới thiệu ZBS Template Message
+Source: https://docs.zaloplatforms.com/docs/ZBS/bat-dau/gioi-thieu-zbs-template-message.md
+
+# Giới thiệu ZBS Template Message
+
+ZBS Template Message API là phương thức chính giúp doanh nghiệp (OA) sử dụng dịch vụ ZBS Template Message, thông qua việc tích hợp Template Message API với hệ thống nội bộ của doanh nghiệp.
+
+ZBS Template Message API giúp doanh nghiệp gửi tin nhắn có sử dụng Template tới user với số lượng lớn và hỗ trợ việc vận hành một cách tự động, đặc biệt trong việc nhận thông tin và truy xuất dữ liệu.
+
+Để sử dụng ZBS Template Message bằng API, doanh nghiệp cần có các tài khoản sau:
+
+
+| Tài khoản | Định nghĩa | Khởi tạo và sử dụng |
+| --- | --- | --- |
+| Zalo Official Account (Zalo OA) | Zalo OA là tài khoản chính thức của Doanh nghiệp trên Zalo, giúp Doanh nghiệp tương tác với người dùng Zalo cá nhân. Tin nhắn ZBS sẽ được gửi tới người dùng Zalo dưới định danh của OA. | Doanh nghiệp chưa có tài khoản OA, có thể bắt đầu tạo OA theo hướng dẫn [tại đây.](https://oa.zalo.me/home/documents/guides/khoi-tao-zalo-official-account_61) |
+| Ứng dụng trên nền tảng Zalo (Zalo App) | Ứng dụng của doanh nghiệp khởi tạo trên nền tảng Zalo, dùng để quản lý Zalo OA hoặc các dịch vụ của nền tảng Zalo (ZBS, Mini App,…). | Doanh nghiệp chưa có Zalo App có thể khởi tạo Ứng dụng theo hướng dẫn [tại đây.](https://zalo.solutions/blog/huong-dan-tao-ung-dung-app-id-va-lien-ket-voi-zalo-oa-/qvzvew3ucioojluzbqfmkf0r) Sau khi tạo ứng dụng, Doanh nghiệp cần xác thực và cấp quyền cho ứng dụng theo hướng dẫn [tại đây](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) để có thể bắt đầu gửi tin nhắn ZBS |
+| ZBS Account (ZBS) | ZBS Account (ZBS) là công cụ quản lý số dư tiền để sử dụng tính năng tính phí của các tài khoản Zalo OA và tin nhắn ZBS. | Doanh nghiệp chưa có ZBS có thể khởi tạo ZBS theo hướng dẫn [tại đây.](https://zalo.solutions/blog/zca-la-gi-huong-dan-dang-ky-tai-khoan-zca/cg671ejticd2co4v5yj7ioz0) Sau đó liên kết ZBS với Zalo App theo hướng dẫn [tại đây](https://zalo.solutions/blog/huong-dan-lien-ket-app-id-vao-tai-khoan-zalo-cloud-account-zca/g6c2pw3grmirqedi1t69u6ta) (Lưu ý: 1 ZBS có thể link với nhiều Zalo App). |
+
+
+## Mô hình sử dụng dịch vụ ZBS Template Message và vận hành bằng API
+
+Để gửi thông báo Template và quản lý vận hành bằng Template Message API, doanh nghiệp cần tích hợp Template Message API với hệ thống (server) của doanh nghiệp thông qua việc cấp quyền cho ứng dụng Zalo App.
+
+Doanh nghiệp sẽ gọi các API tương ứng với các quyền quản lý OA và gửi tin nhắn ZBS dưới định danh OA thông qua ứng dụng. Khi có sự kiện về thông báo được gửi hoặc tương tác giữa người dùng và OA hoặc các thông báo từ Zalo, Zalo sẽ gửi các event webhook (method POST) đến webhook url của ứng dụng
+
+![](/assets/ZBS/img/gioi-thieu-zbs-template-message-1.jpg)
+Luồng gửi, quản lý dữ liệu và vận hành thông qua API
+
+---
+
+# Giới thiệu về các nhóm quyền thuộc ZBS Template Message
+Source: https://docs.zaloplatforms.com/docs/ZBS/bat-dau/gioi-thieu-ve-cac-nhom-quyen-thuoc-zbs-template-message.md
+
+# Giới thiệu về các nhóm quyền thuộc ZBS Template Message
+
+Để sử dụng ZBS Template Message qua API hoặc qua Gửi tin nhắn theo chiến dịch, đối tác sở hữu AppID cần được OA uỷ quyền tương ứng để có thể sử dụng API hoặc nhận sự kiện qua webhook.
+
+Đối tác tham khảo danh sách API/webhook với các nhóm quyền tương ứng:
+
+## 1. Quyền sử dụng API
+
+| Nhóm quyền | API liên quan |
+| --- | --- |
+| **Quyền gửi tin qua SĐT:** - Gửi tin qua sđt - Truy xuất dữ liệu gửi tin SĐT | - [API Gửi tin](/docs/ZBS/gui-tin-template-qua-sdt/api-gui-tin-qua-sdt/api-gui-tin) - [API Gửi tin sử dụng hash phone](/docs/ZBS/gui-tin-template-qua-sdt/api-gui-tin-qua-sdt/api-gui-tin-su-dung-hash-phone) - [API Gửi tin sử dụng development mode](/docs/ZBS/gui-tin-template-qua-sdt/api-gui-tin-qua-sdt/api-gui-tin-su-dung-development-mode) - [API Gửi tin với hệ mã hóa RSA](/docs/ZBS/gui-tin-template-qua-sdt/api-gui-tin-qua-sdt/api-gui-tin-voi-he-ma-hoa-rsa) - [API Gửi tin journey](/docs/ZBS/gui-tin-template-qua-sdt/api-gui-tin-qua-sdt/api-gui-tin-journey) - [API Lấy thông tin trạng thái gửi tin qua SĐT](/docs/ZBS/gui-tin-template-qua-sdt/api-truy-xuat-thong-tin-gui-tin-qua-sdt/api-lay-thong-tin-trang-thai-gui-tin-qua-sdt) - [API Lấy thông tin quota gửi tin qua SĐT](/docs/ZBS/gui-tin-template-qua-sdt/api-truy-xuat-thong-tin-gui-tin-qua-sdt/api-lay-thong-tin-quota-gui-tin-qua-sdt) - [API Lấy thông tin chất lượng gửi tin qua SĐT hiện tại của OA](/docs/ZBS/gui-tin-template-qua-sdt/api-truy-xuat-thong-tin-gui-tin-qua-sdt/api-lay-thong-tin-chat-luong-gui-tin-qua-sdt-hien-tai-cua-oa) |
+| **Quyền quản lý Message Template:** - Tạo và chỉnh sửa thông tin Template - Truy xuất thông tin Template - Quản lý hình ảnh / logo dùng cho việc tạo Template | - [API tạo template](/docs/ZBS/quan-ly-template/template-api/api-tao-template) - [API chỉnh sửa template](/docs/ZBS/quan-ly-template/template-api/api-chinh-sua-template) - [API Upload ảnh](/docs/ZBS/quan-ly-template/template-api/api-upload-anh) - [API Lấy danh sách template](/docs/ZBS/quan-ly-template/template-api/api-lay-danh-sach-template) - [API Lấy thông tin chi tiết template](/docs/ZBS/quan-ly-template/template-api/api-lay-thong-tin-chi-tiet-template) - [API Lấy dữ liệu mẫu của template](/docs/ZBS/quan-ly-template/template-api/api-lay-du-lieu-mau-cua-template) - [API Lấy thông tin đánh giá của khách hàng](/docs/ZBS/quan-ly-template/template-api/api-lay-thong-tin-danh-gia-cua-khach-hang) |
+| **Quyền gửi tin nhắn** | - [API gửi tin UID](/docs/ZBS/gui-tin-template-qua-uid/api-gui-tin-qua-uid) (Tham khảo bài viết [tại đây](/docs/OA/bat-dau/gioi-thieu-official-account-api-va-cac-nhom-quyen)) |
+
+## 2. Quyền nhận sự kiện webhook
+
+| Nhóm quyền | Sự kiện liên quan |
+| --- | --- |
+| **Quyền nhận sự kiện quản lý gửi tin qua SĐT:** - Sự kiện quản lý quyền lợi của OA - Sự kiện từ người dùng | - [Sự kiện người dùng nhận tin qua SĐT](/docs/ZBS/gui-tin-template-qua-sdt/webhook-gui-tin-qua-sdt/su-kien-nguoi-dung-nhan-tin-qua-sdt) - [Sự kiện thay đổi về hạn mức gửi tin qua SĐT](/docs/ZBS/gui-tin-template-qua-sdt/webhook-gui-tin-qua-sdt/su-kien-thay-doi-ve-han-muc-gui-tin-qua-sdt) |
+| **Quyền nhận sự kiện quản lý gửi tin qua UID:** - Sự kiện người dùng đã nhận tin nhắn từ OA - Sự kiện người dùng đã đọc tin nhắn - Sự kiện người dùng gửi tin nhắn đến OA - Sự kiện OA gửi tin nhắn cho người dùng | - [Sự kiện về gửi tin UID](/docs/ZBS/gui-tin-template-qua-uid/webhook-gui-tin-qua-uid) |
+| **Quyền nhận sự kiện quản lý message template:** - Sự kiện người dùng phản hồi Template đánh giá dịch vụ - Sự kiện thay đổi trạng thái Template ZBS - Sự kiện thay đổi chất lượng gửi của Template ZBS - Sự kiện thay đổi thông tin Journey | - [Sự kiện người dùng phản hồi template đánh giá dịch vụ](/docs/ZBS/quan-ly-template/template-webhook/su-kien-nguoi-dung-phan-hoi-template-danh-gia-dich-vu) - [Sự kiện thay đổi về chất lượng gửi của mẫu tin](/docs/ZBS/quan-ly-template/template-webhook/su-kien-thay-doi-ve-chat-luong-gui-cua-mau-tin) - [Sự kiện thay đổi trạng thái Template](/docs/ZBS/quan-ly-template/template-webhook/su-kien-thay-doi-trang-thai-template) - [Sự kiện Journey hết hạn](/docs/ZBS/gui-tin-template-qua-sdt/webhook-gui-tin-qua-sdt/su-kien-journey-het-han) - [Sự kiện Journey được tính phí](/docs/ZBS/gui-tin-template-qua-sdt/webhook-gui-tin-qua-sdt/su-kien-journey-duoc-tinh-phi) |
+
+---
+
+# Giới thiệu chung về Template
+Source: https://docs.zaloplatforms.com/docs/ZBS/quan-ly-template/bat-dau/gioi-thieu-chung-ve-template.md
+
+# Giới thiệu chung về Template
+
+## 1. Template là gì?
+
+![](/assets/ZBS/img/gioi-thieu-chung-ve-template-1.png)
+
+**Template** là mẫu nội dung tin nhắn có cấu trúc được **định nghĩa trước, đăng ký và kiểm duyệt bởi Zalo Business Solutions**, dùng để gửi tin nhắn doanh nghiệp đến người dùng Zalo.
+
+Template được dùng chung cho cả luồng gửi tin nhắn qua **Số điện thoại (SDT)** và **UID**.
+
+## 2. Cấu trúc cơ bản của một Template
+
+Về mặt kỹ thuật, một Template ZBS được cấu thành từ **components** và **parameters**, trong đó hai khái niệm này **độc lập với nhau** nhưng được sử dụng kết hợp khi hiển thị nội dung tin nhắn.
+
+- **Components** định nghĩa cấu trúc và cách hiển thị của Template (ví dụ: tiêu đề, đoạn văn bản, bảng, nút hành động…).
+- **Parameters** định nghĩa dữ liệu động được truyền vào khi gửi tin và có thể được sử dụng bên trong các components.
+
+Nói cách khác, **components là khung**, còn **parameters là dữ liệu được inject vào khung đó tại thời điểm gửi.**
+
+### 2.1. Tham số
+
+Tham số là các biến động được định nghĩa sẵn trong Template và được map dữ liệu khi gọi API gửi tin.
+
+![](/assets/ZBS/img/gioi-thieu-chung-ve-template-2.png)
+ 
+
+Mỗi parameter tương ứng với một placeholder (ví dụ: `<customer_name>`, `<order_code>`) và **có thể được sử dụng trong nhiều loại component khác nhau**, không giới hạn ở content văn bản.
+
+Khi gửi tin, hệ thống ZBS sẽ thay thế các placeholder trong component bằng dữ liệu thực tế được truyền vào từ request API.
+
+### 2.2. Components
+
+Components là các khối cấu trúc được sử dụng để xây dựng nội dung Template.
+
+Các components này được khai báo và cấu hình khi sử dụng **API tạo template ZBS** hoặc **API chỉnh sửa template ZBS**, và quyết định cách tin nhắn được hiển thị cũng như khả năng tương tác của người dùng.
+
+![](/assets/ZBS/img/gioi-thieu-chung-ve-template-3.png)
+ 
+
+Mỗi component có:
+
+- Cấu trúc dữ liệu (syntax) riêng
+- Tập tham số hỗ trợ riêng
+- Các ràng buộc kỹ thuật (độ dài, số lượng parameter, điều kiện bắt buộc…)
+
+Danh sách đầy đủ các loại components, cấu trúc dữ liệu, ví dụ syntax và quy tắc sử dụng chi tiết được mô tả trong tài liệu chính thức của Zalo Developers tại:
+
+- API tạo Template: [https://developers.zalo.me/docs/zbs-template-message/quan-ly-template/template-api/tao-template](/docs/ZBS/quan-ly-template/template-api/api-tao-template)
+- Danh sách components: [https://developers.zalo.me/docs/zbs-template-message/quan-ly-template/bat-dau/danh-sach-components](/docs/ZBS/quan-ly-template/bat-dau/danh-sach-components)
+
+## 3. Mục đích gửi của Template (Tag)
+
+Mỗi Template bắt buộc phải được phân loại theo **mục đích nội dung**.
+
+Phân loại này ảnh hưởng trực tiếp đến kiểm duyệt, quota và quyền gửi tin.
+
+| Tag | Phân loại | Mục đích | Use case thực tế |
+| --- | --- | --- | --- |
+| Tag 1 | TRANSACTION | Tin nhắn giao dịch | OTP, xác nhận đơn hàng, trạng thái thanh toán |
+| Tag 2 | CUSTOMER_CARE | Chăm sóc khách hàng | Nhắc lịch, cập nhật dịch vụ, khảo sát |
+| Tag 3 | PROMOTION | Hậu mãi / khuyến mãi | Voucher, ưu đãi, upsell |
+
+## Ví dụ:
+
+### Tag 1 – TRANSACTION
+
+Tin nhắn phục vụ mục đích giao dịch hoặc xác thực, thường có tính khẩn cấp và bắt buộc cá nhân hóa.
+
+> Xin chào &#123;&#123;customer_name&#125;&#125;,
+>
+> Mã xác thực của bạn là &#123;&#123;otp_code&#125;&#125;.
+>
+> Mã có hiệu lực trong &#123;&#123;expire_time&#125;&#125; phút.
+
+### Tag 2 – CUSTOMER_CARE
+
+Tin nhắn dùng để chăm sóc, hỗ trợ hoặc thông báo dịch vụ.
+
+> Xin chào &#123;&#123;customer_name&#125;&#125;,
+>
+> Bạn có lịch hẹn bảo dưỡng vào ngày &#123;&#123;appointment_date&#125;&#125; tại &#123;&#123;service_location&#125;&#125;.
+>
+> Vui lòng liên hệ nếu cần hỗ trợ thêm.
+
+### Tag 3 – PROMOTION
+
+Tin nhắn mang tính tiếp thị, hậu mãi hoặc ưu đãi.
+
+> Xin chào &#123;&#123;customer_name&#125;&#125;,
+>
+> Ưu đãi &#123;&#123;discount_value&#125;&#125; dành riêng cho bạn khi mua &#123;&#123;product_name&#125;&#125;.
+>
+> Mã ưu đãi: &#123;&#123;promo_code&#125;&#125;.
+>
+> Ưu đãi có hiệu lực đến &#123;&#123;expiry_date&#125;&#125;.
+
+## 4. Trạng thái và chất lượng Template
+
+### 4.1. Trạng thái
+
+Template có vòng đời và chất lượng riêng, được Zalo theo dõi trong suốt quá trình sử dụng.
+
+| Status | Description |
+| --- | --- |
+| PENDING_REVIEW | Template đang chờ Zalo kiểm duyệt |
+| ENABLE | Template đã được duyệt và có thể sử dụng để gửi tin |
+| REJECT | Template bị từ chối do không đạt yêu cầu kiểm duyệt |
+| DISABLE | Template bị hủy kích hoạt, không thể tiếp tục sử dụng |
+| DELETE | Template đã bị xóa khỏi hệ thống |
+
+### 4.2. Chất lượng (Quality)
+
+Chất lượng Template được Zalo đánh giá dựa trên phản hồi người dùng và hành vi gửi tin sau khi Template được sử dụng.
+
+| Quality | Description |
+| --- | --- |
+| HIGH | Template có chất lượng tốt, tỷ lệ phản hồi tiêu cực thấp |
+| MEDIUM | Template có chất lượng ở mức bình thường |
+| LOW | Template có chất lượng thấp, có nguy cơ bị hạn chế hoặc DISABLE |
+| UNDEFINED | Chưa đủ dữ liệu để đánh giá chất lượng |
+
+---
+
+# Danh sách Components
+Source: https://docs.zaloplatforms.com/docs/ZBS/quan-ly-template/bat-dau/danh-sach-components.md
+
+# Danh sách Components
+
+Các components của template, được sử dụng trong [API tạo template](/docs/ZBS/quan-ly-template/template-api/api-tao-template) và [API chỉnh sửa template](/docs/ZBS/quan-ly-template/template-api/api-chinh-sua-template).
+
+Thứ tự và số lượng các components của mỗi template phụ thuộc vào loại template được chọn khởi tạo hoặc chỉnh sửa
+
+## Danh sách components
+
+### Danh sách components — 1. Tiêu đề (Title)
+
+** Syntax **
+
+```bash
+{ 
+  "TITLE": {"value": "<value>"} 
+}
+```
+
+** Tham số **
+
+| Field | Tính bắt buộc | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- | --- |
+| value | yes | string | - Bao gồm text cố định hoặc param. Số lượng param ở component TITLE không được vượt quá 4. - Tối thiểu 9 ký tự và tối đa 65 ký tự. |
+
+
+### Danh sách components — 2. Đoạn văn bản (Paragraph)
+
+** Syntax **
+
+```bash
+{   
+   "PARAGRAPH": {"value": "<value>"} 
+} 
+```
+
+** Tham số **
+
+| Field | Tính bắt buộc | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- | --- |
+| value | yes | string | - Bao gồm text cố định hoặc param. Số lượng param ở component PARAGRAPH vượt quá 10. - Tối thiểu 9 ký tự và tối đa 400 ký tự. |
+
+
+### Danh sách components — 3. OTP
+
+** Syntax **
+
+```bash
+{   
+    "OTP": {"value":"<value>"} 
+} 
+```
+
+** Tham số **
+
+| Field | Tính bắt buộc | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- | --- |
+| value | yes | string | - Bao gồm text cố định hoặc param. Nếu là param cần define param type là OTP(10). - Tối thiểu 1 ký tự và tối đa 10 ký tự. |
+
+
+### Danh sách components — 4. Bảng (Table)
+
+** Syntax **
+
+```bash
+{
+	"TABLE": {
+		"rows": [
+			{
+				"title": "<title>",
+				"value": "<value>",
+				"row_type": 1
+			},
+			{
+				"title": "<title>",
+				"value": "<value>"
+			}
+		]
+	}
+}
+```
+
+** Tham số **
+
+| Field | Tính bắt buộc | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- | --- |
+| rows | yes | JSON Array | - Mỗi object là một dòng của table. - Tối thiểu 2 objects, tối đa 8 objects. Cấu trúc data Object Field Tính bắt buộc Kiểu dữ liệu Mô tả title yes string - Chỉ chứa text cố định - Tối thiểu 3 ký tự, tối đa 36 ký tự value yes string - Bao gồm text cố định hoặc param (số lượng param không bị giới hạn theo component nhưng bị giới hạn theo template). - Tối thiểu 3 ký tự, tối đa 90 ký tự. row_type no integer Hiệu ứng row, bao gồm các hiệu ứng: - 0: Không có hiệu ứng - 1: Thành công - 2: Cập nhật - 3: Lưu ý - 4: Báo lỗi - 5: Cơ bản |
+
+
+### Danh sách components — 5. Tệp đính kèm (Attachment)
+
+** Syntax **
+
+```bash
+{
+	"type": "<type>",
+	"media_id": "<media_id>"
+}
+```
+
+** Tham số **
+
+| Field | Tính bắt buộc | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- | --- |
+| type | yes | string | Các định dạng support: - "IMAGE": Ảnh |
+| media_id | yes | string | media_id nhận được khi upload ảnh sử dụng [API upload ảnh](/docs/ZBS/quan-ly-template/template-api/api-chinh-sua-template). |
+
+
+### Danh sách components — 6. Logo
+
+** Syntax **
+
+```bash
+{
+    "LOGO": {
+        "light": "<attachment>",
+        "dark": "<attachment>"
+    }
+}
+```
+
+** Tham số **
+        
+| Field | Tính bắt buộc | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- | --- |
+| light | yes | Attachment Object | Sử dụng component Attachment |
+| dark | yes | Attachment Object | Sử dụng component Attachment |
+
+
+### Danh sách components — 7. Image
+
+** Syntax **
+
+```bash
+{
+	"IMAGES": {
+		"items": [
+			"<attachment>"
+		]
+	}
+}
+```
+
+** Tham số **
+        
+| Field | Tính bắt buộc | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- | --- |
+| items | yes | Attachment Array | Sử dụng component Attachment. Tối thiểu 1 Attachment và tối đa 3 Attachment |
+
+
+### Danh sách components — 8. Button
+
+** Syntax **
+
+```bash
+{
+	"BUTTONS": {
+		"items": [
+			{
+				"type": 1,
+				"title": "<button_title>",
+				"content": "<button_content>"
+			},
+			{
+				"type": 2,
+				"title": "<button_title>",
+				"content": "<button_content>"
+			}
+		]
+	}
+}
+```
+
+** Tham số **
+
+| Field | Tính bắt buộc | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- | --- |
+| items | yes | Attachment Array | - Chứa các object, mỗi object là một button - Tối thiểu 1 object và tối đa 2 objects |
+ 
+
+** Dữ liệu trường thông tin items **
+
+| Field | Tính bắt buộc | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- | --- |
+| type | yes | integer | Danh sách button: value Loại button 1 Đến trang của doanh nghiệp 2 Gọi điện 3 Đến trang thông tin OA 4 Đến ứng dụng Zalo Mini App của doanh nghiệp 5 Đến trang ứng dụng của doanh nghiệp 6 Đến trang phân phối sản phẩm (Ngừng hỗ trợ sau ngày 16/03/2026) 7 Đến trang web/Zalo Mini App khác 8 Đến trang ứng dụng của doanh nghiệp khác 9 Đến bài viết của OA và các tài nguyên khác của Doanh nghiệp trên Zalo 10 Sao chép 11 Thanh toán ngay 12 Xem chi tiết 13 Đến trang tra cứu hoá đơn điện tử 14 Đến trang đích kêu gọi hành động tải ứng dụng Từ ngày 16/03/2026, loại button “Đến trang phân phối sản phẩm” sẽ ngừng hỗ trợ cho việc tạo mới và chỉnh sửa template. Các template đang sử dụng phân loại này sẽ được tự động chuyển sang phân loại “Đến trang web/Zalo Mini App khác”. |
+| title | yes | string | - Nội dung button - Chỉ bao gồm text cố định, không cho phép param - Tối thiểu 5 ký tự và tối đa 30 ký tự |
+| content | yes | string | - Đường dẫn liên kết/số điện thoại - Cho phép param. Param cần được định nghĩa với type là URL(200) và ở vị trí sub domain. |
+
+
+### Danh sách components — 9. Payment
+
+** Syntax **
+
+```bash
+{
+	"PAYMENT": {
+		"bank_code": "970425",
+		"account_name": "Lê Huỳnh Minh Trí",
+		"bank_account": "31231902930129",
+		"amount": "<amount>",
+		"note": "<amount>"
+	}
+}
+```
+
+** Tham số **
+
+| Field | Tính bắt buộc | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- | --- |
+| bank_code | yes | string | - Bank code. Khi gửi tin sẽ hiển thị tên ngân hàng tương ứng. - Không cho phép truyền param, truyền vào các giá trị cố định tương ứng với BIN code nằm trong list Danh sách [BIN CODE](/docs/ZBS/phu-luc/danh-sach-bin-code) |
+| account_name | yes | string | - Tên tài khoản - Chỉ cho phép truyền text cố định - Tối thiểu 1 ký tự, tối đa 100 ký tự |
+| bank_account | yes | string | - Số tài khoản - Chỉ cho phép truyền fix text - Tối thiểu 1 ký tự, tối đa 100 ký tự |
+| amount | yes | list | - Số tiền - Cho phép truyền text cố định hoặc truyền biến - Truyền fix cần có giá trị từ 2,000 đến 500,000,000 - Param được truyền cần định nghĩa với type: Tiền tệ (VNĐ) (12) |
+| note | no | string | - Nội dung chuyển khoản. - Cho phép truyền text cố định hoặc truyền param. - Truyền fix: Tối thiếu 1, tối đa 90 ký tự - Truyền biến : Biến cần được định nghĩa với type: Bank transfer note (90). |
+
+
+### Danh sách components — 10. Voucher
+
+** Syntax **
+
+```bash
+{
+	"VOUCHER": {
+		"name": "<name>",
+		"condition": "<condition>",
+		"start_date": "<start_date>",
+		"end_date": "<end_date>",
+		"voucher_code": "ABC123"
+	}
+}
+```
+
+** Tham số **
+
+| Field | Tính bắt buộc | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- | --- |
+| name | yes | string | - Voucher name - Cho phép truyền text cố định hoặc param - Tối thiểu 1 ký tự, tối đa 30 ký tự |
+| condition | yes | string | - Điều kiện sử dụng voucher - Cho phép truyền text cố định hoặc param - Tối thiểu 1 ký tự, tối đa 40 ký tự |
+| start_date | no | string | - Ngày bắt đầu hiệu lực của voucher - Cho phép truyền text cố định hoặc param - Truyền param: Param cần được định nghĩa với type: Thời gian (20) - Truyền cố định: Giá trị tuân theo định dạng datetime |
+| end_date | yes | string | - Ngày kết thúc của voucher - Cho phép truyền text cố định hoặc param - Truyền param: Param cần được định nghĩa với type: Thời gian (20) - Truyền cố định: Giá trị tuân theo định dạng datetime |
+| voucher_code | yes | string | - Mã voucher - Cho phép truyền text cố định hoặc param. Tối thiểu 1 ký tự, tối đa 25 ký tự - Truyền param: Param cần được định nghĩa với type: Mã số (30) |
+
+
+### Danh sách components — 11. Rating
+
+** Syntax **
+
+```bash
+{ 
+    "RATING": { 
+        "rating_type": "csat", 
+        "option": "five_stars", 
+        "items": [ 
+            { 
+                "rate": 1, 
+                "title": "Rất không hài lòng", 
+                "question": "chúng tôi có thể cải thiện điều gì?", 
+                "answers": [ 
+                    "đóng gói hàng tốt hơn", 
+                    "chất lượng sản phẩm tốt hơn" 
+                ], 
+                "thanks": "abc", 
+                "description": "hello" 
+            }, 
+            { 
+                "rate": 2, 
+                "title": "Không hài lòng", 
+                "question": "chúng tôi có thể cải thiện điều gì?", 
+                "answers": [ 
+                    "đóng gói hàng tốt hơn", 
+                    "chất lượng sản phẩm tốt hơn" 
+                ], 
+                "thanks": "abc", 
+                "description": "hello" 
+            }, 
+            { 
+                "rate": 3, 
+                "title": "Bình thường", 
+                "question": "chúng tôi có thể cải thiện điều gì?", 
+                "answers": [ 
+                    "đóng gói hàng tốt hơn", 
+                    "chất lượng sản phẩm tốt hơn" 
+                ], 
+                "thanks": "abc", 
+                "description": "hello" 
+            }, 
+            { 
+                "rate": 4, 
+                "title": "Hài lòng", 
+                "question": "chúng tôi có thể cải thiện điều gì?", 
+                "answers": [ 
+                    "đóng gói hàng tốt hơn", 
+                    "chất lượng sản phẩm tốt hơn" 
+                ], 
+                "thanks": "abc", 
+                "description": "hello" 
+            }, 
+            { 
+                "rate": 5, 
+                "title": "Rất hài lòng", 
+                "question": "chúng tôi có thể cải thiện điều gì?", 
+                "answers": [ 
+                    "đóng gói hàng tốt hơn", 
+                    "chất lượng sản phẩm tốt hơn" 
+                ], 
+                "thanks": "abc", 
+                "description": "hello" 
+            } 
+        ] 
+    }
+}
+```
+
+** Tham số **
+
+| Field | Tính bắt buộc | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- | --- |
+| rating_type | no | string | Loại đánh giá. Bao gồm 1 trong các giá trị sau: - csat (Mặc định nếu không set giá trị cho trường rating_type) |
+| option | yes | string | - three_emotions - five_emotions - five_stars |
+| items | yes | Array object | - Chứa các object, mỗi object là một sao - Bao gồm 5 objects (Bắt buộc) |
+
+
+** Dữ liệu trường thông tin items **
+
+| Field | Tính bắt buộc | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- | --- |
+| rate | yes | string | Giá trị đánh giá tương ứng với từng mức trong thang đo khi chọn options. - three_emotions: giá trị từ 1 đến 3 - five_emotions: giá trị từ 1 đến 5 - five_stars: giá trị từ 1 đến 5 |
+| title | yes | string | - Tiêu đề tương ứng với số sao - Tối thiểu 1 ký tự, tối đa 50 ký tự |
+| question | no | string | - Câu hỏi tương ứng với số sao - Tối thiểu 1 ký tự, tối đa 100 ký tự |
+| answers | no | List string | - Danh sách câu trả lời, tương ứng với số sao - Tối thiểu 1 câu trả lời (trong trường hợp field answers được truyền), Tối đa 5 câu trả lời. - Mỗi câu trả lời: tối thiểu 1 ký tự, tối đa 50 ký tự |
+| thanks | yes | string | - Câu cám ơn, tương ứng với số sao - Tối thiểu 1 ký tự, tối đa 100 ký tự |
+| description | yes | string | - Mô tả, tương ứng với số sao - Tối thiểu 1 ký tự, tối đa 200 ký tự |
+
+---
+
+# API Upload Ảnh
+Source: https://docs.zaloplatforms.com/docs/ZBS/quan-ly-template/template-api/api-upload-anh.md
+
+# API Upload Ảnh
+
+API upload ảnh template cho phép tải lên ảnh/logo trên hệ thống Zalo. Sau khi tải lên thành công, hệ thống sẽ trả về một media_id để có thể đính kèm khi tạo mẫu tin nhắn qua API tạo template (Chi tiết xem [tại đây](/docs/ZBS/quan-ly-template/template-api/api-tao-template)) và API chỉnh sửa template (Chi tiết xem [tại đây](/docs/ZBS/quan-ly-template/template-api/api-chinh-sua-template)).
+
+:::warning Lưu ý
+**Quyền cần có:** Quản lý Message Template
+:::
+
+## Prequisite
+
+* Mã truy cập (Access Token) được doanh nghiệp (OA) ủy quyền cho App.
+* Quyền cần có để sử dụng API: Quản lý tài sản.
+
+## Giới hạn
+
+* File upload định dạng JPG hoặc PNG, có dung lượng tối đa 500 KB.
+* Hạn mức mỗi tháng: Tối đa 5000 ảnh được upload cho mỗi ứng dụng (App).
+
+## Lưu ý:
+
+* Quy định về Logo (Xem chi tiết):
+  * Định dạng: PNG
+  * Kích thước: 400x96 px
+* Quy định về hình ảnh (Xem chi tiết):
+  * Định dạng: JPG, PNG
+  * Tỉ lệ: 16:9
+
+## HTTP request
+
+- **URL:** https://business.openapi.zalo.me/upload/image 
+- **Method:** POST 
+- **Content Type:** form-data/multipart
+- **Response Type:** text/json
+
+## Example request
+```bash
+curl --location 'https://business.openapi.zalo.me/upload/image' \
+--header 'access_token: <access_token>' \
+--form 'file=@"/path/to/file.png"'
+```
+
+### Tham số header
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| [access_token](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) | String | Yes | Đoạn mã cần truyền vào để xác minh quyền sử dụng API. Xem thêm [tài liệu tham khảo](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new). |
+
+
+### Tham số body request
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| file | binary | Yes | - Nội dung nhị phân của file ảnh - Các định dạng ảnh hỗ trợ: jpg và png - Dung lượng tối đa: 500 KB |
+
+
+## response
+```json
+{
+	"data": {
+		"media_id": "wESbL53O_shdvIPILC7iR_JpC552r_fjukKg"
+	},
+	"error": 0,
+	"message": "Success"
+}
+```
+### Cấu trúc thuộc tính data
+
+| Thuộc tính | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- |
+| media_id | string | ID của ảnh được upload |
+
+---
+
+# API Lấy danh sách Template
+Source: https://docs.zaloplatforms.com/docs/ZBS/quan-ly-template/template-api/api-lay-danh-sach-template.md
+
+# API Lấy danh sách Template
+
+:::warning Lưu ý
+**Quyền cần có:** Quản lý Message Template
+:::
+
+## HTTP request
+
+- **URL:** https://business.openapi.zalo.me/template/all 
+- **Method:** GET 
+- **Content Type:** application/json 
+- **Response Type:** application/json
+
+## Example request
+```bash
+curl
+-X GET
+-H "Content-Type: application/json" "https://business.openapi.zalo.me/template/all?offset=0&limit=100&status=2&filterPreset=1"
+```
+### Tham số header
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| [access_token](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) | string | yes | Đoạn mã cần truyền vào để xác minh quyền sử dụng API. Xem thêm [tài liệu tham khảo](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) |
+
+
+### Tham số
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| offset | int | yes | Thứ tự của template đầu tiên trong danh sách trả về. Lưu ý: Template được tạo gần nhất sẽ có thứ tự là 0. |
+| limit | int | yes | Số lượng template muốn lấy. Lưu ý: Mỗi request được lấy tối đa 100 template. |
+| status | int | no | Trạng thái của template muốn lấy. Các giá trị nhận vào: - status = 1: Lấy các template có trạng thái Enable. - status = 2: Lấy các template có trạng thái Pending review. - status = 3: Lấy các template có trạng thái Reject. - status = 4: Lấy các template có trạng thái Disable. Lưu ý: Trường hợp không truyền vào tham số status, API sẽ trả về danh sách template thuộc mọi trạng thái. |
+| filterPreset | int | no | Tham số để chọn bộ lọc mẫu có sẵn khi truy vấn danh sách Template của OA. Các giá trị nhận vào: - filterPreset = 0: Trả về toàn bộ template thuộc OA. - filterPreset = 1: Chỉ trả về template được tạo bởi App tương ứng với access_token đang gọi API. Lưu ý: Trường hợp không truyền vào tham số filterPreset, trả về toàn bộ template thuộc OA. |
+
+
+## Example respond
+```json
+{
+   "error": 0,
+   "message": "Success",
+   "data": [
+       {
+           "templateId": 900025,
+           "templateName": "Template_1",
+           "createdTime": 0
+           "status": "PENDING_REVIEW"
+           "templateQuality": "UNDEFINED"
+       }
+   ],
+    "metadata": {
+            "total": 300
+    }
+}
+```
+### Cấu trúc thuộc tính data
+
+| Thuộc tính | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- |
+| templateId | string | ID của template |
+| templateName | string | Tên của template |
+| createdTime | long | Thời gian tạo template |
+| status | string | Trạng thái của template. Các giá trị trả về: - PENDING_REVIEW - DISABLE - ENABLE - REJECT |
+| templateQuality | string | Chất lượng gửi tin hiện tại của template. Các giá trị trả về: - HIGH - MEDIUM - LOW - UNDEFINED Lưu ý: Trường hợp chất lượng gửi tin hiện tại của template là Low thì template có khả năng bị khóa. Xem thêm chi tiết về cơ chế đánh giá chất lượng và quyền lợi gửi Template [tại đây](/docs/ZBS/phu-luc/co-che-danh-gia-chat-luong-va-quyen-loi-gui-tin-qua-sdt). |
+
+
+### Cấu trúc thuộc tính metadata
+
+| Thuộc tính | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- |
+| total | int | Tổng số lượng template ứng với trạng thái đã truyền vào ở request. Lưu ý: Trường hợp không truyền vào tham số status, API sẽ trả về tổng số lượng template thuộc mọi trạng thái của OA. |
+
+---
+
+# API Lấy thông tin chi tiết Template
+Source: https://docs.zaloplatforms.com/docs/ZBS/quan-ly-template/template-api/api-lay-thong-tin-chi-tiet-template.md
+
+# API Lấy thông tin chi tiết Template
+
+:::warning Lưu ý
+**Quyền cần có:** Quản lý Message Template
+:::
+
+## HTTP request
+
+- **URL:** https://business.openapi.zalo.me/template/info/v2
+- **Method:** GET 
+- **Content Type:** application/json 
+- **Response Type:** application/json
+
+## Example request
+
+```bash
+curl
+-X GET
+-H "Content-Type: application/json"
+"https://business.openapi.zalo.me/template/info/v2?template_id=12345"
+```
+
+### Tham số header
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| [access_token](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) | string | yes | Đoạn mã cần truyền vào để xác minh quyền sử dụng API. Xem thêm [tài liệu tham khảo](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) |
+
+
+### Tham số
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| template_id | string | yes | ID của template cần lấy thông tin. |
+
+
+## Example respond
+```json
+{
+    "error": 0,
+    "message": "Success",
+    "data": {
+        "templateId": "12345",
+        "templateName": "Test tạo mẫu tin từ trang admin - dạng bảng",
+        "status": "ENABLE",
+        "listParams": [
+            {
+                "name": "payment_link",
+                "require": true,
+                "type": "STRING",
+                "maxLength": 30,
+                "minLength": 0,
+                "acceptNull": false
+            }
+        ],
+        "listButtons": [
+            {
+                "type": 1,
+                "title": "Truy cập website",
+                "content": "https://zalo.solutions/zns"
+            },
+            {
+                "type": 2,
+                "title": "Gọi CSKH",
+                "content": "0858808xxxx"
+            }
+        ],
+        "timeout": 7200000,
+        "previewUrl": "https://account.zalo.solutions/znspreview/c1t6Wk43sxXTiLPyC__hXQ==",
+        "templateQuality": "HIGH",
+        "templateTag": "IN_TRANSACTION",
+        "price_sdt": "800",
+        "price_uid": "560",
+        "price": "800"
+    }
+}
+```
+### Cấu trúc thuộc tính data
+
+| Thuộc tính | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- |
+| templateId | String | ID của template. |
+| templateName | string | Tên của template. |
+| status | string | Trạng thái template. Các trạng thái bao gồm: - ENABLE: Trạng thái template được kích hoạt, có thể sử dụng để gửi tin qua SĐT - PENDING_REVIEW: Trạng thái template chờ kiểm duyệt - DELETE: Trạng thái template bịxóa - REJECT: Trạng thái template bị từ chối - DISABLE: Trạng thái template bị hủy kích hoạt |
+| reason | string | Lý do template có trạng thái hiện tại Status Chi tiết lý do của trạng thái hiện tại DISABLE ** Chi tiết lý do khi template ở trạng thái Disable hoặc Reject REJECT ENABLE Template đã được duyệt DELETE Template đã bị xóa PENDING_REVIEW Template đang được kiểm duyệt |
+| listParams | object array | Danh sách các thuộc tính của template. |
+| listButtons | object array | Danh sách các buttons/CTAs của template Chỉ áp dụng với 2 loại CTA: primary và secondary. Không hiển thị các CTA từ image module và response button. |
+| timeout | long | Thời gian timeout của template. |
+| previewUrl | string | Đường dẫn đến bản xem trước của template. |
+| templateQuality | string | Trả về giá trị “Null” cho trường thông tin này (Dự kiến từ 10/12) |
+| templateTag | string | Loại nội dung của template. Các giá trị trả về: - TRANSACTION: Giao dịch - CUSTOMER_CARE: Chăm sóc khách hàng - PROMOTION: Hậu mãi |
+| price_sdt | string | Đơn giá gửi tin qua SĐT. |
+| price_uid | string | Đơn giá gửi tin qua UID. |
+| price | string | [DEPRECATED] Đơn giá gửi tin qua SĐT. |
+
+
+### Cấu trúc thuộc tính data.listParams
+
+| Thuộc tính | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- |
+| name | string | Tên thuộc tính. |
+| require | boolean | Tính bắt buộc của thuộc tính. |
+| type | string | Định dạng validate của thuộc tính. |
+| maxLength | int | Số kí tự tối đa được truyền vào thuộc tính. |
+| minLength | int | Số kí tự tối thiểu được truyền vào thuộc tính. |
+| acceptNull | boolean | Thông tin cho biết thuộc tính có thể nhận giá trị rỗng hay không. |
+
+
+### Cấu trúc thuộc tính data.listButtons
+
+
+| Thuộc tính | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- |
+| type | integer | Danh sách button: value Loại button 1 Đến trang của doanh nghiệp 2 Gọi điện 3 Đến trang thông tin OA 4 Đến ứng dụng Zalo Mini App của doanh nghiệp 5 Đến trang ứng dụng của doanh nghiệp 6 Đến trang phân phối sản phẩm (Ngừng hỗ trợ sau ngày 16/03/2026) 7 Đến trang web/Zalo Mini App khác 8 Đến trang ứng dụng của doanh nghiệp khác 9 Đến bài viết của OA và các tài nguyên khác của Doanh nghiệp trên Zalo 10 Sao chép 11 Thanh toán ngay 12 Xem chi tiết 13 Đến trang tra cứu hoá đơn điện tử 14 Đến trang đích kêu gọi hành động tải ứng dụng Từ ngày 16/03/2026, loại button “Đến trang phân phối sản phẩm” sẽ ngừng hỗ trợ cho việc tạo mới và chỉnh sửa template. Các template đang sử dụng phân loại này sẽ được tự động chuyển sang phân loại “Đến trang web/Zalo Mini App khác”. |
+| title | string | Nội dung Button |
+| content | string | Đường dẫn liên kết/số điện thoại |
+
+---
+
+# API Lấy dữ liệu mẫu của Template
+Source: https://docs.zaloplatforms.com/docs/ZBS/quan-ly-template/template-api/api-lay-du-lieu-mau-cua-template.md
+
+# API Lấy dữ liệu mẫu của Template
+
+:::warning Lưu ý
+**Quyền cần có:** Quản lý Message Template
+:::
+
+## HTTP request
+
+- **URL:** https://business.openapi.zalo.me/template/sample-data 
+- **Method:** GET 
+- **Content Type:** application/json 
+- **Response Type:** application/json
+
+## Example request
+```bash
+curl
+-X GET
+-H "Content-Type: application/json"
+"https://business.openapi.zalo.me/template/sample-data?template_id=12345"
+```
+### Tham số header
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| [access_token](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) | string | yes | Đoạn mã cần truyền vào để xác minh quyền sử dụng API. Xem thêm [tài liệu tham khảo](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) |
+
+
+### Tham số
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| template_id | string | yes | ID của template cần lấy thông tin. |
+
+
+## Example respond
+```json
+{
+   "message": "Success",
+   "data": {
+       "balance_debt": 2000,
+       "due_date": "01/01/1970",
+       "number_debt": 2000,
+       "customer_name": "customer_name_sample"
+   },
+   "error": 0
+}
+```
+### Cấu trúc respond
+
+| Thuộc tính | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- |
+| data | object | Chứa tham số và dữ liệu mẫu của template bạn cần truy xuất. |
+
+---
+
+# API Lấy thông tin đánh giá của khách hàng
+Source: https://docs.zaloplatforms.com/docs/ZBS/quan-ly-template/template-api/api-lay-thong-tin-danh-gia-cua-khach-hang.md
+
+# API Lấy thông tin đánh giá của khách hàng
+
+API cho phép lấy thông tin đánh giá khách hàng đã phản hồi qua template đánh giá dịch vụ.
+
+:::warning Lưu ý
+**Quyền cần có:** Quản lý Message Template
+Ứng dụng chỉ có thể lấy thông tin đánh giá từ template đánh giá dịch vụ được tạo bởi ứng dụng đó hoặc OA cấp quyền cho ứng dụng (Access token truyền vào phải ứng với template ID được tạo bởi app và OA).
+:::
+
+## HTTP request
+
+- **URL:** https://business.openapi.zalo.me/rating/get 
+- **Method:** POST 
+- **Content Type:** application/json 
+- **Response Type:** application/json
+
+## Example request
+```bash
+curl
+-X GET
+-H "Content-Type: application/json"
+"https://business.openapi.zalo.me/rating/get?template_id=203972&from_time=1616673095659&to_time=1616673271320&offset=0&limit=1"
+```
+
+### Tham số header
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| [access_token](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) | string | yes | Đoạn mã cần truyền vào để xác minh quyền sử dụng API. Xem thêm [tài liệu tham khảo](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) |
+
+
+### Tham số
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| template_id | String | yes | ID của template cần lấy thông tin. |
+| from_time | long | yes | Thời điểm bắt đầu của khoảng thời gian cần lấy dữ liệu được gửi lên hệ thống. Lưu ý: Định dạng timestamp (đơn vị: millisecond). |
+| to_time | long | yes | Thời điểm kết thúc của khoảng thời gian cần lấy dữ liệu được gửi lên hệ thống. Lưu ý: Định dạng timestamp (đơn vị: millisecond). |
+| offset | int | yes | Vị trí thứ tự của đánh giá đầu tiên được trả về. |
+| limit | int | yes | Số lượng đánh giá tối đa được trả về. |
+
+
+## Example respond
+```json
+{
+    "data": {
+        "total": 2,
+        "data": [
+            {
+                "rating_type": "csat",
+                "option": "five_emotions",
+                "note": "Tôi rất hài lòng.",
+                "rate": 5,
+                "submitDate": "1616673095659",
+                "msgId": "7e4c33cfc20b05575c18",
+                "feedbacks": [
+                    "Nhân viên vui vẻ",
+                    "Quy trình đơn giản, hiệu quả",
+                    "Xử lý nhanh nhẹn",
+                    "Tác phong chuyên nghiệp",
+                    "Hướng dẫn tận tình"
+                ],
+                "trackingId": "1956"
+            },
+            {
+                "rating_type": "csat",
+                "option": "five_emotions",
+                "note": "Phục vụ chưa tốt",
+                "rate": 4,
+                "submitDate": "1616673164105",
+                "msgId": "4da9fb7506b1c1ed98a2",
+                "feedbacks": [
+                    "Cải thiện thái độ nhân viên",
+                    "Xử lý nhanh hơn"
+                ],
+                "trackingId": "729"
+            }
+        ]
+    },
+    "error": 0
+}
+```
+### Cấu trúc thuộc tính data
+
+| Thuộc tính | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- |
+| total | int | Tổng số lượng đánh giá được trả về. |
+| data | array object | Dữ liệu đánh giá từ khách hàng được trả về theo dạng array. Xem cấu trúc data array bên dưới. |
+
+
+### Cấu trúc thuộc tính data object
+
+| Tên biến | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- |
+| rating_type | string | Loại đánh giá - csat (Default) |
+| option | string | - three_emotions - five_emotions - five_stars |
+| note | string | Phần ghi chú thêm của khách hàng. |
+| rate | int | Mức đánh giá của khách hàng. |
+| submitDate | string | Thời điểm khách hàng submit đánh giá. Biến submitDate sẽ có giá trị trong khoảng thời gian từ from_time đến to_time (được truyền vào từ request). Lưu ý: Tính theo timestamp (millisecond). |
+| msgId | string | ID của thông tin đánh giá. |
+| feedback | array | Phần nhận xét từ khách hàng. |
+| trackingId | string | Tracking ID từ phía đối tác truyền vào khi gửi tin qua SĐT. |
+
+---
+
+# API Tạo Template
+Source: https://docs.zaloplatforms.com/docs/ZBS/quan-ly-template/template-api/api-tao-template.md
+
+# API Tạo Template
+
+Template cần được khởi tạo và kiểm duyệt bởi đội ngũ Zalo trước khi có thể sử dụng để gửi tin đến người dùng Zalo.
+
+Doanh nghiệp muốn gửi tin qua SĐT, cần tạo template theo một trong hai phương thức: API tạo template hoặc công cụ tạo template trên ZBS Account (Chi tiết xem [tại đây](https://zalo.solutions/blog/huong-dan-tao-mau-thong-bao-zns/aeubd8edy4g6bggevv)). API tạo template phù hợp với các Agency hoặc doanh nghiệp có nhu cầu gửi tin đa dạng, cần khởi tạo số lượng template lớn và tích hợp vào các hệ thống của doanh nghiệp.
+
+Sau khi gửi request tạo template thành công, đội ngũ Zalo sẽ kiểm duyệt. Sau khi kiểm duyệt xong, một event [webhook thay đổi trạng thái template](/docs/ZBS/quan-ly-template/template-webhook/su-kien-thay-doi-trang-thai-template) sẽ được gửi về webhook URL đã được thiết lập trước đó của doanh nghiệp. Trạng thái của template sẽ thay đổi từ PENDING_REVIEW sang REJECT nếu bị Zalo từ chối hoặc chuyển sang ENABLE nếu được duyệt.
+
+:::warning THÔNG BÁO
+API này đang được đánh giá lại và có thể có điều chỉnh trong thời gian sắp tới.
+
+**→ Khuyến nghị:** Ưu tiên tạo và chỉnh sửa Template qua giao diện [ZBS Account](https://zalo.solutions/business-message/guidelines/huong-dan-tao-zbs-template-message).
+:::
+
+:::warning Lưu ý
+**Quyền cần có:** Quản lý Message Template
+:::
+
+## Prequisite
+
+* Mã truy cập (Access Token) được doanh nghiệp (OA) ủy quyền cho App. Lưu ý: Template khởi tạo sẽ thuộc sở hữu của OA.
+* Quyền cần có để sử dụng API: Quản lý tài sản.
+
+## Giới hạn
+
+* Daily quota của API tạo template: **100** requests/ngày
+* Các mẫu tin được phép khởi tạo bao gồm:
+  * Template Xác thực
+  * Template Tùy chỉnh
+  * Template yêu cầu thanh toán
+  * Template voucher
+  * Template đánh giá dịch vụ
+
+Mỗi loại mẫu tin sẽ có các quy định cần phải tuân theo khác nhau về các trường thông tin.
+
+## HTTP request
+
+- **URL:** https://business.openapi.zalo.me/template/create 
+- **Method:** POST 
+- **Content Type:** application/json 
+- **Response Type:** application/json
+
+## Example request
+
+```bash
+curl --location 'https://business.openapi.zalo.me/template/create' \
+--header 'Content-Type: application/json' \
+--header 'access_token: your_access_token' \
+--data '{
+	"template_name": "mẫu chăm sóc khách hàng",
+	"template_type": "1",
+	"tag": "1",
+	"layout": {
+		"header": {
+			"components": [
+				{
+					"IMAGES": {
+						"items": [
+							{
+								"type": "IMAGE",
+								"media_id": "1ashjkdbkj"
+							},
+							{
+								"type": "IMAGE",
+								"media_id": "1ashjkdbkj"
+							}
+						]
+					}
+				},
+				{
+					"LOGO": {
+						"light": {
+							"type": "IMAGE",
+							"media_id": "1ashjkdbkj"
+						},
+						"dark": {
+							"type": "IMAGE",
+							"media_id": "1ashjkdbkj"
+						}
+					}
+				}
+			]
+		},
+		"body": {
+			"components": [
+				{
+					"TITLE": {
+						"value": "Xác nhận đơn hàng"
+					}
+				},
+				{
+					"PARAGRAPH": {
+						"value": "Cảm ơn <name> đã mua hàng tại cửa hàng. Đơn hàng của bạn đã được xác nhận với chi tiết như sau:"
+					}
+				},
+				{
+					"OTP": {
+						"value": "<otp>"
+					}
+				},
+				{
+					"TABLE": {
+						"rows": [
+							{
+								"value": "<order_code>",
+								"title": "Mã đơn",
+								"row_type": 1
+							},
+							{
+								"value": "<phone_number>",
+								"title": "Điện thoại"
+							},
+							{
+								"value": "<price>",
+								"title": "Giá tiền"
+							},
+							{
+								"value": "<status>",
+								"title": "Trạng thái"
+							},
+							{
+								"value": "<date>",
+								"title": "Ngày đặt hàng"
+							}
+						]
+					}
+				},
+				{
+					"VOUCHER": {
+						"name": "Giảm 70.000đ",
+						"condition": "Cho đơn hàng trên 200K",
+						"voucher_code": "<voucher_code>",
+						"start_date": "<start_date>", 
+            "end_date": "<end_date>"
+					}
+				},
+				{
+					"PAYMENT": {
+						"bank_code": "970416",
+						"account_name": "CÔNG TY OA NAME",
+						"account_number": "0123456789",
+						"amount": "1000000",
+						"note": "sample note"
+					}
+				}
+			]
+		},
+		"footer": {
+			"components": [
+				{
+					"BUTTONS": {
+						"items": [
+							{
+								"content": "https://zalo.solutions/",
+								"type": 1,
+								"title": "Xem đơn hàng đã đặt"
+							}
+						]
+					}
+				}
+			]
+		}
+	},
+	"params": [
+		{
+			"type": "1",
+			"name": "name",
+			"sample_value": "nguyen van A"
+		},
+		{
+			"type": "11",
+			"name": "order_code",
+			"sample_value": "ABC123"
+		},
+		{
+			"type": "15",
+			"name": "phone_number",
+			"sample_value": "0123456789"
+		},
+		{
+			"type": "18",
+			"name": "price",
+			"sample_value": "100000"
+		},
+		{
+			"type": "14",
+			"name": "status",
+			"sample_value": "DONE"
+		},
+		{
+			"type": "19",
+			"name": "date",
+			"sample_value": "19/01/1999"
+		}
+	],
+	"note": "ghi chú kiểm duyệt",
+	"tracking_id": "abc123"
+}'
+```
+
+### Tham số header
+
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| [access_token](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) | string | yes | Đoạn mã cần truyền vào để xác minh quyền sử dụng API. Xem thêm [tài liệu tham khảo](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) |
+ 
+
+### Tham số body của request 
+
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| template_name | string | yes | - Tên mẫu tin - Tối thiểu 10 ký tự, tối đa 60 ký tự |
+| template_type | integer | yes | - Loại mẫu tin. Mỗi template_type sẽ quy định tag và các components được chọn. - Cần truyền vào giá trị value cho trường thông tin template_type Danh sách template_type Value Loại mẫu tin 1 Template tùy chỉnh 2 Template xác thực 3 Template yêu cầu thanh toán 4 Template voucher 5 Template đánh giá dịch vụ |
+| tag | string | yes | - Tag mẫu tin - Cần truyền vào giá trị value cho trường thông tin tag Value Tag name 1 Transaction 2 Customer care 3 Promotion Note: Để tạo được template tag 3, OA cần có quyền gửi template tag 3. Chi tiết cơ chế quyền gửi template tag 3, xem thêm [tại đây](/docs/ZBS/phu-luc/co-che-danh-gia-chat-luong-va-quyen-loi-gui-tin-qua-sdt) - Với template_type được chọn, tag cần có giá trị tương ứng cho phép: template_type tag 1 - Template tùy chỉnh 1,2,3 2 - Template xác thực 1 3 - Template yêu cầu thanh toán 1,3 4 - Template voucher 1,2,3 5 - Template đánh giá dịch vụ 2 |
+| layout | JSON Array | yes | - Gồm 3 thành phần: header, body và footer. Trong mỗi thành phần sẽ có các components khác nhau. Tùy thuộc vào template_type và tag đã chọn, sẽ có các quy định khác nhau với từng loại components ở các thành phần. Chi tiết về các loại components, xem tại mục [Template components](/docs/ZBS/quan-ly-template/bat-dau/danh-sach-components) - Quy định về số lượng và thứ tự các components theo từng loại template_type ### Example request — Template tùy chỉnh thành phần Component Mô tả header Logo - Min: 1 - Max: 1 Hình ảnh - Min: 1 - Max: 1 Chỉ chứa 1 trong 2 components, Logo hoặc Image. body Tiêu đề - Min: 1 - Max: 1 Paragraph - Min: 0 - Max: 4 Table - Min: 0 - Max: 1 Có thể bao gồm cả 2 components, Paragraph và Table. Các components Table và Paragraph có thể thay đổi vị trí. footer Button - Min: 0/1 - Max: 3 Nếu Template chứa component Images, thì cần chứa ít nhất 1 button. ### Example request — Template xác thực thành phần Component Mô tả header Logo - Min: 1 - Max: 1 Chỉ bao gồm logo body OTP - Min: 1 - Max: 1 Paragraph- Min: 1 - Max: 1 Đề xuất nội dung: "Tuyệt đối KHÔNG chia sẻ mã xác thực cho bất kỳ ai dưới bất kỳ hình thức nào. Mã xác thực có hiệu lực trong 5 phút." ### Example request — Template yêu cầu thanh toán thành phần Component Mô tả header Logo - Min: 1 - Max: 1 body Tiêu đề - Min: 1 - Max: 1 Paragraph - Min: 0 - Max: 4 Table - Min: 0 - Max: 1 Có thể bao gồm cả 2 components, Paragraph và Table. Các components Table và Paragraph có thể thay đổi vị trí. Payment - Min: 1 - Max: 1 footer Button - Min: 1 - Max: 3 Mặc định Button 1: Thanh toán ngay ### Example request — Template voucher thành phần Component Mô tả header Logo - Min: 1 - Max: 1 Image - Min: 1 - Max: 1 Chỉ chứa 1 trong 2, Logo hoặc Image. body Tiêu đề - Min: 1 - Max: 1 Paragraph - Min: 0 - Max: 4 Table - Min: 0 - Max: 1 Có thể bao gồm cả 2 components, Paragraph và Table. Các components Table và Paragraph có thể thay đổi vị trí. Voucher - Min: 1 - Max: 1 footer Button - Min: 1 - Max: 3 Mặc định Button 1: Xem chi tiết (Mã ưu đãi). Nếu Template chứa component Images, thì cần bổ sung thêm ít nhất 1 button. Link Image là link của Button đầu tiên của template, không bao gồm button mặc định - Xem chi tiết (Mã ưu đãi). ### Example request — Template đánh giá dịch vụ thành phần Component Mô tả header Logo - Min: 1 - Max: 1 body Tiêu đề - Min: 1 - Max: 1 Paragraph - Min: 0 - Max: 1 Rating - Min: 1 - Max: 1 footer Button - Min: 0 - Max: 2 |
+| params | JSON Array | No | - Thông tin về param. Khi khai báo bất kỳ param nào trong field layout, cần khai báo param tại đây. - Mỗi Object đại diện cho thông tin của 1 param, bao gồm các fields sau: Field Kiểu dữ liệu Tính bắt buộc Mô tả name string yes Tên của param type string yes Loại param. Xem danh sách param type bên dưới. sample_value string yes Dữ liệu mẫu của param, phục vụ cho mục đích kiểm duyệt. Độ dài phụ thuộc vào type. Danh sách param type value Param type 1 Tên khách hàng (30) 2 Số điện thoại (15) 3 Địa chỉ (200) 4 Mã số (30) 5 Nhãn tùy chỉnh (30) 6 Trạng thái giao dịch (30) 7 Thông tin liên hệ (50) 8 Giới tính / Danh xưng (5) 9 Tên sản phẩm / Thương hiệu (200) 10 Số lượng / Số tiền (20) 11 Thời gian (20) 12 OTP (10) 13 URL (200) 14 Tiền tệ (VNĐ) (12) 15 Bank transfer note (90) |
+| note | string | no | - Ghi chú kiểm duyệt - Tối thiếu 1 ký tự, tối đa 400 ký tự |
+| tracking_id | string | yes | - Mã tracking, do đối tác tự định nghĩa |
+
+
+## response
+```json
+{
+	"error": 0,
+	"message": "Success",
+	"data": {
+		"template_id": "31239",
+		"template_name": "Xác nhận giao dịch",
+		"template_type": 1,
+		"status": "PENDING_REVIEW",
+		"tag": 1,
+		"app_id": "21391239109232390",
+		"oa_id": "19319231302193091",
+		"price_sdt": "200",
+		"price_uid":  "140",
+		"price": "200",
+		"timeout": 7200000,
+		"preview_url": "https://account.zalo.solutions/znspreview/c1t6Wk43sxXTiLPyC__hXQ=="
+	}
+}
+```
+### Cấu trúc thuộc tính data
+
+
+| Thuộc tính | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- |
+| template_id | string | Template ID |
+| template_name | string | Tên của template |
+| template_type | string | Loại template. Bao gồm 1 trong các giá trị: - 1: Template tùy chỉnh - 2: Template xác thực - 3: Template yêu cầu thanh toán - 4: Template voucher - 5: Template đánh giá dịch vụ |
+| status | string | Trạng thái của template sau khi submit: PENDING_REVIEW |
+| tag | string | Template tag. Bao gồm 1 trong các giá trị: - 1: TRANSACTION - 2: CUSTOMER CARE - 3: PROMOTION |
+| app_id | string | App ID của template |
+| oa_id | string | OA ID của template |
+| price_sdt | string | Đơn giá gửi tin qua SĐT. |
+| price_uid | string | Đơn giá gửi tin qua UID. |
+| price | string | [DEPRECATED] Đơn giá gửi tin qua SĐT. Trường price đã được thay thế bằng price_sdt và price_uid. Trường này sẽ bị loại bỏ trong các bản cập nhật tiếp theo. |
+| timeout | long | Timeout của template |
+| preview_url | string | Link preview template |
+
+---
+
+# API Chỉnh sửa Template
+Source: https://docs.zaloplatforms.com/docs/ZBS/quan-ly-template/template-api/api-chinh-sua-template.md
+
+# API Chỉnh sửa Template
+
+Doanh nghiệp có thể chỉnh sửa các template có trạng thái **REJECT** (đã bị từ chối) thông qua API chỉnh sửa template. Tương tự như quá trình tạo template, các thay đổi đối với template sau khi gửi qua API sẽ cần được đội ngũ Zalo kiểm duyệt trước khi sử dụng lại.
+
+API chỉnh sửa template đặc biệt hữu ích cho các doanh nghiệp hoặc agency có nhu cầu cập nhật nhiều template sau khi nhận phản hồi từ Zalo hoặc khi cần thay đổi nội dung template bị từ chối (REJECT).
+
+Sau khi gửi yêu cầu chỉnh sửa template thành công, đội ngũ Zalo sẽ kiểm duyệt. Sau khi kiểm duyệt xong, một event webhook thay đổi trạng thái template sẽ được gửi về webhook URL đã được thiết lập trước đó của doanh nghiệp. Trạng thái của template sẽ thay đổi từ PENDING_REVIEW sang REJECT nếu bị Zalo từ chối hoặc ENABLE nếu được duyệt.
+
+:::warning THÔNG BÁO
+API này đang được đánh giá lại và có thể có điều chỉnh trong thời gian sắp tới.
+
+**→ Khuyến nghị:** Ưu tiên tạo và chỉnh sửa Template qua giao diện [ZBS Account](https://zalo.solutions/business-message/guidelines/huong-dan-tao-zbs-template-message).
+:::
+
+:::warning Lưu ý
+**Quyền cần có:** Quản lý Message Template
+:::
+
+## Prequisite
+
+* Mã truy cập (Access Token) được doanh nghiệp (OA) ủy quyền cho App. Lưu ý: Template khởi tạo sẽ thuộc sở hữu của OA.
+* Quyền cần có để sử dụng API: Quản lý tài sản.
+* Logo/Hình ảnh đính kèm khi tạo template, doanh nghiệp cần tải lên thông qua API upload ảnh (Chi tiết xem [tại đây](/docs/ZBS/quan-ly-template/template-api/api-upload-anh))
+
+## Giới hạn
+
+* Daily quota của API chỉnh sửa template: **100** requests/ngày
+
+Mỗi loại mẫu tin sẽ có các quy định cần phải tuân theo khác nhau về các trường thông tin.
+
+## HTTP request
+
+- **URL:** https://business.openapi.zalo.me/template/edit 
+- **Method:** POST 
+- **Content Type:** application/json 
+- **Response Type:** application/json
+
+## Example request
+
+```bash
+curl --location 'https://business.openapi.zalo.me/template/edit' \
+--header 'Content-Type: application/json' \
+--header 'access_token: your_access_token' \
+--data '{
+  "template_id": "234567", 
+	"template_name": "mẫu chăm sóc khách hàng",
+	"template_type": "1",
+	"tag": "1",
+	"layout": {
+		"header": {
+			"components": [
+				{
+					"IMAGES": {
+						"items": [
+							{
+								"type": "IMAGE",
+								"media_id": "1ashjkdbkj"
+							},
+							{
+								"type": "IMAGE",
+								"media_id": "1ashjkdbkj"
+							}
+						]
+					}
+				},
+				{
+					"LOGO": {
+						"light": {
+							"type": "IMAGE",
+							"media_id": "1ashjkdbkj"
+						},
+						"dark": {
+							"type": "IMAGE",
+							"media_id": "1ashjkdbkj"
+						}
+					}
+				}
+			]
+		},
+		"body": {
+			"components": [
+				{
+					"TITLE": {
+						"value": "Xác nhận đơn hàng"
+					}
+				},
+				{
+					"PARAGRAPH": {
+						"value": "Cảm ơn <name> đã mua hàng tại cửa hàng. Đơn hàng của bạn đã được xác nhận với chi tiết như sau:"
+					}
+				},
+				{
+					"OTP": {
+						"value": "<otp>"
+					}
+				},
+				{
+					"TABLE": {
+						"rows": [
+							{
+								"value": "<order_code>",
+								"title": "Mã đơn",
+								"row_type": 1
+							},
+							{
+								"value": "<phone_number>",
+								"title": "Điện thoại"
+							},
+							{
+								"value": "<price>",
+								"title": "Giá tiền"
+							},
+							{
+								"value": "<status>",
+								"title": "Trạng thái"
+							},
+							{
+								"value": "<date>",
+								"title": "Ngày đặt hàng"
+							}
+						]
+					}
+				},
+				{
+					"VOUCHER": {
+						"name": "Giảm 70.000đ",
+						"condition": "Cho đơn hàng trên 200K",
+						"voucher_code": "<voucher_code>",
+						"start_date": "<start_date>", 
+            "end_date": "<end_date>"
+					}
+				},
+				{
+					"PAYMENT": {
+						"bank_code": "970416",
+						"account_name": "CÔNG TY OA NAME",
+						"account_number": "0123456789",
+						"amount": "1000000",
+						"note": "sample note"
+					}
+				}
+			]
+		},
+		"footer": {
+			"components": [
+				{
+					"BUTTONS": {
+						"items": [
+							{
+								"content": "https://zalo.solutions/",
+								"type": 1,
+								"title": "Xem đơn hàng đã đặt"
+							}
+						]
+					}
+				}
+			]
+		}
+	},
+	"params": [
+		{
+			"type": "1",
+			"name": "name",
+			"sample_value": "nguyen van A"
+		},
+		{
+			"type": "11",
+			"name": "order_code",
+			"sample_value": "ABC123"
+		},
+		{
+			"type": "15",
+			"name": "phone_number",
+			"sample_value": "0123456789"
+		},
+		{
+			"type": "18",
+			"name": "price",
+			"sample_value": "100000"
+		},
+		{
+			"type": "14",
+			"name": "status",
+			"sample_value": "DONE"
+		},
+		{
+			"type": "19",
+			"name": "date",
+			"sample_value": "19/01/1999"
+		}
+	],
+	"note": "ghi chú kiểm duyệt",
+	"tracking_id": "abc123"
+}'
+```
+
+### Tham số header
+
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| [access_token](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) | string | yes | Đoạn mã cần truyền vào để xác minh quyền sử dụng API. Xem thêm [tài liệu tham khảo](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) |
+ 
+
+### Tham số body của request 
+
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| template_id | string | yes | - Template ID được hệ thống tự tạo. Đối vớitrường hợp edit template, template ID là ID củatemplate cũ. |
+| template_name | string | yes | - Tên mẫu tin - Tối thiểu 10 ký tự, tối đa 60 ký tự |
+| template_type | integer | yes | - Loại mẫu tin. Mỗi template_type sẽ quy định tag và các components được chọn. - Cần truyền vào giá trị value cho trường thông tin template_type Danh sách template_type Value Loại mẫu tin 1 Template tùy chỉnh 2 Template xác thực 3 Template yêu cầu thanh toán 4 Template voucher 5 Template đánh giá dịch vụ |
+| tag | string | yes | - Tag mẫu tin - Cần truyền vào giá trị value cho trường thông tin tag Value Tag name 1 Transaction 2 Customer care 3 Promotion Note: Để tạo được template tag 3, OA cần có quyền gửi template tag 3. Chi tiết cơ chế quyền gửi template tag 3, xem thêm [tại đây](/docs/ZBS/phu-luc/co-che-danh-gia-chat-luong-va-quyen-loi-gui-tin-qua-sdt) - Với template_type được chọn, tag cần có giá trị tương ứng cho phép: template_type tag 1 - Template tùy chỉnh 1,2,3 2 - Template xác thực 1 3 - Template yêu cầu thanh toán 1,3 4 - Template voucher 1,2,3 5 - Template đánh giá dịch vụ 2 |
+| layout | JSON Array | yes | - Gồm 3 thành phần: header, body và footer. Trong mỗi thành phần sẽ có các components khác nhau. Tùy thuộc vào template_type và tag đã chọn, sẽ có các quy định khác nhau với từng loại components ở các thành phần. Chi tiết về các loại components, xem tại mục [Template components](/docs/ZBS/quan-ly-template/bat-dau/danh-sach-components) - Quy định về số lượng và thứ tự các components theo từng loại template_type ### Example request — Template tùy chỉnh thành phần Component Mô tả header Logo - Min: 1 - Max: 1 Hình ảnh - Min: 1 - Max: 1 Chỉ chứa 1 trong 2 components, Logo hoặc Image. body Tiêu đề - Min: 1 - Max: 1 Paragraph - Min: 0 - Max: 4 Table - Min: 0 - Max: 1 Có thể bao gồm cả 2 components, Paragraph và Table. Các components Table và Paragraph có thể thay đổi vị trí. footer Button - Min: 0/1 - Max: 3 Nếu Template chứa component Images, thì cần chứa ít nhất 1 button. ### Example request — Template xác thực thành phần Component Mô tả header Logo - Min: 1 - Max: 1 Chỉ bao gồm logo body OTP - Min: 1 - Max: 1 Paragraph- Min: 1 - Max: 1 Đề xuất nội dung: "Tuyệt đối KHÔNG chia sẻ mã xác thực cho bất kỳ ai dưới bất kỳ hình thức nào. Mã xác thực có hiệu lực trong 5 phút." ### Example request — Template yêu cầu thanh toán thành phần Component Mô tả header Logo - Min: 1 - Max: 1 body Tiêu đề - Min: 1 - Max: 1 Paragraph - Min: 0 - Max: 4 Table - Min: 0 - Max: 1 Có thể bao gồm cả 2 components, Paragraph và Table. Các components Table và Paragraph có thể thay đổi vị trí. Payment - Min: 1 - Max: 1 footer Button - Min: 1 - Max: 3 Mặc định Button 1: Thanh toán ngay ### Example request — Template voucher thành phần Component Mô tả header Logo - Min: 1 - Max: 1 Image - Min: 1 - Max: 1 Chỉ chứa 1 trong 2, Logo hoặc Image. body Tiêu đề - Min: 1 - Max: 1 Paragraph - Min: 0 - Max: 4 Table - Min: 0 - Max: 1 Có thể bao gồm cả 2 components, Paragraph và Table. Các components Table và Paragraph có thể thay đổi vị trí. Voucher - Min: 1 - Max: 1 footer Button - Min: 1 - Max: 3 Mặc định Button 1: Xem chi tiết (Mã ưu đãi). Nếu Template chứa component Images, thì cần bổ sung thêm 1 ít nhất button. Link Image là link của Button đầu tiên của template, Không bao gồm button mặc định - Xem chi tiết (Mã ưu đãi). ### Example request — Template đánh giá dịch vụ thành phần Component Mô tả header Logo - Min: 1 - Max: 1 body Tiêu đề - Min: 1 - Max: 1 Paragraph - Min: 0 - Max: 1 Rating - Min: 1 - Max: 1 footer Button - Min: 0 - Max: 2 |
+| params | JSON Array | No | - Thông tin về param. Khi khai báo bất kỳ param nào trong field layout, cần khai báo param tại đây. - Mỗi Object đại diện cho thông tin của 1 param, bao gồm các fields sau: Field Kiểu dữ liệu Tính bắt buộc Mô tả name string yes Tên của param type string yes Loại param. Xem danh sách param type bên dưới. sample_value string yes Dữ liệu mẫu của param, phục vụ cho mục đích kiểm duyệt. Độ dài phụ thuộc vào type. Danh sách param type value Param type 1 Tên khách hàng (30) 2 Số điện thoại (15) 3 Địa chỉ (200) 4 Mã số (30) 5 Nhãn tùy chỉnh (30) 6 Trạng thái giao dịch (30) 7 Thông tin liên hệ (50) 8 Giới tính / Danh xưng (5) 9 Tên sản phẩm / Thương hiệu (200) 10 Số lượng / Số tiền (20) 11 Thời gian (20) 12 OTP (10) 13 URL (200) 14 Tiền tệ (VNĐ) (12) 15 Bank transfer note (90) |
+| note | string | no | - Ghi chú kiểm duyệt - Tối thiếu 1 ký tự, tối đa 400 ký tự |
+| tracking_id | string | yes | - Mã tracking, do đối tác tự định nghĩa |
+
+
+## response
+```json
+{
+	"error": 0,
+	"message": "Success",
+	"data": {
+		"template_id": "31239",
+		"template_name": "Xác nhận giao dịch",
+		"template_type": 1,
+		"status": "PENDING_REVIEW",
+		"tag": 1,
+		"app_id": "21391239109232390",
+		"oa_id": "19319231302193091",
+		"price_sdt": "200",
+		"price_uid":  "140",
+		"price": "200",
+		"timeout": 7200000,
+		"preview_url": "https://account.zalo.solutions/znspreview/c1t6Wk43sxXTiLPyC__hXQ=="
+	}
+}
+```
+### Cấu trúc thuộc tính data
+
+
+| Thuộc tính | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- |
+| template_id | string | Template ID |
+| template_name | string | Tên của template |
+| template_type | string | Loại template. Bao gồm 1 trong các giá trị: - 1: Template tùy chỉnh - 2: Template xác thực - 3: Template yêu cầu thanh toán - 4: Template voucher - 5: Template đánh giá dịch vụ |
+| status | string | Trạng thái của template sau khi submit: PENDING_REVIEW |
+| tag | string | Template tag. Bao gồm 1 trong các giá trị: - 1: TRANSACTION - 2: CUSTOMER CARE - 3: PROMOTION |
+| app_id | string | App ID của template |
+| oa_id | string | OA ID của template |
+| price_sdt | string | Đơn giá gửi tin qua SĐT. |
+| price_uid | string | Đơn giá gửi tin qua UID. |
+| price | string | Giá của template |
+| timeout | long | Timeout của template |
+| preview_url | string | Link preview template |
+
+---
+
+# API Lấy thông tin phản hồi nhanh của khách hàng
+Source: https://docs.zaloplatforms.com/docs/ZBS/quan-ly-template/template-api/api-lay-thong-tin-phan-hoi-nhanh-cua-khach-hang.md
+
+# API Lấy thông tin phản hồi nhanh của khách hàng
+
+API cho phép lấy thông tin khách hàng đã phản hồi qua template phản hồi nhanh.
+
+:::warning Lưu ý
+**Quyền cần có:** Quản lý Message Template
+Ứng dụng chỉ có thể lấy thông tin phản hồi từ template phản hồi nhanh được tạo bởi ứng dụng đó hoặc OA cấp quyền cho ứng dụng (Access token truyền vào phải ứng với template ID được tạo bởi app và OA).
+:::
+
+## HTTP request
+
+- **URL:** https://business.openapi.zalo.me/response/get 
+- **Method:** POST 
+- **Content Type:** application/json 
+- **Response Type:** application/json
+
+## Example request
+```bash
+curl
+-X GET
+-H "Content-Type: application/json"
+"https://business.openapi.zalo.me/response/get?template_id=203972&from_time=1616673095659&to_time=1616673271320&offset=0&limit=1"
+```
+
+### Tham số header
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| [access_token](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) | string | yes | Đoạn mã cần truyền vào để xác minh quyền sử dụng API. Xem thêm [tài liệu tham khảo](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) |
+
+
+### Tham số
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| template_id | String | yes | ID của template cần lấy thông tin. |
+| from_time | long | yes | Thời điểm bắt đầu của khoảng thời gian cần lấy dữ liệu được gửi lên hệ thống. Lưu ý: Định dạng timestamp (đơn vị: millisecond). |
+| to_time | long | yes | Thời điểm kết thúc của khoảng thời gian cần lấy dữ liệu được gửi lên hệ thống. Lưu ý: Định dạng timestamp (đơn vị: millisecond). |
+| limit | int | yes | Số lượng phản hồi tối đa được trả về. |
+
+
+## Example respond
+```json
+{
+    "data": {
+        "total": 2,
+        "data": [
+            {
+                "data": "Đồng ý",
+                "submitDate": "1616673095658",
+                "msgId": "7e4c33cfc20b05575c18",
+                "oaId": "19319231302193091",
+                "trackingId": "1956"
+            },
+            {
+                "data": "Không đồng ý",
+                "submitDate": "1616673095659",
+                "msgId": "7e4c33cfc20b05575c19",
+                "oaId": "19319231302193091",
+                "trackingId": "1957"
+            }
+        ]
+    },
+    "error": 0
+}
+```
+### Cấu trúc thuộc tính data
+
+| Thuộc tính | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- |
+| total | int | Tổng số lượng phản hồi được trả về. |
+| data | array object | Dữ liệu phản hồi từ khách hàng được trả về theo dạng array. Xem cấu trúc data array bên dưới. |
+
+
+### Cấu trúc thuộc tính data object
+
+| Tên biến | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- |
+| data | string | Nội dung dữ liệu phản hồi của khách hàng (là field "Nội dung nút"). |
+| submitDate | string | Thời điểm khách hàng click nút phản hồi. Biến submitDate sẽ có giá trị trong khoảng thời gian từ from_time đến to_time (được truyền vào từ request). Lưu ý: Tính theo timestamp (millisecond). |
+| msgId | string | ID của thông báo trả về khi gửi tin. |
+| oaId | string | Official Account ID mà khách hàng đã click nút phản hồi. |
+| trackingId | string | Tracking ID từ phía đối tác truyền vào khi gửi tin. |
+
+---
+
+# Sự kiện người dùng phản hồi template đánh giá dịch vụ
+Source: https://docs.zaloplatforms.com/docs/ZBS/quan-ly-template/template-webhook/su-kien-nguoi-dung-phan-hoi-template-danh-gia-dich-vu.md
+
+# Sự kiện người dùng phản hồi template đánh giá dịch vụ
+
+Khi có sự kiện người dùng phản hồi (feedback) qua template đánh giá dịch vụ, hệ thống Zalo sẽ gửi đến Webhook Url của ứng dụng một HTTP request như sau. 
+
+:::warning Lưu ý
+**Quyền cần có:** Nhận sự kiện quản lý Message Template
+:::
+
+
+*   **URL:** Webhook Url của ứng dụng
+*   **Method:** POST
+*   **Content Type:** application/json
+*   **X-ZEvent-Signature:** mac = sha256(appId + data + timeStamp + OAsecretKey), với data là chuỗi json trả về dưới đây.
+
+## Ví dụ:
+```json
+{
+  "event_name": "user_feedback",
+  "message": {
+    "rating_type": "csat",
+    "option": "five_emotions",
+    "note": "Tôi rất hài lòng.",
+    "rate": 5,
+    "submit_time": "1616673095659",
+    "msg_id": "7e4c33cfc20b05575c18",
+    "feedbacks": [
+            "Nhân viên vui vẻ",
+            "Quy trình đơn giản, hiệu quả",
+            "Xử lý nhanh nhẹn",
+            "Tác phong chuyên nghiệp",
+            "Hướng dẫn tận tình"
+    ],
+    "tracking_id": "1956"
+  },
+  "app_id": "2074138120372622546",
+  "oa_id": "2074138120372622547",
+  "timestamp": "1602560967477"
+}
+```
+
+### Mô tả thuộc tính
+
+| Thuộc tính | Mô tả |
+| --- | --- |
+| event_name String | Tên sự kiện Giá trị nhận về: user_feedback |
+| app_id String | ID của App |
+| oa_id String | ID của OA |
+| message Json | Thông tin đánh giá của người dùng |
+| timestamp String | Thời gian hệ thống gửi thông báo |
+
+
+### Cấu trúc thuộc tính message
+
+| Thuộc tính | Mô tả |
+| --- | --- |
+| rating_type String | Loại đánh giá. Bao gồm 1 trong các giá trị sau: - csat (Default) |
+| option String | Các loại thang đo: - three_emotions - five_emotions - five_stars |
+| note String | Ghi chú của người dùng |
+| rate Integer | Mức đánh giá của người dùng |
+| submit_time String | Thời điểm người dùng gửi đánh giá Note: tính theo timestamp |
+| msg_id String | ID của thông báo |
+| feedbacks List\ | Danh sách phần nhận xét từ người dùng |
+| trackingId String | Tracking ID do đối tác truyền vào khi gửi tin |
+
+---
+
+# Sự kiện thay đổi trạng thái Template
+Source: https://docs.zaloplatforms.com/docs/ZBS/quan-ly-template/template-webhook/su-kien-thay-doi-trang-thai-template.md
+
+# Sự kiện thay đổi trạng thái Template
+
+Khi có sự kiện mẫu tin (template) được thay đổi trạng thái, hệ thống Zalo sẽ gửi đến **Webhook Url của ứng dụng được cấp quyền và ứng dụng liên kết (nếu có)** một HTTP request như sau.
+
+:::warning Lưu ý
+**Quyền cần có:** Nhận sự kiện quản lý Message Template
+:::
+
+*   **URL:** Webhook Url của ứng dụng
+*   **Method:** POST
+*   **Content Type:** application/json
+*   **X-ZEvent-Signature:** mac = sha256(appId + data + timeStamp + OAsecretKey), với data là chuỗi json trả về dưới đây.
+
+## Ví dụ:
+
+```json
+
+{
+    "event_name": "change_template_status",
+    "oa_id": "23528683620520284",
+    "app_id": "26502567361042074",
+    "template_id": "123456",
+    "status":
+        {
+            "prev_status": "PENDING_REVIEW",
+            "new_status": "REJECT"
+        },
+    "reason": "Mẫu tin bị lặp; Mẫu tin có dấu hiệu spam; Logo không hợp lệ",
+    "timestamp": "1724921480327"
+}
+```
+
+### Mô tả thuộc tính:
+
+| Thuộc tính | Mô tả |
+| --- | --- |
+| event_name string | Tên sự kiện Giá trị nhận về: change_template_status |
+| oa_id string | ID của OA ủy quyền |
+| app_id string | ID của App ủy quyền |
+| template_id string | ID của template ghi nhận thay đổi trạng thái |
+| status Json Object | Ví dụ: ```json { "prev_status": "PENDING_REVIEW", "new_status": "REJECT" } ``` Trong đó: - new_status: Trạng thái template sau khi cập nhật - prev_status: Trạng thái trước khi cập nhật Các trạng thái bao gồm: - ENABLE: Trạng thái template được kích hoạt - PENDING_REVIEW: Trạng thái template chờ duyệt - DELETE: Trạng thái template bị xóa - REJECT: Trạng thái template bị từ chối - DISABLE: Trạng thái template bị hủy kích hoạt |
+| reason string | Lý do thay đổi trạng thái template |
+| timestamp string | Thời gian hệ thống gửi thông báo |
+
+---
+
+# Sự kiện thay đổi về chất lượng gửi của mẫu tin
+Source: https://docs.zaloplatforms.com/docs/ZBS/quan-ly-template/template-webhook/su-kien-thay-doi-ve-chat-luong-gui-cua-mau-tin.md
+
+# Sự kiện thay đổi về chất lượng gửi của mẫu tin
+
+Khi có sự kiện thay đổi về chất lượng của mẫu tin phát sinh theo hệ thống đánh giá, hệ thống Zalo sẽ gửi đến Webhook Url của ứng dụng một HTTP request như sau. 
+
+:::warning Lưu ý
+**Quyền cần có:** Nhận sự kiện quản lý Message Template
+:::
+
+*   **URL:** Webhook Url của ứng dụng
+*   **Method:** POST
+*   **Content Type:** application/json
+*   **X-ZEvent-Signature:** mac = sha256(appId + data + timeStamp + OAsecretKey), với data là chuỗi json trả về dưới đây.
+
+## Ví dụ:
+```json
+{
+  "event_name": "change_template_quality",
+  "oa_id": "2352868362652028400",
+  "template_id": "123456",
+  "quality": "HIGH",
+  "timestamp": "1602560967477"
+}
+```
+
+### Mô tả thuộc tính
+
+| Thuộc tính | Mô tả |
+| --- | --- |
+| event_name String | Tên sự kiện Giá trị nhận về: change_template_quality |
+| oa_id String | ID của OA ủy quyền |
+| template_id String | ID của mẫu tin |
+| quality String | Chất lượng sau khi cập nhật. - HIGH – Mức độ chất lượng tốt - MEDIUM – Mức độ chất lượng trung bình - LOW – Mức độ chất lượng kém - UNDEFINED – Mức độ chất lượng Template chưa được xác định (trường hợp Template chưa được gửi thông báo nào trong khung thời gian đánh giá) |
+| timestamp String | Thời gian hệ thống gửi thông báo |
+
+---
+
+# Sự kiện người dùng phản hồi template phản hồi nhanh
+Source: https://docs.zaloplatforms.com/docs/ZBS/quan-ly-template/template-webhook/su-kien-nguoi-dung-phan-hoi-template-phan-hoi-nhanh.md
+
+# Sự kiện người dùng phản hồi template phản hồi nhanh
+
+Khi có sự kiện người dùng click nút phản hồi qua Mẫu tin Phản hồi nhanh, hệ thống Zalo sẽ gửi đến Webhook Url của ứng dụng một HTTP request như sau.
+
+:::warning Lưu ý
+**Quyền cần có:** Nhận sự kiện quản lý Message Template
+:::
+
+
+*   **URL:** Webhook Url của ứng dụng
+*   **Method:** POST
+*   **Content Type:** application/json
+*   **X-ZEvent-Signature:** mac = sha256(appId + data + timeStamp + OAsecretKey), với data là chuỗi json trả về dưới đây.
+
+## Ví dụ:
+```json
+{
+  "event_name": "user_click_response_button",
+  "message": {
+    "submit_time": "1312931923091",
+    "button_type": "response",
+    "data": "Tôi đồng ý",
+    "tracking_id": "1956"
+  },
+  "msg_id": "12031029391228341312",
+  "app_id": "21310931903012990123",
+  "oa_id": "3970966762224483791",
+  "timestamp": "1312931923091"
+}
+```
+
+### Mô tả thuộc tính
+
+| Thuộc tính | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- |
+| event_name | string | Tên sự kiện. Cụ thể: user_click_response_button |
+| message | object | Thông tin phản hồi của người dùng |
+| msg_id | string | ID của thông báo trả về khi gửi tin |
+| app_id | string | ID của ứng dụng gửi tin |
+| oa_id | string | Official Account Id mà user đã click response button |
+| timestamp | string | Thời điểm gửi event cho đối tác |
+
+
+### Cấu trúc thuộc tính message
+
+| Thuộc tính | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- |
+| submit_time | string | Thời điểm user click button |
+| button_type | string | Loại button. Cụ thể: response |
+| data | string | Nội dung dữ liệu phản hồi của user (là field "Nội dung nút") |
+| tracking_id | string | Tracking ID do đối tác truyền vào khi gửi tin |
+
+---
+
+# API Gửi tin
+Source: https://docs.zaloplatforms.com/docs/ZBS/gui-tin-template-qua-sdt/api-gui-tin-qua-sdt/api-gui-tin.md
+
+# API Gửi tin
+
+:::warning Lưu ý
+**Quyền cần có:** Gửi tin qua số điện thoại
+:::
+
+## HTTP request
+
+- **URL:** https://business.openapi.zalo.me/message/template 
+- **Method:** POST 
+- **Content Type:** application/json 
+- **Response Type:** application/json
+
+## Example request
+
+```bash
+curl --location 'https://business.openapi.zalo.me/message/template' \
+--header 'Content-Type: application/json' \
+--header 'access_token: your_access_token' \
+--data '{
+    "phone": "84987654321",
+    "template_id": "7895417a7d3f9461cd2e",
+    "template_data": {
+        "ky": "1",
+        "thang": "4/2020",
+        "start_date": "20/03/2020",
+        "end_date": "20/04/2020",
+        "customer": "Nguyễn Thị Hoàng Anh",
+        "cid": "PE010299485",
+        "address": "VNG Campus, TP.HCM",
+        "amount": "100",
+        "total": "100000",
+     },
+    "tracking_id":"tracking_id"
+}'
+```
+
+### Tham số header
+
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| [access_token](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) | string | yes | Đoạn mã cần truyền vào để xác minh quyền sử dụng API. Xem thêm [tài liệu tham khảo](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) |
+
+
+### Cấu trúc body của request
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| phone | string | yes | SĐT của người nhận. Lưu ý: SĐT phải được liên kết với tài khoản Zalo và được viết ở định dạng chuẩn hóa theo mã quốc gia. (VD: SĐT 0987654321 viết theo định dạng chuẩn hóa của Việt Nam là 84987654321 hoặc +84987654321) |
+| template_id | string | yes | ID của template muốn sử dụng. template_id sẽ được phía Zalo cung cấp riêng cho từng đối tác. |
+| template_data | JSON object | yes | Các thuộc tính của template mà đối tác đã đăng ký với Zalo. Lưu ý: Cấu trúc template_data được quy định riêng ứng với từng template. |
+| sending_mode | string | no | Chế độ gửi Giá trị Tên chế độ gửi Mô tả 1 (Default) Gửi thường Tin qua SĐT được gửi theo cơ chế thông thường 3 Gửi vượt hạn mức Cơ chế cho phép OA gửi tin qua SĐT tag 3 vượt hạn mức Lưu ý: Chế độ Gửi vượt hạn mức (sending_mode = 3) chỉ áp dụng cho các OA được whitelist. Vui lòng liên hệ đội ngũ CSKH của Zalo Cloud qua support@zalo.solutions hoặc [kênh hỗ trợ vận hành tin qua SĐT](https://zalooa.freshdesk.com/support/tickets/new/) |
+| tracking_id | string | yes | Mã số đánh dấu lần gọi API của đối tác, do đối tác định nghĩa. Đối tác có thể dùng tracking_id để đối soát mà không phụ thuộc vào message_id của Zalo cung cấp. Lưu ý: Zalo khuyến khích sử dụng tham số có độ dài tối đa 48 ký tự và không chứa kí tự đặc biệt. |
+
+
+**Ghi chú:** API gửi tin qua SĐT có hỗ trợ mã hoá AES/CBC/PKCS5Padding. Chi tiết sẽ được trao đổi cụ thể trong lúc thực thi tích hợp nếu doanh nghiệp có yêu cầu.
+
+## Example respond
+```json
+{
+    "error": 0,
+    "message": "Success",
+    "data": {
+           "msg_id": "a4d0243feee163bd3af2",
+             "sent_time": "1626926349402",
+             "sending_mode": "1",
+             "quota": {
+                "dailyQuota": "500",
+                "remainingQuota": "499"
+             }
+    }
+}
+```
+### Cấu trúc thuộc tính data
+
+
+| Thuộc tính | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- |
+| msg_id | string | ID của tin qua SĐT. |
+| sent_time | string | Thời gian gửi tin qua SĐT (định dạng timestamp). |
+| sending_mode | string | Bao gồm giá trị: - 1: tin qua SĐT được gửi theo cơ chế thông thường - 3: tin qua SĐT được gửi theo cơ chế vượt hạn mức |
+| quota | object | Thông tin quota tin qua SĐT của OA. |
+
+
+### Cấu trúc thuộc tính data.quota
+
+
+| Thuộc tính | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- |
+| dailyQuota | string | Số lượng tin của OA được gửi qua SĐT trong 1 ngày. Lưu ý: Hạn mức gửi tin qua SĐT mỗi ngày của OA sẽ tự động được điều chỉnh dựa theo chất lượng và nhu cầu gửi. Xem thêm chi tiết về cơ chế đánh giá chất lượng và quyền lợi gửi tin qua SĐT [tại đây](/docs/ZBS/bat-dau/gioi-thieu-zbs-template-message). |
+| remainingQuota | string | Số lượng tin OA được gửi qua SĐT trong ngày còn lại. |
+
+---
+
+# API Gửi tin sử dụng hash phone
+Source: https://docs.zaloplatforms.com/docs/ZBS/gui-tin-template-qua-sdt/api-gui-tin-qua-sdt/api-gui-tin-su-dung-hash-phone.md
+
+# API Gửi tin sử dụng hash phone
+
+:::warning Lưu ý
+**Quyền cần có:** Gửi tin qua số điện thoại
+:::
+
+## HTTP request
+
+- **URL:** https://business.openapi.zalo.me/message/template/hashphone
+- **Method:** POST 
+- **Content Type:** application/json 
+- **Response Type:** application/json
+
+## Example request
+
+```bash
+curl --location 'https://business.openapi.zalo.me/message/template/hashphone' \
+--header 'Content-Type: application/json' \
+--header 'access_token: your_access_token' \
+--data '{
+    "hash_phone": "544bcae26adc08abc55ec3db75887109eacf8bfe65a2150bc8db2802403d57f2",
+    "template_id": "7895417a7d3f9461cd2e",
+    "template_data": {
+        "ky": "1",
+        "thang": "4/2020",
+        "start_date": "20/03/2020",
+        "end_date": "20/04/2020",
+        "customer": "Nguyễn Thị Hoàng Anh",
+        "cid": "PE010299485",
+        "address": "VNG Campus, TP.HCM",
+        "amount": "100",
+        "total": "100000",
+     },
+    "tracking_id":"tracking_id"
+}'
+```
+
+### Tham số header
+
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| [access_token](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) | string | yes | Đoạn mã cần truyền vào để xác minh quyền sử dụng API. Xem thêm [tài liệu tham khảo](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) |
+
+
+### Cấu trúc body của request
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| hash_phone | string | yes | Số điện thoại của người nhận. Lưu ý: Số điện thoại cần được mã hóa SHA-256 (hash) trước khi truyền vào. |
+| template_id | string | yes | ID của template muốn sử dụng. template_id sẽ được phía Zalo cung cấp riêng cho từng đối tác. |
+| template_data | JSON object | yes | Các thuộc tính của template mà đối tác đã đăng ký với Zalo. Lưu ý: Cấu trúc template_data được quy định riêng ứng với từng template. |
+| tracking_id | string | yes | Mã số đánh dấu lần gọi API của đối tác, do đối tác định nghĩa. Đối tác có thể dùng tracking_id để đối soát mà không phụ thuộc vào message_id của Zalo cung cấp. Lưu ý: Zalo khuyến khích sử dụng tham số có độ dài tối đa 48 ký tự và không chứa kí tự đặc biệt. |
+
+
+**Ghi chú:** API có hỗ trợ mã hoá AES/CBC/PKCS5Padding. Chi tiết sẽ được trao đổi cụ thể trong lúc thực thi tích hợp nếu doanh nghiệp có yêu cầu.
+
+## Example respond
+```json
+{
+    "error": 0,
+    "message": "Success",
+    "data": {
+           "msg_id": "a4d0243feee163bd3af2",
+             "sent_time": "1626926349402",
+             "sending_mode": "1",
+             "quota": {
+                "dailyQuota": "500",
+                "remainingQuota": "499"
+             }
+    }
+}
+```
+### Cấu trúc thuộc tính data
+
+
+| Thuộc tính | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- |
+| msg_id | string | ID của tin qua SĐT. |
+| sent_time | string | Thời gian gửi tin qua SĐT (định dạng timestamp). |
+| sending_mode | string | Bao gồm giá trị: + 1: tin qua SĐT được gửi theo cơ chế thông thường. |
+| quota | object | Thông tin quota tin qua SĐT của OA. |
+
+
+### Cấu trúc thuộc tính data.quota
+
+
+| Thuộc tính | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- |
+| dailyQuota | string | Số lượng tin qua SĐT được gửi trong 1 ngày của OA. Lưu ý: Hạn mức gửi tin qua SĐT mỗi ngày của OA sẽ tự động được điều chỉnh dựa theo chất lượng và nhu cầu gửi. Xem thêm chi tiết về cơ chế đánh giá chất lượng và quyền lợi gửi tin qua SĐT [tại đây](/docs/ZBS/bat-dau/gioi-thieu-zbs-template-message). |
+| remainingQuota | string | Số lượng tin qua SĐT còn lại trong ngày. |
+
+---
+
+# API Gửi tin sử dụng development mode
+Source: https://docs.zaloplatforms.com/docs/ZBS/gui-tin-template-qua-sdt/api-gui-tin-qua-sdt/api-gui-tin-su-dung-development-mode.md
+
+# API Gửi tin sử dụng development mode
+
+Khi có nhu cầu gửi thử tin qua SĐT để kiểm tra trước khi gửi chính thức, bạn có thể gọi API ở chế độ development (development mode). **Lưu ý:** Chế độ development chỉ hỗ trợ gửi thử tin qua SĐT đến quản trị viên của ứng dụng hoặc quản trị viên của OA.
+
+:::warning Lưu ý
+**Quyền cần có:** Gửi tin qua số điện thoại
+:::
+
+## HTTP request
+
+- **URL:** https://business.openapi.zalo.me/message/template
+- **Method:** POST
+- **Content Type:** application/json
+- **Response Type:** application/json
+
+## Example request
+```bash
+curl --location 'https://business.openapi.zalo.me/message/template' \
+--header 'Content-Type: application/json' \
+--header 'access_token: your_access_token' \
+--data '{
+    "phone": "84987654321",
+    "template_id": "7895417a7d3f9461cd2e",
+    "template_data": {
+        "ky": "1",
+        "thang": "4/2020",
+        "start_date": "20/03/2020",
+        "end_date": "20/04/2020",
+        "customer": "Nguyễn Thị Hoàng Anh",
+        "cid": "PE010299485",
+        "address": "VNG Campus, TP.HCM",
+        "amount": "100",
+        "total": "100000",
+     },
+    "tracking_id":"tracking_id"
+}'
+```
+
+### Tham số header
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| [access_token](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) | string | yes | Đoạn mã cần truyền vào để xác minh quyền sử dụng API. Xem thêm [tài liệu tham khảo](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) |
+
+
+### Cấu trúc body của request
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| mode | string | yes | Tham số cho biết thông báo sẽ được gửi ở chế độ development. Giá trị nhận vào: - development |
+| phone | string | yes | SĐT của quản trị viên ứng dụng hoặc quản trị viên OA. Lưu ý: SĐT phải được liên kết với tài khoản Zalo và được viết ở định dạng chuẩn hóa theo mã quốc gia. VD: SĐT 0987654321 (viết theo định dạng chuẩn hóa của Việt Nam là 84987654321 hoặc +84987654321) |
+| template_id | string | yes | ID của template muốn sử dụng. template_id sẽ được phía Zalo cung cấp riêng cho từng đối tác. |
+| template_data | JSON object | yes | Các thuộc tính của template mà đối tác đã đăng ký với Zalo. Lưu ý: Cấu trúc template_data được quy định riêng ứng với từng template. |
+| tracking_id | string | yes | Mã số đánh dấu lần gọi API của đối tác, do đối tác định nghĩa. Đối tác có thể dùng tracking_id để đối soát mà không phụ thuộc vào message_id của Zalo cung cấp. Lưu ý: Tham số có độ dài tối đa 48 ký tự và không chứa kí tự đặc biệt. |
+
+
+## Example respond
+```json
+{
+  "data": {
+    "sent_time": "1619595918601",
+       "msg_id": "b15f0398cb7a1e264769"
+  },
+  "error": 0,
+  "message": "Success"
+}
+```
+### Cấu trúc thuộc tính data
+
+| Thuộc tính | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- |
+| sent_time | string | Thời gian gửi tin qua SĐT (định dạng timestamp). |
+| msg_id | string | ID của tin qua SĐT. |
+
+---
+
+# API Gửi tin với hệ mã hóa RSA
+Source: https://docs.zaloplatforms.com/docs/ZBS/gui-tin-template-qua-sdt/api-gui-tin-qua-sdt/api-gui-tin-voi-he-ma-hoa-rsa.md
+
+# API Gửi tin với hệ mã hóa RSA
+
+
+API cho phép khách hàng của đối tác mã hóa nội dung thông báo trước khi truyền đến hệ thống của đối tác để thực hiện xử lý lệnh. Nội dung đã mã hóa sẽ được dịch lại ở phía Zalo.
+
+:::warning Lưu ý
+**Quyền cần có:** Gửi tin qua số điện thoại
+:::
+
+**Tổng quan luồng mã hóa nội dung**
+
+![](/assets/ZBS/img/rsa.png)
+
+**Bước 1: Tạo RSA key**
+
+API tạo RSA key cho phép đối tác tạo 1 cặp key gồm public key và private key. Public key sẽ được trả về cho đối tác để cung cấp cho khách hàng. Private key sẽ được Zalo lưu trữ để giải mã nội dung nhận được từ phía đối tác trước khi gửi đến người dùng. Trong trường hợp đối tác đã tạo RSA key, vui lòng sử dụng API lấy public key để nhận được public key.
+
+## Tạo public key
+
+## HTTP request
+
+- **URL:** https://business.openapi.zalo.me/rsa/key/gen 
+- **Method:** GET 
+- **Content Type:** application/json 
+- **Response Type:** text/json
+
+## Example request
+```bash
+curl
+-X GET
+-H "Content-Type: application/json" -d "https://business.openapi.zalo.me/rsa/key/gen"
+```
+### Tham số header
+
+| Column 1 | Column 2 | Column 3 |
+| --- | --- | --- |
+| Tên Header | Kiểu dữ liệu | Mô tả |
+| [access_token](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) | string | Đoạn mã cần truyền vào để xác minh quyền sử dụng API. Xem thêm [tài liệu tham khảo](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new). |
+
+
+## Example respond
+```json
+{
+  "data": {
+    "public_key": "e6fa968f027"
+  },
+  "error": 0,
+  "message": "Success"
+}
+```
+### Cấu trúc tham số data
+
+| Column 1 | Column 2 | Column 3 |
+| --- | --- | --- |
+| Tên biến | Kiểu dữ liệu | Mô tả |
+| public_key | string | Public key để khách hàng của đối tác có thể mã hóa thông báo. Lưu ý: Public key này đã được Zalo chuyển đổi từ định dạng byte array sang string theo chuẩn mã hóa base64. |
+
+
+## Lấy public key
+
+## HTTP request
+
+- **URL:** https://business.openapi.zalo.me/rsa/key/get 
+- **Method:** GET 
+- **Content Type:** application/json 
+- **Response Type:** text/json
+
+## Example request
+```bash
+curl
+-X GET
+-H "Content-Type: application/json" -d "https://business.openapi.zalo.me/rsa/key/get"
+```
+### Tham số header
+
+| Column 1 | Column 2 | Column 3 |
+| --- | --- | --- |
+| Tên Header | Kiểu dữ liệu | Mô tả |
+| [access_token](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) | string | Đoạn mã cần truyền vào để xác minh quyền sử dụng API. Xem thêm [tài liệu tham khảo](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) |
+
+
+## Example respond
+```json
+{
+  "data": {
+    "public_key": "e6fa968f027"
+  },
+  "error": 0,
+  "message": "Success"
+}
+```
+### Cấu trúc tham số data
+
+| Column 1 | Column 2 | Column 3 |
+| --- | --- | --- |
+| Tên biến | Kiểu dữ liệu | Mô tả |
+| public_key | string | Public key để khách hàng của đối tác có thể mã hóa thông báo. Lưu ý: Public key này đã được Zalo chuyển đổi từ định dạng byte array sang string theo chuẩn mã hóa base64. |
+
+
+**Bước 2: Gửi public key cho khách hàng**
+
+Đối tác vui lòng gửi public key cho khách hàng. **Lưu ý:**
+
+*   Public key mà đối tác nhận được ở bước 1 sẽ ở dạng string. Vui lòng sử dụng chuẩn mã hóa **Base64** để chuyển đổi public key về định dạng byte array.
+*   Cipher Type khi encode: RSA/ECB/OAEPWITHSHA-256ANDMGF1PADDING
+
+**Bước 3: Gửi nội dung đã được mã hóa**
+
+Khách hàng của đối tác sẽ sử dụng public key để mã hóa số điện thoại của người nhận và từng nội dung trong template_data trước khi truyền cho đối tác thực hiện gửi. 
+
+**Ví dụ:** Với nội dung tin nhắn gốc: “Đây là tin nhắn mẫu”, public key bạn nhận được có dạng như sau:
+
+```
+MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAnoSa3FcFgH19rI7Emp5SoHthGjlwwgWDNc30h82Z1K/nGa6mxW4VLaSGQS3ykg070xAFL80x0Vadkt3K/EITacB3MUxouyqMpMD+a0SbSYw+u9nT0QUJRvRMTJ679QFm0g9V943wa8OTHNNHalEc2tl7B9MjBl3/I5YgYXp5oG2YocrIFMNwlaujd+yiYCsmTMVDB7VtRgBmN0nPFfebl6E2CTTbWfnJsUZaqp3Njph0ab7XM2QnaDyd9xACtRMGFm4EaXEuuqvqH4acz6eu3YfUgm669B87sC8s/7pFs62laoTf+uPeZt1o8pQ3uRvenbvSXMRkWhpNOmnka2UqdD4DhOCNl6Jba4oVgECnJCp6SudfsE17VuANAkeRJOcUhRcHoBt8zs57AzA8qmd6RG6eRtz/9EXTBoetaUwPMumfQmF55XV7r1cwGd8Vdtid4llXGqVdUkCky67a/zyoEsjNTN1q8uw0+0InSkypLp7UROgEMUnrI0DL5yyDmOhimn0eXNVtut8bEyvBorrNwsCxxr4G/gv0e6HSaSaHfhh94w2t0STEcykZYoIBz9HEcto+8glePAYxFLHs8ifj36skfTXdrDN64Z8rp/yRYlZ9IRu2bJnc/dM1AV9mwvebgWcr5KPPOipHMXWosbZl08N5Tu1AiJ/sZUykTi3hJF0CAwEAAQ==
+```
+Sử dụng public key trên để mã hóa nội dung gốc. Nội dung sau khi được mã hóa theo chuẩn base64 sẽ có dạng như sau
+```
+FsytVT99s5mBhvuBuJ4a9bZGkOcPesPYo/u0LctnWGTkkVK6NOcFQHhvkkK82HGBc0ybz6RvxQUIbpoJ1UGRwPNvcVWQ4w/VFJhA7ajU42S+ig2fI09k8OTqfhmvlriWdo4XpqQY7p3KwP0nV1N6MvQGB0Goc2OI8sLl9wk9/JAAs2SZzEypBdasxFWV5CW5uJ+nVo4DM3PoTn/OFtIf4GVmCu16pQJfaCl0hNt7pwZMPsVBy5PxEUegffYs/ru0IgSY6DVD8xNZC1FerhaLJAljWt03zO/hVUhqDmN3K2Ff7mu7nYvPMMPZWhGVKPafc+pRGzBIle96z9dmH8iruns8LUppA08x8AcHEmHqdMRtYzV3H+ss2x7YL2bu3OYNmvEGaSjhu7GCE3/R5GrtJi4mzgkTRkuyU8dCc5uj8g+UXqSwTV0OwGcGvXVqRMthkQ4BHnBNmxwT+7Awx5ARAm2u7s+PciYUNHH25Y83k1Ao38OSznt0iuet3kMF23JmDNWirbNEahHcHTxkASrd8MpdwY98nWTpu6q1RSvz8HO5CfV6i6jjpumPwm8dWeLkZiupg6EjPryXlNffjmedbhgGKdjAbcPS+7eBnxjvFzpFFZ0cJfkZ+IiktftraZjT6ird8alhSYrHd6f8a4nM1srklyh1bKeim0/eF4MzBA0=
+```
+Sau khi nhận được nội dung đã mã hóa từ phía khách hàng, đối tác sử dụng API gửi nội dung đã mã hóa để gửi thông báo đến người quan tâm thông qua Zalo. Zalo sẽ sử dụng private key (được lưu trữ bảo mật phía Zalo) để giải mã nội dung và gửi đến cho người quan tâm.
+
+## HTTP request
+
+- **URL:** https://business.openapi.zalo.me/rsa/message/template 
+- **Method:** POST 
+- **Content Type:** application/json 
+- **Response Type:** text/json
+
+## Example request
+```bash
+curl
+-X POST
+-H "Content-Type: application/json" 
+-d "https://business.openapi.zalo.me/rsa/message/template"
+```
+### Tham số header
+
+| Column 1 | Column 2 | Column 3 |
+| --- | --- | --- |
+| Tên Header | Kiểu dữ liệu | Mô tả |
+| [access_token](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) | string | Là một đoạn mã cần truyền vào để xác minh quyền sử dụng API. Xem thêm [tài liệu tham khảo](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) |
+
+
+### Body
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| rsa_phone | string | yes | SĐT của người nhận đã được mã hóa với public key (Theo chuẩn base64) Lưu ý: SĐT trước khi mã hóa phải được liên kết với tài khoản Zalo và được viết ở định dạng chuẩn hóa theo mã quốc gia (VD: SĐT 0987654321 viết theo định dạng chuẩn hóa của Việt Nam là 84987654321 hoặc +84987654321) |
+| template_id | string | yes | ID của template muốn sử dụng. template_id sẽ được phía Zalo cung cấp riêng cho từng đối tác. |
+| template_data | JSON object | yes | Các thuộc tính của template mà đối tác đã đăng ký với Zalo. Giá trị của param: Đã được mã hóa với public key (theo chuẩn Base64) Lưu ý: Cấu trúc template_data được quy định riêng ứng với từng template. |
+| tracking_id | string | yes | Mã số đánh dấu lần gọi API của đối tác, do đối tác định nghĩa. Đối tác có thể dùng tracking_id để đối soát mà không phụ thuộc vào message_id của Zalo cung cấp. Lưu ý: Zalo khuyến khích sử dụng tham số có độ dài tối đa 48 ký tự và không chứa kí tự đặc biệt. |
+
+
+## Example body
+```json
+{
+    "rsa_phone": "YxLw/6km7vSKUZg3zH21lJNL2OQ4NIkirMD8P3vj+Vl1PhEdC+Dlnyo4s1mlpN24BmLuxVU1FdmAebV0vqLzrB4S1G9nGIqHh0uxKhIL8uSKxLqIiR5F+EDTZ/GUFDb9WB63p9a831Nd0NkMNFJgiJ6juhZ8NByy81rGfM+9Mx89kafK4nIGtCjvLuPy7daXPwpWpIBRnL5em31OnSAZswKxXN7LQyLrBJPbhOMZEfWTMexY7GGkA3ua654nVUSc2vs+YaUHTi/sn+1iyio5wnNiRErHV5lhId588aPMtSSIJFIUBlHFhma+nyApAVRK57NkYKAF7YOos9CImbUD+yOhbajBDhi9gSMvfvt/amASbVVGv6YRnndS4+09cAbUwiH3OR2VHlPIqU4rTuSuPmmEwoDoeQbQO6HarUvgud9breXIsctct9vmsyN4oodjS1/djzwgiEggs4rHt7eJmm3sLjXCCmxr9bQLFm9J5RQCooTRUVnaoXw0UOSc9qhUev1rhkoOTe+hq9Ush1FhE9HHmOzJ37Mq+vro/k26F72xB8cnlEieeLqDTOSCL4E2rcmpdeov5bH8Mp4WarnqMR2oldhFc3tTwAt3jZlOGrN6RpvdteqYx0VOTLoGzuUVv4HJ4qgV5FylLNEEEWbQSoZIVXO3uaqj9Q2ugvQ5BeE=",
+    "template_id": "1234567",
+    "template_data": {
+        "param_1": "YxLw/6km7vSKUZg3zH21lJNL2OQ4NIkirMD8P3vj+Vl1PhEdC+Dlnyo4s1mlpN24BmLuxVU1FdmAebV0vqLzrB4S1G9nGIqHh0uxKhIL8uSKxLqIiR5F+EDTZ/GUFDb9WB63p9a831Nd0NkMNFJgiJ6juhZ8NByy81rGfM+9Mx89kafK4nIGtCjvLuPy7daXPwpWpIBRnL5em31OnSAZswKxXN7LQyLrBJPbhOMZEfWTMexY7GGkA3ua654nVUSc2vs+YaUHTi/sn+1iyio5wnNiRErHV5lhId588aPMtSSIJFIUBlHFhma+nyApAVRK57NkYKAF7YOos9CImbUD+yOhbajBDhi9gSMvfvt/amASbVVGv6YRnndS4+09cAbUwiH3OR2VHlPIqU4rTuSuPmmEwoDoeQbQO6HarUvgud9breXIsctct9vmsyN4oodjS1/djzwgiEggs4rHt7eJmm3sLjXCCmxr9bQLFm9J5RQCooTRUVnaoXw0UOSc9qhUev1rhkoOTe+hq9Ush1FhE9HHmOzJ37Mq+vro/k26F72xB8cnlEieeLqDTOSCL4E2rcmpdeov5bH8Mp4WarnqMR2oldhFc3tTwAt3jZlOGrN6RpvdteqYx0VOTLoGzuUVv4HJ4qgV5FylLNEEEWbQSoZIVXO3uaqj9Q2ugvQ5BeE="
+    }
+}
+```
+ 
+
+## Example respond
+```json
+{
+  "data": {
+    "sent_time": "1619595918601",
+    "msg_id": "b15f0398cb7a1e264769"
+  },
+  "error": 0,
+  "message": "Success"
+}
+```
+### Cấu trúc thuộc tính data
+
+| Thuộc tính | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- |
+| sent_time | string | Thời gian gửi tin qua SĐT (định dạng timestamp). |
+| msg_id | string | ID của tin qua SĐT. |
+
+---
+
+# API Gửi tin Journey
+Source: https://docs.zaloplatforms.com/docs/ZBS/gui-tin-template-qua-sdt/api-gui-tin-qua-sdt/api-gui-tin-journey.md
+
+# API Gửi tin Journey
+
+Khi có nhu cầu gửi tin qua SĐT theo hành trình cho hành trình giao vận hoặc vé xe khách, bạn có thể sử dụng chuỗi tin Journey tương ứng với 1 trong 2 hành trình để tối ưu chi phí.
+
+:::warning Lưu ý:
+Bạn cần liên hệ với bộ phận vận hành dịch vụ gửi tin qua SĐT thông qua [Zalo Official Account](https://oa.zalo.me/4462152339089565647)/[kênh email](https://zalooa.freshdesk.com/support/tickets/new/), hoặc đội ngũ chăm sóc khách hàng đang làm việc với doanh nghiệp của bạn để được cấp phép sử dụng loại API này và hướng dẫn các cài đặt template liên quan.
+:::
+
+:::warning Lưu ý
+**Quyền cần có:** Gửi tin qua số điện thoại
+:::
+
+**Mô hình gửi tin Journey qua SĐT**
+
+*   Một tin Journey được định nghĩa là một chuỗi các tin gửi qua SĐT gửi đến 1 khách hàng, tính phí theo một mô hình riêng (thay vì theo từng tin).
+* Tin Journey hiện tại được chia theo 2 industries chính:
+  * Logistics: Hành trình giao vận
+  * Coach bus: Hành trình xe khách
+*   Cần phải có Journey Token để thực hiện chuỗi gửi tin Journey đến khách hàng. Từng khách hàng, cho từng hành trình, sẽ có từng Journey Token khác nhau.
+* Mỗi loại Journey Token cần được gửi bằng loại Template Journey tương ứng. Vui lòng liên hệ đội ngũ Chăm sóc khách hàng của Zalo Business Solutions qua email: support@zalo.solutions để khởi tạo các mẫu Template này.
+*   Các mẫu tin gửi qua SĐT trong bộ tin Journey cần phải được khai báo trước khi sử dụng.
+
+**Khởi tạo Journey Token**
+------------------------
+
+### HTTP request
+
+- **URL:**  **[https://business.openapi.zalo.me/journey/get-token](https://business.openapi.zalo.me/journey/get-token)** 
+- **Method:** POST 
+- **Content Type:** application/json 
+- **Response Type:** text/json
+
+### Example request
+```bash
+curl --location 
+--request POST 'https://business.openapi.zalo.me/journey/get-token' 
+--header 'Content-Type: application/json' 
+--header 'access_token: your_access_token' 
+--data-raw '{ "phone":"84987654321", "token_type":"token_logistics_7" }'
+```
+
+#### Tham số header
+
+| Column 1 | Column 2 | Column 3 | Column 4 |
+| --- | --- | --- | --- |
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| [access_token](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) | string | yes | Đoạn mã cần truyền vào để xác minh quyền sử dụng API. Xem thêm [tài liệu tham khảo](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) |
+
+
+#### Cấu trúc body của request
+
+| Column 1 | Column 2 | Column 3 | Column 4 |
+| --- | --- | --- | --- |
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| phone | string | yes | SĐT của người nhận mẫu tin. Lưu ý: SĐT phải được liên kết với tài khoản Zalo và được viết ở định dạng chuẩn hóa theo mã quốc gia. VD: SĐT 0987654321 viết theo định dạng chuẩn hóa của Việt Nam là 84987654321 hoặc +84987654321 |
+| token_type | string | no | Loại Journey token muốn khởi tạo, bao gồm - token_logistics_7 - token_logistics_30 - token_coach_bus_7 - token_coach_bus_30 |
+
+
+:::warning Lưu ý
+* **Journey token gồm 4 loại chính, bao gồm:**
+
+### Giao vận
+
+- token_logistics_7
+  - Journey token: Token hành trình giao vận 7 ngày
+- token_logistics_30
+  - Journey token: Token hành trình giao vận 30 ngày
+
+### Xe khách
+
+- token_coach_bus_7
+  - Journey token: Token hành trình xe khách 7 ngày
+- token_coach_bus_30
+  - Journey token: Token hành trình xe khách 30 ngày
+
+
+* **Nếu tham số token_type không được truyền, mặc định token_type = token_logistics_7.**
+* **journey_token có thời gian hiệu lực trong 7 ngày** kể từ thời điểm được kích hoạt.
+:::
+
+### Example respond
+```json
+{
+    "error": 0,
+    "message": "Success",
+    "token": "8iCeIhJbTcPtLo0Kh1kS6rOVXl0Rgv2wZNPRaW61sKQaXTGth1KrhGwQrDVXHnJbckzcL8fG-k_X0h1IL-SyeBPfCtwyljtiKutpUQvih7P65AgvJiz9fYYSHkrdrVNuCdPAMeVCYgERu3UWmQOjKMfLWsII_u5E9ylCO46Z-_mFSJC7DstAkBxFVcJTlzduNMsQzxBVaUom9E_06p1cw7DKRtGjLAF0jkfKgj0ftMI=",
+    "journey_id": "123456789"
+}
+```
+#### Cấu trúc tham số data
+
+| Column 1 | Column 2 | Column 3 |
+| --- | --- | --- |
+| Thuộc tính | Kiểu dữ liệu | Mô tả |
+| token | string | Mã journey token được kích hoạt. |
+| journey_id | string | ID của journey |
+
+
+**Gửi tin qua SĐT với Journey Token**
+-----------------------------
+
+### HTTP request
+
+- **URL:  [https://business.openapi.zalo.me/message/template](https://business.openapi.zalo.me/message/template)** 
+- **Method:** POST 
+- **Content Type:** application/json 
+- **Response Type:** text/json
+
+### Example request
+```bash
+curl --location 
+--request POST 'https://business.openapi.zalo.me/message/template' 
+--header 'Content-Type: application/json' 
+--header 'access_token: your_access_token' 
+--header 'journey_token: 8iCeIhJbTcPtLo0Kh1kS6rOVXl0Rgv2wZNPRaW61sKQaXTGth1KrhGwQrDVXHnJbckzcL8fG-k_X0h1IL-SyeBPfCtwyljtiKutpUQvih7P65AgvJiz9fYYSHkrdrVNuCdPAMeVCYgERu3UWmQOjKMfLWsII_u5E9ylCO46Z-_mFSJC7DstAkBxFVcJTlzduNMsQzxBVaUom9E_06p1cw7DKRtGjLAF0jkfKgj0ftMI=' 
+--data-raw 
+'{
+    "template_data": {
+    },
+    "phone": "84987654321",
+   "template_id":217489
+}'
+```
+
+#### Tham số header
+
+| Column 1 | Column 2 | Column 3 | Column 4 |
+| --- | --- | --- | --- |
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| [access_token](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) | string | yes | Đoạn mã cần truyền vào để xác minh quyền sử dụng API. Xem thêm [tài liệu tham khảo](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) |
+| journey_token | string | yes | Đoạn mã xác minh mẫu tin thuộc hành trình vừa kích hoạt |
+
+
+#### Cấu trúc body của request
+
+| Column 1 | Column 2 | Column 3 | Column 4 |
+| --- | --- | --- | --- |
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| phone | string | yes | SĐT của người nhận mẫu tin. Lưu ý: SĐT phải được liên kết với tài khoản Zalo và được viết ở định dạng chuẩn hóa theo mã quốc gia. VD: SĐT 0987654321 viết theo định dạng chuẩn hóa của Việt Nam là 84987654321 hoặc +84987654321 |
+| template_id | string | yes | ID của template muốn sử dụng. template_id sẽ được phía Zalo cung cấp riêng cho từng đối tác. |
+| template_data | JSON object | yes | Các thuộc tính của template mà đối tác đã đăng ký với Zalo. Lưu ý: Cấu trúc template_data được quy định riêng ứng với từng template. |
+
+
+### Example respond
+```json
+{
+    "error": 0,
+    "message": "Success",
+    "data": {
+        "sent_time": "1640144305350",
+        "quota": {
+            "remainingQuota": "480",
+            "dailyQuota": "500"
+        },
+        "msg_id": "6e84304c259208ce5181"
+    }
+}
+```
+#### Cấu trúc tham số data của respond
+
+| Column 1 | Column 2 | Column 3 |
+| --- | --- | --- |
+| Thuộc tính | Kiểu dữ liệu | Mô tả |
+| sent_time | string | Thời gian gửi tin qua SĐT (định dạng timestamp). |
+| msg_id | string | ID của tin qua SĐT. |
+| quota.remainingQuota | string | Số lượng tin qua SĐT có thể gửi còn lại trong 1 ngày. |
+| quota.dailyQuota | string | Số lượng tin qua SĐT có thể gửi trong 1 ngày. |
+
+
+:::warning Lưu ý
+* **Để gửi được tin qua SĐT Journey, cần đảm bảo sử dụng Journey Token và Journey Template cùng loại, cụ thể:**
+
+### Giao vận
+
+- Template hành trình giao vận 7 ngày
+  - Journey token: Token hành trình giao vận 7 ngày
+- Template hành trình giao vận 30 ngày
+  - Journey token: Token hành trình giao vận 30 ngày
+
+### Xe khách
+
+- Template hành trình xe khách 7 ngày
+  - Journey token: Token hành trình xe khách 7 ngày
+- Template hành trình xe khách 30 ngày
+  - Journey token: Token hành trình xe khách 30 ngày
+
+:::
+
+**Kiểm tra Journey Token**
+--------------------------
+
+### HTTP request
+
+- **URL:  [https://business.openapi.zalo.me/journey/check-token](https://business.openapi.zalo.me/journey/check-token)** 
+- **Method:** GET 
+- **Content Type:** application/json 
+- **Response Type:** text/json
+
+### Example request
+```bash
+curl --location --request GET 'https://business.openapi.zalo.me/journey/check-token'
+--header 'Content-Type: application/json'
+--header 'access_token: access_token'
+--header 'journey_token: journey_token'
+```
+#### Tham số header
+
+| Column 1 | Column 2 | Column 3 | Column 4 |
+| --- | --- | --- | --- |
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| [access_token](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) | string | yes | Đoạn mã cần truyền vào để xác minh quyền sử dụng API. Xem thêm [tài liệu tham khảo](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) |
+| journey_token | string | yes | Đoạn mã xác minh mẫu tin thuộc hành trình vừa kích hoạt |
+
+
+### Example respond
+```json
+{
+    "error": 0,
+    "message": "Success",
+    "data": {
+        "appId": "4349311699477619340",
+        "oaId": "3886651700907664415",
+        "tokenType ": "token_logistics_7",
+        "createdAt": "1641269204370",
+        "expiredAt": "1641269384370"
+    }
+}
+```
+#### Cấu trúc tham số data của respond
+
+| Thuộc tính | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- |
+| createdAt | string | Thời gian tạo Journey Token (định dạng timestamp) |
+| expiredAt | string | Thời gian Journey Token hết hạn sử dụng (định dạng timestamp) |
+| tokenType | string | Loại Journey token tương ứng, bao gồm - token_logistics_7 - token_logistics_30 - token_coach_bus_7 - token_coach_bus_30 |
+| appId | string | Id của ứng dụng |
+| oaId | string | Id của OA |
+
+
+**Mã lỗi liên quan**
+--------------------
+
+| Column 1 | Column 2 | Column 3 |
+| --- | --- | --- |
+| Mã lỗi | Mô tả lỗi | Thông tin lỗi |
+| -109 | Template ID invalid | ID Template không hợp lệ |
+| -132 | Parameter invalid | Tham số không hợp lệ |
+| -148 | Missing journey token | Không tìm thấy journey token |
+| -149 | Invalid journey token | Journey token không hợp lệ |
+| -150 | Journey token has expired | Journey token đã hết hạn |
+
+
+Các mã lỗi về gửi tin qua SĐT, vui lòng tham khảo [Bảng mã lỗi](/docs/ZBS/bang-ma-loi).
+
+---
+
+# API Lấy thông tin trạng thái gửi tin qua SĐT
+Source: https://docs.zaloplatforms.com/docs/ZBS/gui-tin-template-qua-sdt/api-truy-xuat-thong-tin-gui-tin-qua-sdt/api-lay-thong-tin-trang-thai-gui-tin-qua-sdt.md
+
+# API Lấy thông tin trạng thái gửi tin qua SĐT
+
+API cho phép đối tác truy xuất trạng thái gửi tin qua SĐT.
+
+:::warning Lưu ý
+**Quyền cần có:** Gửi tin qua số điện thoại
+:::
+
+## HTTP request
+
+- **URL:** https://business.openapi.zalo.me/message/status 
+- **Method:** GET 
+- **Content Type:** application/json 
+- **Response Type:** application/json
+
+## Example request
+```bash
+curl
+-X GET
+-H "Content-Type: application/json" 
+"https://business.openapi.zalo.me/message/status?message_id=message_id&phone=phone"
+```
+
+### Tham số header
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| [access_token](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) | string | yes | Đoạn mã cần truyền vào để xác minh quyền sử dụng API. Xem thêm [tài liệu tham khảo](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) |
+
+
+### Tham số
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| message_id | string | yes | ID của thông báo cần lấy thông tin trạng thái. |
+
+
+## Example respond
+```json
+{
+   "message": "Success",
+   "data": {
+       "delivery_time": "1600328011517",
+       "message": "The message was delivered to the user's phone",
+       "status": 1
+   },
+   "error": 0
+}
+```
+
+### Cấu trúc thuộc tính data
+
+| Thuộc tính | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- |
+| delivery_time | string | Thời gian thiết bị của người dùng nhận được tin qua SĐT. |
+| status | int | Trạng thái của tin qua SĐT. |
+| message | string | Mô tả trạng thái tin qua SĐT. Các giá trị trả về: - -1: The message does not exist - 0: The message is pushed successfully to Zalo server but has not yet delivered to user’s phone - 1: The message was delivered to the user's phone |
+
+---
+
+# API Lấy thông tin quota gửi tin qua SĐT
+Source: https://docs.zaloplatforms.com/docs/ZBS/gui-tin-template-qua-sdt/api-truy-xuat-thong-tin-gui-tin-qua-sdt/api-lay-thong-tin-quota-gui-tin-qua-sdt.md
+
+# API Lấy thông tin quota gửi tin qua SĐT
+
+API cho phép đối tác truy xuất thông tin quota (số lượng) gửi tin qua SĐT của OA được gửi mỗi ngày.
+
+:::warning Lưu ý
+**Quyền cần có:** Gửi tin qua số điện thoại
+:::
+
+## HTTP request
+
+- **URL:** https://business.openapi.zalo.me/message/quota 
+- **Method:** GET 
+- **Content Type:** application/json 
+- **Response Type:** text/json
+
+## Example request
+```bash
+curl
+-X GET
+-H "Content-Type: application/json" "https://business.openapi.zalo.me/message/quota"
+```
+
+### Tham số header
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| [access_token](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) | string | yes | Đoạn mã cần truyền vào để xác minh quyền sử dụng API. Xem thêm [tài liệu tham khảo](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) |
+
+
+## Example respond
+```json
+{
+    "data": {
+        "dailyQuota": 500,
+        "remainingQuota": 499,
+        "dailyQuotaPromotion": null,
+        "remainingQuotaPromotion": null,
+        "monthlyPromotionQuota": 125,
+        "remainingMonthlyPromotionQuota": 124,
+        "estimatedNextMonthPromotionQuota" :2000
+    },
+    "error": 0,
+    "message": "success"
+}
+```
+
+### Cấu trúc thuộc tính data
+
+| Thuộc tính | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- |
+| dailyQuota | long | Số tin qua SĐT của OA được gửi trong 1 ngày. Lưu ý: Hạn mức gửi tin qua SĐT mỗi ngày của OA sẽ tự động được điều chỉnh dựa theo chất lượng và nhu cầu gửi. Xem thêm chi tiết về cơ chế đánh giá chất lượng và quyền lợi gửi tin qua SĐT [tại đây](/docs/ZBS/phu-luc/co-che-danh-gia-chat-luong-va-quyen-loi-gui-tin-qua-sdt). |
+| remainingQuota | long | Số tin qua SĐT còn lại của OA được gửi trong ngày. |
+| dailyQuotaPromotion | string | Số tin hậu mãi của OA được gửi trong ngày. Ghi chú: Từ ngày 1/11, thuộc tính này sẽ trả về giá trị null |
+| remainingQuotaPromotion | string | Số tin hậu mãi còn lại của OA được gửi trong ngày. Ghi chú: Từ ngày 1/11, thuộc tính này sẽ trả về giá trị null |
+| monthlyPromotionQuota | long | Số tin hậu mãi của OA được gửi trong tháng. |
+| remainingMonthlyPromotionQuota | long | Số tin hậu mãi còn lại của OA được gửi trong tháng. |
+| estimatedNextMonthPromotionQuota | long | Số tin hậu mãi dự kiến mà OA có thể gửi trong tháng tiếp theo. |
+
+---
+
+# API Lấy thông tin chất lượng gửi tin qua SĐT hiện tại của OA
+Source: https://docs.zaloplatforms.com/docs/ZBS/gui-tin-template-qua-sdt/api-truy-xuat-thong-tin-gui-tin-qua-sdt/api-lay-thong-tin-chat-luong-gui-tin-qua-sdt-hien-tai-cua-oa.md
+
+# API Lấy thông tin chất lượng gửi tin qua SĐT hiện tại của OA
+
+API cho phép đối tác truy xuất chất lượng gửi tin qua SĐT trong 48 giờ gần nhất của OA.
+
+:::warning Lưu ý
+**Quyền cần có:** Gửi tin qua số điện thoại
+:::
+
+## HTTP request
+
+- **URL:** https://business.openapi.zalo.me/quality 
+- **Method:** GET 
+- **Content Type:** application/json 
+- **Response Type:** text/json
+
+## Example request
+```bash
+curl
+-X GET
+-H "Content-Type: application/json" "https://business.openapi.zalo.me/quality"
+```
+### Tham số header
+
+| Tham số | Kiểu dữ liệu | Tính bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| [access_token](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) | string | yes | Đoạn mã cần truyền vào để xác minh quyền sử dụng API. Xem thêm [tài liệu tham khảo](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) |
+
+
+## Example respond
+```json
+{
+    "data": {
+        "oaCurrentQuality": "HIGH",
+        "oa7dayQuality": "HIGH"
+    },
+    "error": 0,
+    "message": "success"
+}
+```
+### Cấu trúc thuộc tính data
+
+| Thuộc tính | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- |
+| oaCurrentQuality | string | Chất lượng gửi tin qua SĐT trong 48 giờ gần nhất của OA. Các giá trị trả về: - HIGH - Mức độ chất lượng tốt - MEDIUM - Mức độ chất lượng trung bình - LOW - Mức độ chất lượng kém - UNDEFINED - Mức độ chất lượng OA chưa được xác định (trường hợp OA không gửi tin qua SĐT nào trong khung thời gian đánh giá) Lưu ý: Xem thêm chi tiết về cơ chế đánh giá chất lượng và quyền lợi gửi tin qua SĐT[tại đây](/docs/ZBS/phu-luc/co-che-danh-gia-chat-luong-va-quyen-loi-gui-tin-qua-sdt). |
+| oa7dayQuality | string | Chất lượng gửi tin qua SĐT trong 7 ngày gần nhất của OA. Các giá trị trả về: - HIGH - Mức độ chất lượng tốt - MEDIUM - Mức độ chất lượng trung bình - LOW - Mức độ chất lượng kém - UNDEFINED - Mức độ chất lượng OA chưa được xác định (trường hợp OA không gửi tin qua SĐT nào trong khung thời gian đánh giá) Lưu ý: Xem thêm chi tiết về cơ chế đánh giá chất lượng và quyền lợi gửi tin qua SĐT[tại đây](/docs/ZBS/phu-luc/co-che-danh-gia-chat-luong-va-quyen-loi-gui-tin-qua-sdt). |
+
+---
+
+# Sự kiện thay đổi về hạn mức gửi tin qua SĐT
+Source: https://docs.zaloplatforms.com/docs/ZBS/gui-tin-template-qua-sdt/webhook-gui-tin-qua-sdt/su-kien-thay-doi-ve-han-muc-gui-tin-qua-sdt.md
+
+# Sự kiện thay đổi về hạn mức gửi tin qua SĐT
+
+Khi có sự kiện thay đổi về hạn mức gửi tin của OA được phát sinh theo hệ thống đánh giá hoặc theo đề xuất thay đổi từ khách hàng, hệ thống Zalo sẽ gửi đến Webhook Url của ứng dụng một HTTP request như sau.
+
+:::warning Lưu ý
+**Quyền cần có:** Nhận sự kiện gửi tin qua SĐT
+:::
+
+*   **URL:** Webhook Url của ứng dụng
+*   **Method:** POST
+*   **Content Type:** application/json
+*   **X-ZEvent-Signature:** mac = sha256(appId + data + timeStamp + OAsecretKey), với data là chuỗi json trả về dưới đây.
+
+## Ví dụ:
+```json
+{
+  "event_name": "change_oa_daily_quota",
+  "oaId": "2352868362652028400",
+  "quota": {
+    "prev_value": 1000,
+    "new_value": 2000
+  },
+  "timestamp": "1602560967477"
+}
+```
+### Mô tả thuộc tính
+
+| Thuộc tính | Mô tả |
+| --- | --- |
+| event_name String | Tên sự kiện Giá trị nhận về: change_oa_daily_quota |
+| oa_id String | ID của OA ủy quyền |
+| quota Json Object | Ví dụ: ```json { "prev_value": 1000, "new_value": 2000 } ``` Trong đó: - "prev_value": Hạn mức gửi tin của OA trước khi cập nhật - "new_value": Hạn mức gửi tin của OA sau khi cập nhật |
+| timestamp String | Thời gian hệ thống gửi thông báo |
+
+---
+
+# Sự kiện journey hết hạn
+Source: https://docs.zaloplatforms.com/docs/ZBS/gui-tin-template-qua-sdt/webhook-gui-tin-qua-sdt/su-kien-journey-het-han.md
+
+# Sự kiện journey hết hạn
+
+Khi có sự kiện một journey hết hạn và chưa từng được sử dụng, hệ thống Zalo sẽ gửi đến Webhook Url của ứng dụng một HTTP request như sau.
+
+:::warning Lưu ý
+**Quyền cần có:** Nhận sự kiện gửi tin qua SĐT
+:::
+
+*   **URL:** Webhook Url của ứng dụng
+*   **Method:** POST
+*   **Content Type:** application/json
+*   **X-ZEvent-Signature:** mac = sha256(appId + data + timeStamp + OAsecretKey), với data là chuỗi json trả về dưới đây.
+
+## Ví dụ:
+```json
+{
+    "event_name": "event_journey_time_out",
+    "journey_id": "928185612043968512",
+    "app_id": "4349311699477619340",
+    "oa_id": "3886651700907664415",
+    "timestamp": "1641367274777"
+}
+```
+
+### Mô tả thuộc tính:
+
+| Thuộc tính | Mô tả |
+| --- | --- |
+| event_name String | Tên sự kiện Giá trị nhận về: event_journey_time_out |
+| journey_id String | ID của journey |
+| app_id String | ID của ứng dụng |
+| oa_id String | ID của OA |
+| timestamp String | Thời gian hệ thống ghi nhận journey timeout |
+
+---
+
+# Sự kiện journey được tính phí
+Source: https://docs.zaloplatforms.com/docs/ZBS/gui-tin-template-qua-sdt/webhook-gui-tin-qua-sdt/su-kien-journey-duoc-tinh-phi.md
+
+# Sự kiện journey được tính phí
+
+Khi có sự kiện tin nhắn journey đầu tiên thuộc chuỗi hành trình (journey) được gửi thành công đến thiết bị người dùng và journey bắt đầu được tính phí, hệ thống Zalo sẽ gửi đến Webhook Url của ứng dụng một HTTP request như sau. 
+
+:::warning Lưu ý
+**Quyền cần có:** Nhận sự kiện gửi tin qua SĐT
+:::
+
+*   **URL:** Webhook Url của ứng dụng
+*   **Method:** POST
+*   **Content Type:** application/json
+*   **X-ZEvent-Signature:** mac = sha256(appId + data + timeStamp + OAsecretKey), với data là chuỗi json trả về dưới đây.
+
+## Ví dụ:
+
+```json
+{
+     "event_name": "event_journey_acknowledged",
+     "journey_id": "928189878372556800",
+     "msg_id": "9c7bce8fc761fb3da272",
+     "app_id": "4349311699477619340",
+     "oa_id": "3886651700907664415",
+     "timestamp": "1641368111938"
+}
+```
+
+### Mô tả thuộc tính:
+
+| Thuộc tính | Mô tả |
+| --- | --- |
+| event_name String | Tên sự kiện Giá trị nhận về: event_journey_acknowledged |
+| journey_id String | ID của journey |
+| msg_id String | ID của tin nhắn được gửi |
+| app_id String | ID của ứng dụng |
+| oa_id String | ID của OA |
+| timestamp String | Thời gian bắt đầu tính phí journey |
+
+---
+
+# Sự kiện người dùng nhận tin qua SĐT
+Source: https://docs.zaloplatforms.com/docs/ZBS/gui-tin-template-qua-sdt/webhook-gui-tin-qua-sdt/su-kien-nguoi-dung-nhan-tin-qua-sdt.md
+
+# Sự kiện người dùng nhận tin qua SĐT
+
+Khi Official Account gửi tin nhắn cho người dùng và tin nhắn đã đến thiết bị người dùng, hệ thống Zalo sẽ gửi đến Webhook Url của ứng dụng một HTTP request như sau 
+
+:::warning Lưu ý
+**Quyền cần có:** Nhận sự kiện gửi tin qua SĐT
+:::
+
+:::warning Lưu ý 
+Thời điểm user nhận tin nhắn là giá trị của trường **delivery_time**, không phải thời điểm webhook nhận event hay giá trị của trường **timestamp** 
+:::
+
+* **URL:** webhook URL của ứng dụng 
+* **Method:** POST 
+* **Content Type:** application/json 
+* **Header** **X-ZEvent-Signature:** mac = sha256(appId + data + timeStamp + OAsecretKey), với data là chuỗi json trả về dưới đây. 
+* **Header X-ZEvent-Server:** ZNS
+
+## Example request
+```json
+{
+  "sender": {
+    "id": "2893352839501541173"
+  },
+  "recipient": {
+    "id": "84123456789"
+  },
+  "event_name": "user_received_message",
+  "message": {
+    "delivery_time": "1602960467432",
+    "msg_id": "15a0cc0bbb13bd4ce403",
+    "tracking_id": "tracking_id"
+  },
+  "app_id": "2074138120372622546",
+  "timestamp": "1602560967477"
+}
+```
+
+### Cấu trúc thuộc tính data
+
+| Thuộc tính | Kiểu dữ liệu | Mô tả |
+| --- | --- | --- |
+| sender.id | string | ID của Official Account gửi tin |
+| recipient.id | string | Số điện thoại người dùng nhận tin Lưu ý: Số điện thoại sẽ có dạng mã hóa SHA-256 nếu đối tác gửi tin qua SĐT sử dụng hash phone. |
+| event_name | string | Tên sự kiện Giá trị nhận về: user_received_message |
+| message.delivery_time | string | Thời gian thiết bị của người dùng nhận được tin qua SĐT |
+| message.msg_id | string | ID của tin qua SĐT |
+| message.tracking_id | string | Mã số đánh dấu lần gọi API của đối tác, do đối tác định nghĩa. |
+| app_id | string | ID của ứng dụng gửi tin (ứng dụng mà OA đã cấp quyền) |
+| timestamp | string | Thời điểm gửi sự kiện |
+
+---
+
+# Quy định gửi tin qua UID
+Source: https://docs.zaloplatforms.com/docs/ZBS/gui-tin-template-qua-uid/quy-dinh-gui-tin-qua-uid.md
+
+# Quy định gửi tin qua UID
+
+**App:** đã bật quyền gửi tin và thông báo qua OA
+
+## Quy định điều kiện gửi theo loại tin:
+
+### Tin Giao dịch:
+
+- ZBS Template Message qua UID sử dụng mẫu tin **Tag 1 - TRANSACTION** hoặc **Tag 2 - CUSTOMER_CARE**
+- Tham khảo bài viết [quy chuẩn kiểm duyệt mẫu ZBS](https://zalo.solutions/business-message/guidelines/quy-dinh-chung-khi-kiem-duyet-mau-zbs-template-message)
+
+### Tin Hậu mãi:
+
+- ZBS Template Message qua UID sử dụng mẫu tin **Tag 3 – PROMOTION**
+- Tham khảo bài viết [quy chuẩn kiểm duyệt mẫu ZBS](https://zalo.solutions/business-message/guidelines/quy-dinh-chung-khi-kiem-duyet-mau-zbs-template-message)
+
+## Hạn mức nhận tin:
+
+Hạn mức nhận tin nhắn truyền thông của người quan tâm OA không được vượt quá hạn mức do nền tảng quy định theo chính sách từng thời kỳ.
+
+## Hiển thị tin nhắn:
+
+**Công cụ OAM:**
+- OAM bản Web: Có
+- OAM bản Mini App: Có
+
+**Thiết bị của Người dùng:**
+- Mobile: Có
+- PC / Web: Có
+
+---
+
+# API gửi tin qua UID
+Source: https://docs.zaloplatforms.com/docs/ZBS/gui-tin-template-qua-uid/api-gui-tin-qua-uid.md
+
+# API gửi tin qua UID
+
+:::warning Lưu ý
+**Quyền cần có:** Gửi tin nhắn
+:::
+
+## HTTP request
+
+- **URL:** [https://openapi.zalo.me/v3.0/oa/message/template](https://openapi.zalo.me/v3.0/oa/message/template)
+- **Method:** POST
+- **Content Type:** application/json
+- **Response Type:** application/json
+
+## Example request
+
+```bash
+curl --location 'https://openapi.zalo.me/v3.0/oa/message/template' \
+--header 'Content-Type: application/json' \
+--header 'access_token: your_access_token' \
+--data '{
+    "user_id": "3485904339058348590",
+    "template_id": "433555",
+    "template_data": {
+        "ky": "1",
+        "thang": "4/2020",
+        "start_date": "20/03/2020",
+        "end_date": "20/04/2020",
+        "customer": "Nguyễn Thị Hoàng Anh",
+        "cid": "PE010299485",
+        "address": "VNG Campus, TP.HCM",
+        "amount": "100",
+        "total": "100000"
+    }
+}'
+```
+
+### Tham số header
+
+
+| Tham số | Loại | Bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| access_token | string | yes | Đoạn mã cần truyền vào để xác minh quyền sử dụng API. Xem thêm tài liệu tham khảo |
+
+
+### Cấu trúc body của request
+
+
+| Tham số | Loại | Bắt buộc | Mô tả |
+| --- | --- | --- | --- |
+| user_id | string | yes | ID của người nhận Định danh người dùng theo OA (nhận được thông qua API truy xuất chi tiết người dùng, API truy xuất danh sách người dùng, các event liên quan đến người dùng). |
+| template_id | string | yes | ID của template muốn sử dụng. Sử dụng API để lấy danh sách template thuộc sở hữu của OA. Tham khảo |
+| template_data | JSON object | yes | Các thuộc tính của template mà đối tác đã đăng ký với Zalo. Lưu ý: Cấu trúc template_data được quy định riêng ứng với từng template. |
+
+
+## Example response
+
+#### 1. Tin gửi ra là tin nằm trong hạn mức gói tính năng lẻ
+
+```json
+{
+  "data": {
+    "quota": {
+      "quota_type": "purchase_quota",
+      "owner_type": "OA",
+      "owner_id": "4462152339089565647"
+    },
+    "message_id": "63ecf43f0df7dba892e6",
+    "user_id": "2512523625412515"
+  },
+  "sent_time": "1626926349402",
+  "error": 0,
+  "message": "Success"
+}
+```
+
+#### Cấu trúc thuộc tính data
+
+
+| Tham số | Loại | Mô tả |
+| --- | --- | --- |
+| message_id | string | ID của thông báo |
+| user_id | string | ID của người nhận |
+| quota_type | string | Nguồn quota sử dụng. Mang giá trị: purchase_quota |
+| owner_type | string | Thực thể sở hữu Quota Package. Giá trị: - OA: Thực thể sở hữu là OA - App: Thực thể sở hữu là App |
+| owner_id | string | ID thực thể sở hữu Quota Package. Giá trị: OA ID hoặc App ID |
+| sent_time | string | Thời gian gửi tin UID (định dạng timestamp). |
+
+
+#### 2. Tin gửi ra là tin nằm trong hạn mức Redeem code
+
+```json
+{
+  "data": {
+    "quota": {
+      "quota_type": "reward_quota",
+      "owner_type": "OA",
+      "owner_id": "4462152339089565647"
+    },
+    "message_id": "63ecf43f0df7dba892e6",
+    "user_id": "2512523625412515"
+  },
+  "sent_time": "1626926349402",
+  "error": 0,
+  "message": "Success"
+}
+```
+
+#### Cấu trúc thuộc tính data
+
+
+| Tham số | Loại | Mô tả |
+| --- | --- | --- |
+| message_id | string | ID của thông báo |
+| user_id | string | ID của người nhận |
+| quota_type | string | Nguồn quota sử dụng. Mang giá trị: reward_quota |
+| owner_type | string | Thực thể sở hữu Quota Package. Giá trị: - OA: Thực thể sở hữu là OA - App: Thực thể sở hữu là App |
+| owner_id | string | ID thực thể sở hữu Quota Package. Giá trị: OA ID hoặc App ID |
+| sent_time | string | Thời gian gửi tin UID (định dạng timestamp). |
+
+
+#### 3. Tin gửi ra là tin tính phí
+
+```json
+{
+  "data": {
+    "message_id": "63ecf43f0df7dba892e6",
+    "user_id": "2512523625412515"
+  },
+  "sent_time": "1626926349402",
+  "error": 0,
+  "message": "Success"
+}
+```
+
+#### Cấu trúc thuộc tính data
+
+
+| Tham số | Loại | Mô tả |
+| --- | --- | --- |
+| message_id | string | ID của thông báo |
+| user_id | string | ID của người nhận |
+| sent_time | string | Thời gian gửi tin UID (định dạng timestamp). |
+
+---
+
+# Webhook gửi tin qua UID
+Source: https://docs.zaloplatforms.com/docs/ZBS/gui-tin-template-qua-uid/webhook-gui-tin-qua-uid.md
+
+# Webhook gửi tin qua UID
+
+Các event liên quan đến sự kiện gửi ZBS Template Message qua UID sẽ tương tự các event OA gửi các loại tin khác qua UID.
+
+Webhook liên quan OA và gửi tin qua UID: [Tổng quan Webhook](/docs/OA/webhook/tong-quan)
+
+---
+
+# Bảng mã lỗi
+Source: https://docs.zaloplatforms.com/docs/ZBS/bang-ma-loi/bang-ma-loi.md
+
+# Bảng mã lỗi
+
+## Mã lỗi API quản lý Template
+
+
+| Mã lỗi | Mô tả lỗi | Thông tin lỗi | Hướng dẫn xử lý |
+| --- | --- | --- | --- |
+| -1091 | Can not edit this type of template | Template không có trạng thái Reject hoặc Template được tạo từ Admin tool | Xem chi tiết document về: [API chỉnh sửa Template](/docs/ZBS/quan-ly-template/template-api/api-chinh-sua-template) |
+| -112 | template data type is not define | Dữ liệu của Template không hợp lệ | Data type chưa được định nghĩa. Sử dụng các loại data type được định nghĩa [tại đây](https://zalo.solutions/blog/cac-dinh-dang-du-lieu-khi-truyen-vao-tham-so-tren-noi-dung-zns/9gubbkay4yyrng86a) |
+| -1132 | Missing required button: Template must contain at least 1 button | Template phải có tối thiểu 01 CTA/button | Thêm ít nhất 01 button khi tạo template |
+
+
+## Mã lỗi API chung khi gửi tin Template
+
+
+| Mã lỗi | Mô tả lỗi | Thông tin lỗi | Hướng dẫn xử lý |
+| --- | --- | --- | --- |
+| -109 | Template ID invalid | ID của Template không hợp lệ | Kiểm tra lại ID của Template |
+| -110 | Zalo version unsupported | Phiên bản Zalo app không được hỗ trợ. Người dùng cần cập nhật phiên bản mới nhất |  |
+| -111 | Template data empty | Template không có dữ liệu |  |
+| -1121 | parameter_name data breaks max length | Dữ liệu tham số vượt quá giới hạn ký tự | Kiểm tra lại giới hạn ký tự của các tham số. Xem thêm [tại đây](https://zalo.solutions/blog/cac-dinh-dang-du-lieu-khi-truyen-vao-tham-so-tren-noi-dung-zns/9gubbkay4yyrng86a) |
+| -1122 | template data is missing a parameter parameter_name | Dữ liệu của Template thiếu tham số | Bổ sung tham số còn thiếu. |
+| -1123 | QR code cannot be generated | Không thể tạo QR code, vui lòng kiểm tra lại |  |
+| -1124 | parameter_name has invalid format | Dữ liệu tham số không đúng format | Truyển sai format dữ liệu - Kiểm tra lại và truyền đúng theo format dữ liệu của biến. Xem thêm [tại đây](https://zalo.solutions/blog/cac-dinh-dang-du-lieu-khi-truyen-vao-tham-so-tren-noi-dung-zns/9gubbkay4yyrng86a) |
+| -113 | Button invalid | Button không hợp lệ |  |
+| -1131 | Invalid button content format | Đường dẫn liên kết không đúng định dạn | Kiểm tra lại đường dẫn liên kết tương ứng với loại nút thao tác |
+| -116 | Text invalid | Nội dung tham số không hợp lệ |  |
+| -117 | OA or App does not have permission to access this template | OA hoặc ứng dụng gửi tin chưa được cấp quyền sử dụng Template này | KH đang sử dụng Template đăng ký bằng thông tin OAID hoặc AppID khác. KH cần kiểm tra lại AppID/OAID/tempID tương ứng [tại đây](/docs/ZBS/quan-ly-template/template-api/api-lay-danh-sach-template) |
+| -121 | Body data empty | Template không có nội dung | Nhập nội dung mẫu Template |
+| -122 | Body format invalid | Body request không đúng định dạng JSON |  |
+| -130 | Maximum character limit exceeded | Nội dung của Template vượt quá giới hạn kí tự | Lượng ký tự vượt quá 100k |
+| -131 | Template not approved | Template chưa được phê duyệt |  |
+| -132 | Parameter invalid | Tham số không hợp lệ |  |
+| -249 | Template does not support send via UID | TemplateID đang sử dụng không hỗ trợ gửi qua UID. Hiện tại, ZBS gửi qua UID chưa hỗ trợ đối với các loại template sau: - Template ZBS được tạo trước ngày 10/12/2025 (template ZNS cũ) - Template xác thực (OTP) - Template chứa component Response (hiện chỉ thử nghiệm gửi qua SĐT) - Template Journey / gửi theo journey token | Vui lòng sử dụng các template có hỗ trợ gửi qua UID, bao gồm: - Template tùy chỉnh - Template đánh giá dịch vụ - Template yêu cầu thanh toán - Template Voucher Đối với các Template được tạo trước ngày 10/12/2025, khách hàng vui lòng tạo mới hoặc clone lại Template tương tự (qua API hoặc ZBS Account) để có thể sử dụng cho luồng gửi UID. |
+
+
+## Mã lỗi API gửi tin qua SĐT
+
+
+| Mã lỗi | Mô tả lỗi | Thông tin lỗi | Hướng dẫn xử lý |
+| --- | --- | --- | --- |
+| 0 | Success | Gửi thành công |  |
+| -100 | Unknown error | Xảy ra lỗi không xác định, vui lòng thử lại sau |  |
+| -101 | Application invalid | Ứng dụng gửi tin không hợp lệ | Kiểm tra lại ID ứng dụng tại [Zalo for Developers](https://developers.zalo.me/apps) |
+| -103 | Application not activated | Ứng dụng chưa được kích hoạt | B1: Truy cập Zalo for Developers và chọn ứng dụng cần kích hoạt. B2: Nhấn chọn kích hoạt ứng dụng ở góc trên bên phải. |
+| -104 | App secret key invalid | Secret key của ứng dụng không hợp lệ | Kiểm tra lại Secret key trong ứng dụng tương ứng tại [Zalo for Developers](https://developers.zalo.me/apps) |
+| -106 | Method unsupported | Phương thức không được hỗ trợ | Đối chiếu phương thức hiện tại với API đã cung cấp. Chi tiết các phương thức [tại đây](/docs/ZBS/bat-dau/gioi-thieu-zbs-template-message) |
+| -107 | Message ID invalid | ID thông báo không hợp lệ |  |
+| -108 | Phone number invalid | Số điện thoại không hợp lệ | Kiểm tra lại thông tin, định dạng số điện thoại người nhận tin SĐT hiện đã gửi tin được đến các định dạng số điện thoại sau: 84xxxx 0xxxx xxxx (Không có số 0 ở đầu do định dạng excel). |
+| -115 | Out of quota | Tài khoản ZBS không đủ số dư | Truy cập [ZBS Account](https://account.zalo.solutions/) để kiểm tra số dư tài khoản và thực hiện nạp tiền nếu không đủ số dư (Xem thêm: [Hướng dẫn nạp tiền vào tài khoản ZBS](https://zalo.solutions/blog/huong-dan-nap-tien-vao-tai-khoan-zalo-cloud-account-zca-/dbuegyjqepvn9gk79q) ) |
+| -118 | Zalo account not existed | Tài khoản Zalo không tồn tại hoặc đã bị vô hiệu hoá |  |
+| -120 | OA does not have permission to use this feature | OA chưa được cấp quyền sử dụng tính năng này do chưa mua gói dịch vụ | Xem hướng dẫn mua gói [tại đây.](https://oa.zalo.me/home/documents/guides/Quan-ly-goi-zalo-oa_5417812380640953602) |
+| -1202 | OA does not have permission to use this resource | OA không có quyền sử dụng media resources (image/logo) |  |
+| -124 | Access token invalid | Mã truy cập không hợp lệ | Tham khảo cách kiểm tra/ lấy lại access token [tại đây](/docs/OA/bat-dau/xac-thuc-va-uy-quyen-cho-ung-dung-new) |
+| -1241 | Invalid appsecret_proof provided in the API argument | appsecret_proof không hợp lệ | Xem thêm về appsecret_proof [tại đây](https://developers.zalo.me/changelog/v240409-them-tinh-nang-kiem-tra-app-secret-proof-khi-goi-api-co-su-dung-access-token-7603) |
+| -125 | Official Account ID invalid | ID Official Account không hợp lệ | Kiểm tra lại OA ID [tại đây](https://oa.zalo.me/manage/oa) |
+| -126 | Out of quota (development mode) | Ví (development mode) không đủ số dư |  |
+| -127 | Test template messages can only be sent to admin | Template test chỉ có thể được gửi cho quản trị viên |  |
+| -133 | Not allow to send message at night from 10pm to 7am Vietnam time | Loại tin nhắn này không được phép gửi vào buổi tối (từ 22 giờ - 7 giờ sáng hôm sau) |  |
+| -135 | No permission to send message via phone number (not verified, in free subscription plan) | OA chưa có quyền gửi tin SĐT (chưa được xác thực, đang sử dụng gói miễn phí) |  |
+| -1351 | OA has no permission to send message via phone number (The system blocks due to violation detection) | OA không có quyền gửi tin SĐT (Hệ thống chặn do phát hiện vi phạm) |  |
+| -136 | ZBS Account association required | Cần kết nối với ZBS Account để sử dụng tính năng này | Ứng dụng cần kết nối với ZBS Account. KH xem chi tiết hướng dẫn [tại đây](https://zalo.solutions/blog/huong-dan-lien-ket-app-id-vao-tai-khoan-zalo-cloud-account-zca/vvurnnpbnqgn8dzbrv) |
+| -137 | ZBS Account charge failure | Thanh toán ZBS Account thất bại (ví không đủ số dư, ...) | Kiểm tra lại số dư ZBS Account |
+| -138 | App does not have permission to access this feature | Ứng dụng gửi tin SĐT chưa có quyền sử dụng tính năng này | Lựa chọn ứng dụng hiện tại [tại đây](https://developers.zalo.me/apps) và kiểm tra xét duyệt đăng ký sử dụng API tương ứng |
+| -1381 | Extension does not have permission to access ZBS Account of OA | OA chưa cấp quyền cho Extension về quyền sử dụng ZBS Account của OA | Kiểm tra lại các quyền cần được xin từ OA, đảm bảo đã đồng ý với quyền Sử dụng ZBS Account đang kết nối với OA. |
+| -139 | User refused to receive this type of Template message | Người dùng từ chối nhận loại tin SĐT này |  |
+| -140 | User not eligible to receive this Template Message type based on current delivery policy | Người dùng không đủ điều kiện để nhận loại tin SĐT này dựa trên chính sách gửi tin hiện tại | Xem chi tiết về quyền gửi tin cho người dùng [tại đây](/docs/ZBS/phu-luc/co-che-danh-gia-chat-luong-va-quyen-loi-gui-tin-qua-sdt) |
+| -141 | User refused to receive this message via phone | Người dùng từ chối nhận tin SĐT từ Official Account |  |
+| -142 | RSA key not exist | RSA key không tồn tại, vui lòng gọi API tạo RSA key | Kiểm tra/ khởi tạo lại RSA Key [tại đây](/docs/ZBS/gui-tin-template-qua-sdt/api-gui-tin-qua-sdt/api-gui-tin-voi-he-ma-hoa-rsa) |
+| -143 | RSA key already existed | RSA key đã tồn tại, vui lòng gọi API lấy RSA key | Kiểm tra lại RSA Key |
+| -144 | Daily quota of Template Message via phone number exceeded | OA đã vượt giới hạn gửi tin SĐT trong ngày | Kiểm tra lại thông tin quota của OA hiện tại. Chi tiết xem [tại đây](/docs/ZBS/gui-tin-template-qua-sdt/api-truy-xuat-thong-tin-gui-tin-qua-sdt/api-lay-thong-tin-quota-gui-tin-qua-sdt) |
+| -1441 | OA exceeded the monthly promotion quota | OA request gửi vượt ngưỡng monthly promotion quota | Kiểm tra lại thông tin quota của OA hiện tại. Chi tiết xem [tại đây](/docs/ZBS/gui-tin-template-qua-sdt/api-truy-xuat-thong-tin-gui-tin-qua-sdt/api-lay-thong-tin-quota-gui-tin-qua-sdt) |
+| -145 | OA does not have permission to send this type of Template Message | OA không được phép gửi loại nội dung tin SĐT này | Kiểm tra xem lại nội dung tin SĐT có thể gửi [tại đây](/docs/ZBS/gui-tin-template-qua-sdt/api-truy-xuat-thong-tin-gui-tin-qua-sdt/api-lay-thong-tin-loai-noi-dung-duoc-phep-gui-tin-qua-sdt) |
+| -147 | Template daily quota exceeded | Template đã vượt giới hạn gửi trong ngày |  |
+| -1471 | OA exceeded the limit of sending promotion messages to this user for this month | OA đã vượt giới hạn gửi tin hậu mãi qua SĐT cho người dùng này trong tháng. |  |
+| -148 | Journey token missing | Không tìm thấy journey token | Kiểm tra lại Journey token đã được cấp [tại đây](/docs/ZBS/gui-tin-template-qua-sdt/api-gui-tin-qua-sdt/api-gui-tin-journey) |
+| -149 | Journey token invalid | Journey token không hợp lệ | Kiểm tra ID journey token [tại đây](/docs/ZBS/gui-tin-template-qua-sdt/api-gui-tin-qua-sdt/api-gui-tin-journey) |
+| -1491 | Journey token type invalid | Journey token type không tương thích với template | Kiểm tra loại journey token type khởi tạo [tại đây](/docs/ZBS/gui-tin-template-qua-sdt/api-gui-tin-qua-sdt/api-gui-tin-journey) |
+| -150 | Journey token expired | Journey token đã hết hạn | Kiểm tra/ khởi tạo lại Journey token [tại đây](/docs/ZBS/gui-tin-template-qua-sdt/api-gui-tin-qua-sdt/api-gui-tin-journey) |
+| -151 | Not an E2EE template | Không phải Template E2EE |  |
+| -152 | Get E2EE key failed | Lấy E2EE key thất bại |  |
+| -153 | Data is invalid \| <detail_reason> | Dữ liệu truyền vào sai quy định | Xem chi tiết document về: [API tạo template](/docs/ZBS/quan-ly-template/template-api/api-tao-template) [API chỉnh sửa template](/docs/ZBS/quan-ly-template/template-api/api-chinh-sua-template) |
+| -158 | The uploaded file exceeds the allowed size | Dung lượng file vượt qua dung lượng cho phép | Xem chi tiết document về: [API upload ảnh](/docs/ZBS/quan-ly-template/template-api/api-upload-anh) |
+| -159 | The uploaded file does not meet the required format specifications | Định dạng file upload không được cho phép |  |
+| -160 | Out of quota | Số lượng tạo/edit template hoặc upload attachment vượt quá daily quota | Xem chi tiết document về: [API tạo template](/docs/ZBS/quan-ly-template/template-api/api-tao-template) [API chỉnh sửa template](/docs/ZBS/quan-ly-template/template-api/api-chinh-sua-template) |
+| -161 | sending_mode has invalid value | sending_mode truyền sai giá trị cho phép | Kiểm tra lại giá trị sending_mode. Chi tiết các giá trị cho phé [tại đây](/docs/ZBS/gui-tin-template-qua-sdt/api-gui-tin-qua-sdt/api-gui-tin) |
+| -162 | Can not send this type of Template Message on this endpoint | Chế độ Gửi vượt hạn mức (sending_mode = 3) không hỗ trợ để gửi tin tag 1, 2 | Kiểm tra lại loại tag của Template |
+| -1472 | OA exceeded the limit of sending promotion messages to this user for the day | OA đã vượt giới hạn gửi tin promotion cho người dùng này trong ngày |  |
+
+
+## Mã lỗi API gửi tin qua UID
+
+Các lỗi liên quan đến điều kiện gửi tin qua UID, vui lòng tham khảo bộ mã lỗi Official Account API [tại đây](/docs/OA/phu-luc/ma-loi).
+
+---
+
+# Cơ chế đánh giá chất lượng và quyền lợi gửi tin qua SĐT
+Source: https://docs.zaloplatforms.com/docs/ZBS/phu-luc/co-che-danh-gia-chat-luong-va-quyen-loi-gui-tin-qua-sdt.md
+
+# Cơ chế đánh giá chất lượng và quyền lợi gửi tin qua SĐT
+
+Tham khảo cơ chế đánh giá chất lượng và quyền lợi gửi tin qua SĐT [tại đây.](https://zalo.solutions/business-message/guidelines/co-che-danh-gia-chat-luong-va-quyen-loi-gui-zbs-template-message)
+
+---
+
+# Danh sách BIN CODE
+Source: https://docs.zaloplatforms.com/docs/ZBS/phu-luc/danh-sach-bin-code.md
+
+# Danh sách BIN CODE 
+
+Hỗ trợ đối với: 
+
+* Template yêu cầu thanh toán (Request Payment) 
+* API tạo/chỉnh sửa template 
+
+
+| BIN CODE | Tên ngân hàng |
+| --- | --- |
+| 168999 | Ngân hàng Cathay United chi nhánh Hồ Chí Minh (Cathay United) |
+| 422589 | Ngân hàng TNHH MTV CIMB Việt Nam (CIMB) |
+| 458761 | Ngân hàng TNHH MTV HSBC (Việt Nam) (HSBC) |
+| 533948 | Ngân hàng Citibank (Citibank) |
+| 546034 | Ngân hàng số CAKE by VPBank (CAKE) |
+| 546035 | Ngân hàng số Ubank by VPBank (Ubank) |
+| 668888 | Ngân hàng Đại chúng TNHH Kasikornbank (KBank) |
+| 796500 | DBS Bank Ltd - Chi nhánh TP. Hồ Chí Minh (DBSBank) |
+| 801011 | Ngân hàng Nonghyup - Chi nhánh Hà Nội (Nonghyup) |
+| 963369 | Ngân hàng Liobank (Liobank) |
+| 963666 | Ngân hàng BNP Paribas chi nhánh Hồ Chí Minh (BNP Paribas HCM) |
+| 963668 | Ngân hàng BNP Paribas chi nhánh Hà Nội (BNP Paribas HN) |
+| 970400 | Ngân hàng TMCP Sài Gòn Công Thương (SaigonBank) |
+| 970403 | Ngân hàng TMCP Sài Gòn Thương Tín (Sacombank) |
+| 970405 | Ngân hàng Nông nghiệp và Phát triển Nông thôn Việt Nam (Agribank) |
+| 970406 | Ngân hàng TMCP Đông Á (DongABank) |
+| 970407 | Ngân hàng TMCP Kỹ thương Việt Nam (Techcombank) |
+| 970408 | Ngân hàng Thương mại TNHH MTV Dầu Khí Toàn Cầu (GPBank) |
+| 970409 | Ngân hàng TMCP Bắc Á (BacABank) |
+| 970410 | Ngân hàng Standard Chartered Việt Nam (Standard Chartered) |
+| 970412 | Ngân hàng TMCP Đại Chúng Việt Nam (PVcomBank) |
+| 970414 | Ngân hàng Thương mại TNHH MTV Đại Dương (Oceanbank) |
+| 970415 | Ngân hàng TMCP Công thương Việt Nam (VietinBank) |
+| 970416 | Ngân hàng TMCP Á Châu (ACB) |
+| 970418 | Ngân hàng TMCP Đầu tư và Phát triển Việt Nam (BIDV) |
+| 970419 | Ngân hàng TMCP Quốc Dân (NCB) |
+| 970421 | Ngân hàng Liên doanh Việt - Nga (VRB) |
+| 970422 | Ngân hàng TMCP Quân đội (MBBank) |
+| 970423 | Ngân hàng TMCP Tiên Phong (TPBank) |
+| 970424 | Ngân hàng TNHH MTV Shinhan Việt Nam (ShinhanBank) |
+| 970425 | Ngân hàng TMCP An Bình (ABBANK) |
+| 970426 | Ngân hàng TMCP Hàng Hải (MSB) |
+| 970427 | Ngân hàng TMCP Việt Á (VietABank) |
+| 970428 | Ngân hàng TMCP Nam Á (NamABank) |
+| 970429 | Ngân hàng TMCP Sài Gòn (SCB) |
+| 970430 | Ngân hàng TMCP Xăng dầu Petrolimex (PGBank) |
+| 970431 | Ngân hàng TMCP Xuất Nhập khẩu Việt Nam (Eximbank) |
+| 970432 | Ngân hàng TMCP Việt Nam Thịnh Vượng (VPBank) |
+| 970433 | Ngân hàng TMCP Việt Nam Thương Tín (VietBank) |
+| 970434 | Ngân hàng TNHH Indovina (IndovinaBank) |
+| 970436 | Ngân hàng TMCP Ngoại Thương Việt Nam (Vietcombank) |
+| 970437 | Ngân hàng TMCP PT Thành phố Hồ Chí Minh (HDBank) |
+| 970438 | Ngân hàng TMCP Bảo Việt (BaoVietBank) |
+| 970439 | Ngân hàng TNHH MTV Public Việt Nam (PublicBank) |
+| 970440 | Ngân hàng TMCP Đông Nam Á (SeABank) |
+| 970441 | Ngân hàng TMCP Quốc tế Việt Nam (VIB) |
+| 970442 | Ngân hàng TNHH MTV Hong Leong Việt Nam (HongLeong) |
+| 970443 | Ngân hàng TMCP Sài Gòn - Hà Nội (SHB) |
+| 970444 | Ngân hàng TM TNHH MTV Xây dựng Việt Nam (CBBank) |
+| 970446 | Ngân hàng Hợp tác xã Việt Nam (COOPBANK) |
+| 970448 | Ngân hàng TMCP Phương Đông (OCB) |
+| 970449 | Ngân hàng TMCP Bưu Điện Liên Việt (LienVietPostBank) |
+| 970452 | Ngân hàng TMCP Kiên Long (KienLongBank) |
+| 970454 | Ngân hàng TMCP Bản Việt (VietCapitalBank) |
+| 970455 | Ngân hàng Công nghiệp Hàn Quốc - Chi nhánh Hà Nội (IBKHN) |
+| 970456 | Ngân hàng Công nghiệp Hàn Quốc - Chi nhánh TP. Hồ Chí Minh (IBKHCM) |
+| 970466 | Ngân hàng Keb Hana chi nhánh Hồ Chí Minh (Keb Hana HCM) |
+| 970467 | Ngân hàng Keb Hana chi nhánh Hà Nội (Keb Hana HN) |
+| 970457 | Ngân hàng TNHH MTV Woori Việt Nam (Woori) |
+| 970458 | Ngân hàng United Overseas - Chi nhánh TP. Hồ Chí Minh (United Overseas) |
+| 970462 | Ngân hàng Kookmin - Chi nhánh Hà Nội (KookminHN) |
+| 970463 | Ngân hàng Kookmin - Chi nhánh Tp. Hồ Chí Minh (KookminHCM) |
+
+---

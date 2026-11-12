@@ -1,0 +1,30 @@
+# Paths that never ship in a release (docs/contracts.md 16.2.4). make_release.py fails the build on a match;
+# doctor check 11 and update phase U1 match a release's MANIFEST.json against this file through
+# release.denylisted(). One glob per line: * and ? stay inside one folder, **/ is any number of folders, a
+# trailing /** is everything below. A pattern that matches a parent folder covers everything inside it.
+# A line starting with ! is an exception: a path it matches is never denylisted.
+.secrets/**
+**/.env
+**/.env.*
+!**/.env.example
+**/.dev.vars
+**/.env.local
+**/node_modules/**
+**/.wrangler/**
+.venv/**
+**/dist/**
+results/**
+research/**
+report/**
+sources/**
+**/*.sqlite*
+**/*.db
+design/eval-set.jsonl
+data/services-corrections.json
+scripts/tests/**
+scripts/eval/**
+**/wip_*
+apps/*/tests/**
+apps/server/test/**
+install/tests/**
+scripts/release/**

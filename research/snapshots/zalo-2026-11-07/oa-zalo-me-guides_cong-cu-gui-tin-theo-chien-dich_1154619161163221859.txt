@@ -1,0 +1,229 @@
+ Công cụ gửi tin theo chiến dịch | Zalo Official Account 
+ Skip to main content 
+ HƯỚNG DẪN VẬN HÀNH
+ Đăng ký và Xác thực 
+ Thanh toán 
+ Thiết lập tài khoản OA 
+ Quản lý nội dung 
+ Tin nhắn 
+ Công cụ gửi tin 
+ Công cụ gửi tin theo chiến dịch 
+ Gọi thoại 
+ Quản lý hội thoại 
+ Nhóm Chat GMF 
+ Tối ưu vận hành 
+ Mở rộng 
+ Nhà phát triển 
+ Công cụ gửi tin 
+ Công cụ gửi tin theo chiến dịch 
+ On this page 
+ Công cụ gửi tin theo chiến dịch
+ 1. Giới thiệu tổng quan ​ 
+ Công cụ gửi tin theo chiến dịch (Campaign Tool) trên OA Manager cho phép doanh nghiệp chủ động tạo mẫu tin và triển khai chiến dịch truyền thông gửi ZBS Template Message (tin Hậu mãi - Tag 3) đến người dùng qua Zalo - ngay trên giao diện OA Manager (bản Web), mà không cần tới đội ngũ kỹ thuật để tích hợp API phức tạp hay xây dựng hệ thống gửi tin chuyên biệt.
+ 1.1  Giải thích thuật ngữ ​ 
+ Một số thuật ngữ được sử dụng xuyên suốt tài liệu hướng dẫn này:
+ Thuật ngữ
+ Giải thích
+ ZBS Template Message
+ Tin nhắn cho Doanh nghiệp theo mẫu (template) gửi đến người dùng qua UID và qua số điện thoại (SĐT) trên Zalo, bao gồm 2 loại chính: Tin Giao dịch và Tin Hậu mãi.
+ CRM
+ Hệ thống lưu trữ Danh sách khách hàng của OA trên OA Manager.
+ UID
+ User ID - mã định danh của một người dùng đối với một tài khoản OA.
+ Tham số
+ Các giá trị nội dung được thay đổi tùy theo thông tin của người nhận trong mẫu tin, ví dụ: tên khách hàng, số điện thoại, kích cỡ.
+ Broadcast
+ Tin Broadcast là loại tin nhắn được OA sử dụng để gửi Nội dung Bài viết đến người quan tâm OA bằng công cụ OA Manager (bản Web) và được tính là tin nhắn có mục đích truyền thông.
+ 1.2  Đối tượng sử dụng ​ 
+ Tính năng chỉ khả dụng đối với OA được xác thực thành công và đăng ký sử dụng gói trả phí. Tham khảo bảng giá & chi tiết quyền lợi các gói dịch vụ tại:  zalo.solutions/oa/pricing .
+ Quyền admin
+ Quyền sử dụng
+ Quản trị viên
+ Tạo, chỉnh sửa, quản lý Template và gửi chiến dịch.
+ Soạn nội dung
+ Tạo, chỉnh sửa, quản lý Template và gửi chiến dịch.
+ Vai trò khác
+ Không có quyền truy cập.
+ 1.3  Điều kiện sử dụng ​ 
+ Trước khi bắt đầu thao tác, hãy đảm bảo OA đáp ứng đủ các điều kiện sau:
+ OA đã được liên kết với tài khoản ZBS 
+ Tài khoản ZBS có số dư hợp lệ - nếu không đủ số dư, chiến dịch sẽ không gửi được
+ Người thao tác là admin quyền Quản trị viên hoặc Soạn nội dung của OA này
+ Người thực hiện "Gửi chiến dịch" đồng thời có quyền quản lý tài khoản ZBS của OA này.
+ 2. Các tính năng chính ​ 
+ Công cụ gửi tin theo chiến dịch bao gồm 3 nhóm chức năng chính: Tạo & Quản lý Template, Tạo & Quản lý Chiến dịch , và Báo cáo tổng hợp .
+ 2.1  Tạo và Quản lý Template ​ 
+ Trước khi tạo chiến dịch, OA cần có ít nhất một ZBS Template được phê duyệt. Mục Quản lý Template cho phép theo dõi toàn bộ danh sách mẫu tin và trạng thái duyệt. Công cụ cho phép OA tạo mẫu tin mới và gửi duyệt ngay trên OA Manager.
+ Truy cập OA Manager (bản Web) và chọn OA cần thao tác, Nhấn  "Chiến dịch" trên thanh menu → chọn  "Quản lý Template" hoặc truy cập  oa.zalo.me/manage/campaign/manage-template  
+ Tạo template 
+ Gồm các trường:
+ Tên mẫu tin: bắt buộc nhập, 10 - 60 ký tự
+ Logo (định dạng, tỷ lệ 400x96px, PNG tối đa 10MB) hoặc Hình ảnh (định dạng PNG/JPG, tỷ lệ 16:9, tối đa 10MB) cho mẫu tin: bắt buộc nhập. Quy định tiêu chuẩn cơ bản về logo xem thêm tại đây .
+ Tiêu đề: bắt buộc nhập, 9 - 65 ký tự, có thể chèn các tham số
+ Văn bản: bắt buộc nhập, tối đa 3 đoạn văn bản, 9 - 400 ký tự, có thể chèn các tham số. Mỗi đoạn văn bản không cho phép xuống dòng, nếu admin thao tác cần xuống dòng có thể sử dụng thêm văn bản 2 và 3
+ Bảng: không bắt buộc, nếu sử dụng bảng phải có từ 2 - 8 hàng, tiêu đề mỗi hàng 3 - 35 ký tự, nội dung hàng 3 - 90 ký tự chứa tối đa 01 tham số
+ Ghi chú: không bắt buộc, 9 - 400 ký tự, có thể chèn các tham số
+ Thông tin voucher: bắt buộc sử dụng đối với các mẫu template gửi mã/ code giảm giá. Bao gồm các trường cố định bắt buộc nhập nếu sử dụng:
+ Tiêu đề: tối đa 30 ký tự, chỉ được chèn 01 tham số
+ Điều kiện áp dụng: tối đa 40 ký tự, chỉ được chèn 01 tham số
+ Ngày bắt đầu: cho phép nhập tham số hoặc chọn Ngày Giờ
+ Hạn sử dụng: cho phép nhập tham số hoặc chọn Ngày Giờ
+ Mã voucher: chèn tham số hoặc nhập mã code cố định tối đa 25 ký tự
+ Nút thao tác (CTA): bắt buộc, tối đa 3 nút, nội dung nút 5 - 30 ký tự, được phép chèn tham số trong các URL của nút. Xem thêm về các loại nút thao tác cho phép và quy định tại đây .
+ Ghi chú cho kiểm duyệt: Lưu ý thêm thông tin (use case sử dụng/ tham số mới/ chi tiết sự kiện khuyến mãi ...) cần làm rõ cho mẫu tin gửi duyệt.
+ Xem danh sách template 
+ Nhấn "Đồng bộ template" để đồng bộ các template ZBS Hậu mãi (Tag 3) đã được tạo trước đó trên trang tài khoản ZBS hoặc qua API (nếu có). Hệ thống sẽ chỉ lấy các template được tạo từ ngày 01/01/2026.
+ Danh sách hiển thị toàn bộ template đã tạo kèm trạng thái duyệt.
+ Sử dụng ô tìm kiếm hoặc bộ lọc theo trạng thái để tìm nhanh template cần dùng.
+ Theo dõi trạng thái duyệt template 
+ Trạng thái
+ Ý nghĩa
+ Nháp
+ Có thể chỉnh sửa.
+ Đang duyệt
+ Bộ phận kiểm duyệt của ZBS đang kiểm tra, trong vòng 2-3 ngày làm việc.
+ Đã duyệt
+ Template có thể dùng để tạo chiến dịch ngay, không thể chỉnh sửa.
+ Bị từ chối
+ Template chưa đáp ứng quy định - xem lý do và chỉnh sửa lại trên công cụ.
+ Bị khoá
+ Hậu kiểm phát hiện Template có vấn đề hoặc nghi vấn sai phạm.
+ ⚠️ Lưu ý:  
+ Mẫu tin cần đảm bảo tuân thủ đúng quy định để được kiểm duyệt thành công. Xem thêm quy định kiểm duyệt  tại đây .
+ Để được hướng dẫn chi tiết về mẫu tin, Doanh nghiệp điền thông tin vào biểu mẫu:  https://go.zalo.me/zbs-support để được hỗ trợ.
+ Mọi thông tin cần hỗ trợ về template (tư vấn mẫu tin/ quy định/ thắc mắc về template và duyệt template) gửi mail về  support@zalo.solution để được tư vấn.
+ 2.2  Tạo và quản lý chiến dịch gửi tin ​ 
+ Tạo chiến dịch ​ 
+ Nhấn "Chiến dịch" trên thanh menu → chọn "Quản lý chiến dịch" hoặc truy cập  oa.zalo.me/manage/campaign/manage-campaign  
+ Nhấn nút " Tạo chiến dịch" ở góc trên bên phải
+ Nhập tên chiến dịch trong hộp thoại hiện ra (10 - 60 ký tự, bắt buộc nhập)
+ Nhấn "Tạo chiến dịch" để bắt đầu quy trình 4 bước dưới đây:
+ Bước 1: Chọn mẫu tin 
+ Tại đây OA cần chọn ZBS Template đã được duyệt, có thể tìm kiếm template theo tên hoặc ID trong ô tìm kiếm và xem trước nội dung cũng như kiểm tra danh sách tham số trên mẫu tin chuẩn bị gửi.
+ Chỉ hiển thị template có trạng thái "Đã duyệt" . Nhấn vào một dòng để chọn template cần sử dụng để gửi tin theo chiến dịch.
+ Box bên phải hiển thị nội dung preview trên giao diện mobile và giá gửi (UID/ SĐT). OA có thể tham khảo bảng giá từng phương thức  tại đây .
+ Nhấn "Xem chi tiết" để kiểm tra thông tin và danh sách tham số của template.
+ Nhấn "Tiếp theo: Chọn tập gửi" sau khi đã chọn xong template.
+ 💡 Kiểm tra kỹ danh sách tham số trong "Xem chi tiết" - đây là các thông tin cần chuẩn bị dữ liệu cho Bước 3.
+ Bước 2: Chọn người nhận 
+ Phương thức gửi tin ​ 
+ Chọn phương thức gửi bằng cách nhấn vào tab tương ứng:
+ Phương thức
+ Mô tả
+ Phù hợp với
+ Gửi qua UID
+ Chọn người nhận từ danh sách CRM OA. Có thể lọc theo nhãn, vị trí, giới tính và một số điều kiện nâng cao.
+ Khách hàng đã có phát sinh tương tác với OA.
+ Gửi qua SĐT
+ Tải lên file Excel hoặc CSV chứa danh sách số điện thoại. Không có giới hạn dung lượng file, tuy nhiên file dữ liệu tối đa 10,000 dòng.
+ Danh sách tự có từ hệ thống nội bộ doanh nghiệp.
+ 💡  Gửi qua UID thường có giá thấp hơn gửi qua SĐT. Ưu tiên dùng UID tối ưu chi phí hơn nếu khách hàng đã tương tác với OA.
+ Gửi qua UID: 
+ Toàn bộ khách hàng trong CRM OA hiển thị mặc định
+ Nhấn biểu tượng bộ lọc để lọc theo Nhãn, Vị trí, Giới tính hoặc điều kiện nâng cao (kết quả lọc phải thoả đồng thời tất cả điều kiện đã chọn). Các thông tin có thể lọc bao gồm: 
+ Thông tin tự phát sinh trong quá trình người dùng tương tác với OA (quan tâm/ chưa quan tâm, thời gian tương tác gần đây)
+ Thông tin Doanh nghiệp chủ động input như: phân loại theo nhãn (tag)...
+ Thông tin khách hàng chủ động cung cấp (Doanh nghiệp chia sẻ biểu mẫu thu thập thông tin tới khách hàng hoặc nhập vào Danh sách khách hàng trên CRM OAM)
+ Nhấn "Áp dụng" để cập nhật danh sách. Danh sách hiển thị số người thoả điều kiện
+ Với danh sách ≤ 200 người: có thể bỏ tích từng người để loại khỏi danh sách gửi
+ ℹ️  Hệ thống gửi tối đa 50,000 khách hàng (UID) mỗi chiến dịch. Nếu sau khi lọc, kết quả lọc được nhiều hơn, hệ thống tự lấy 50,000 người đầu tiên. 
+ Mẹo: 
+ 1/ OA có thể tự phân tập người nhận bằng tag (nhãn khách hàng) hoặc thông tin trước khi gửi. Tới bước gửi chiến dịch chỉ cần filter lấy tag đó làm tệp người nhận
+ 2/ Dùng bộ lọc “Thời gian tương tác” - thông tin mà hệ thống luôn có và chia tệp theo thời gian tương tác với mỗi tệp dưới 50,000 UID để gửi.
+ Gửi qua SĐT: 
+ Kéo thả file vào ô tải lên, hoặc nhấn "Tải danh sách lên" 
+ Hệ thống kiểm tra file và báo số dòng hợp lệ/ không hợp lệ
+ Nhấn "Tải tệp mẫu" nếu chưa có file, để tải về file Excel mẫu với định dạng chuẩn, hệ thống sẽ dễ dàng nhận diện dữ liệu và tự động khớp nối thông tin theo tham số trên mẫu template
+ Nếu admin OA không sử dụng file mẫu, hệ thống sẽ chỉ kiểm tra các điều kiện sau trên file:
+ (1) Có cột nào có định dạng số điện thoại có khả dụng hay không
+ (2) Số cột dữ liệu có trong file: Số cột cần tương đương hoặc lớn hơn số lượng tham số có trong mẫu template. Nếu số lượng cột ít hơn, hệ thống sẽ không cho upload file.
+ Lưu ý : Ở bước ngay sau khi upload file excel có chứa danh sách số điện thoại lên, phần thông tin trong bảng pop-up chỉ là thông tin dựa trên hệ thống tự quét và kiểm tra file đã upload để so khớp với tham số đã khai báo. Việc hệ thống trả ra thông tin số dòng không hợp lệ hoàn toàn không có nghĩa là file không dùng được, chỉ là chưa so khớp được đúng cột dữ liệu với tham số trong template
+ (ví dụ: OA đặt tên các cột không khớp với tham số trong template, tên cột có dấu cách, có ký tự dư,…) → OA hoàn toàn có thể qua màn hình thiết lập tham số để tự ghép nối thủ công vẫn có thể xử lý dữ liệu sử dụng và gửi tiếp được.
+ Yêu cầu file
+ Chi tiết
+ Định dạng
+ Excel (.xlsx, .xls) hoặc CSV.
+ Dung lượng
+ Không giới hạn dung lượng file, tối đa 10,000 dòng, không tính dòng tiêu đề.
+ Định dạng dữ liệu cho tham số
+ Dùng định dạng Text hoặc sử dụng dấu ' để chuyển cụm ký tự thành dạng String. Đối với tham số dữ liệu là thời gian, cần nhập đúng định dạng thời gian mà ZBS Template quy định. Tiêu chuẩn về định dạng dữ liệu truyền vào tham số xem chi tiết
+ tại đây .
+ Cột A
+ Nên là cột số điện thoại di động của Việt Nam theo định dạng hợp lệ (có thể bắt đầu bằng 0, 84 hoặc +84).
+ Các cột tiếp theo
+ Dòng đầu tiên cần là tên của cột trùng với tên tham số trong Template để hệ thống tự động khớp nối dữ liệu khi upload file. Admin OA không cần thao tác thủ công và tránh sai sót nội dung dữ liệu.
+ Trùng lặp
+ Không được có số điện thoại trùng trong cùng file. Nếu có trùng hệ thống sẽ tự động sử dụng dữ liệu của dòng đầu tiên được tìm thấy trong file.
+ Bước 3: Thiết lập giá trị cho tham số trong nội dung mẫu tin 
+ Gán nguồn dữ liệu cho từng tham số trong mẫu tin - từ CRM OA hoặc nhập giá trị cố định. 
+ Nguồn dữ liệu
+ Mô tả
+ Lưu ý
+ Từ CRM trên OA Manager
+ Chọn biến trên CRM - mỗi người nhận một giá trị khác nhau tương ứng với từng dòng cho mỗi người nhận
+(VD: <customer_name> chọn Tên Zalo từ CRM → tin nhắn đúng tên từng người)
+ Bắt buộc điền "Giá trị dự phòng" - dùng khi dữ liệu CRM của khách hàng bất kỳ bị trống
+hoặc không đúng định dạng với tham số tương ứng trên mẫu tin.
+ Ví dụ: Tham số Tên khách hàng quy định số ký tự tối đa = 30, nhưng tên khách hàng thực tế = 35 ký tự
+→ hệ thống sẽ tự động lấy giá trị dự phòng (ví dụ: Anh/Chị) để thay thế vào, đảm bảo tin vẫn gửi đi được.
+ Nhập giá trị mới
+ Một giá trị cố định cho toàn bộ khách hàng nhận tin trong chiến dịch
+ Tối đa 100 ký tự.
+ ℹ️  Với phương thức gửi SĐT, mỗi tham số được gán với một cột trong file Excel đã tải lên. Cột A nên là cột chứa số điện thoại, nếu không phải thì hệ thống sẽ tự động nhận biết cột đầu tiên khớp với định dạng SĐT để dùng làm SĐT người nhận (OA cũng hoàn toàn có thể thay đổi tại màn hình "Thiết lập tham số" .
+ Bước 4: Hoàn tất để bắt đầu gửi chiến dịch 
+ Chọn admin nhận tin thử từ danh sách và nhấn "Gửi thử" để kiểm tra nội dung trước (miễn phí)
+ Kiểm tra chi phí dự kiến = Đơn giá template × Số người nhận
+ Kiểm tra số dư ví ZBS - nếu không đủ số dư, nhấn "Nạp tiền vào ví ZBS" để nạp thêm (hệ thống chuyển hướng mở tab mới, sau khi nạp, số dư tự cập nhật)
+ Nhấn "Hoàn tất" để bắt đầu gửi - chiến dịch chuyển ngay sang trạng thái "Trong hàng chờ" 
+ ⚠️ Lưu ý: 
+ Chi phí dự kiến là mức ước tính tối đa, dựa trên số lượng người nhận và đơn giá mẫu tin theo phương thức gửi đang chọn (UID hoặc SĐT), chưa bao gồm hạn mức nhận tin có mục đích truyền thông của người dùng. Xem chi tiết chính sách tại đây .​
+ Chi phí thực tế có thể thấp hơn nếu một số khách hàng trong tập gửi đã đạt hạn mức nhận tin.
+ Số dư tài khoản ZBS chỉ hiển thị với admin có quyền quản lý ZBS Account.
+ ⚠️  Sau khi xác nhận gửi, danh sách người nhận không thể chỉnh sửa. Kiểm tra kỹ trước khi nhấn "Tạo chiến dịch" .
+ Quản lý chiến dịch ​ 
+ Xem hướng dẫn tại mục  2.3.a bên dưới.
+ 2.3  Theo dõi chiến dịch và xem báo cáo ​ 
+ OA có thể xem thông tin báo cáo tại 3 nơi: 
+ a. Quản lý chiến dịch ​ 
+ Vào "Chiến dịch" → "Quản lý chiến dịch" để xem tiến trình chiến dịch đang chạy
+ Sử dụng bộ lọc theo trạng thái, phương thức gửi và khoảng thời gian để tìm chiến dịch cần xem
+ Nhấn vào tên chiến dịch để xem chi tiết: số tin đã gửi, đã nhận, lỗi 
+ Trạng thái chiến dịch 
+ Trạng thái
+ Ý nghĩa
+ Thao tác có thể thực hiện
+ Nháp
+ Đã lưu, chưa gửi.
+ Chỉnh sửa, Gửi, Xóa.
+ Đang gửi
+ Đang gửi - hiển thị số tin đã xử lý.
+ Kiểm tra số lượng đã xử lý, không thể tạm dừng/ huỷ.
+ Hoàn thành
+ Đã xử lý xong toàn bộ danh sách.
+ Xem báo cáo (UID gửi thành công/ không gửi được).
+ Không gửi được
+ Toàn bộ tin gặp lỗi.
+ Có thể xem lý do lỗi gửi tin.
+ b. Tổng quan ​ 
+ Trang  Tổng quan là màn hình mặc định khi truy cập vào mục  Chiến dịch , giúp nắm bắt nhanh hiệu quả hoạt động mà không cần điều hướng vào từng chiến dịch riêng lẻ, hiển thị 3 nhóm thông tin chính:
+ Chỉ số tổng quan: Chọn khoảng thời gian xem (30 / 60 / 90 ngày, mặc định 30 ngày) để lọc 4 chỉ số: Tổng template đã duyệt, Tổng chiến dịch hoàn thành, Tổng lượt gửi.
+ Top 3 chiến dịch gần đây: Hai bảng riêng biệt cho chiến dịch  Gửi qua UID và  Gửi qua SĐT , sắp xếp theo số lượng đã gửi. Nhấn "Xem tất cả" để chuyển sang trang  Quản lý chiến dịch tương ứng.
+ Thông báo vận hành: Hiển thị độc lập với bộ lọc thời gian. Gồm 2 nhóm - Template và Chiến dịch - thông báo các việc cần xử lý ngay (template bị từ chối, chiến dịch đang gửi/lỗi). Nhấn vào từng thông báo để điều hướng đến màn hình xử lý tương ứng.
+ c. Báo cáo tổng hợp (Sắp ra mắt) ​ 
+ Tính năng Báo cáo tổng hợp đang trong giai đoạn phát triển. Khi ra mắt, đây sẽ là nơi xem tổng hợp hiệu quả toàn bộ chiến dịch ZBS đã gửi, hỗ trợ doanh nghiệp phân tích hành vi khách hàng và tối ưu chiến lược gửi tin.
+ 💡  Để báo cáo có chiều sâu hơn ngay khi tính năng ra mắt, OA nên chuẩn bị data CRM từ bây giờ: làm đầy hồ sơ khách hàng qua Biểu mẫu, gắn nhãn phân loại hội thoại, duy trì gửi chiến dịch đều đặn và ghi chú tình trạng từng khách hàng. Xem thêm hướng dẫn chi tiết  tại đây . 
+ 2.4  Tính năng gửi Broadcast ​ 
+ Ngoài Chiến dịch gửi tin theo mẫu ZBS, OA Manager còn hỗ trợ gửi Broadcast truyền thông bài viết tới tệp người quan tâm. Hướng dẫn sử dụng tính năng Broadcast xem tại đây .
+ --------------
+ Nếu cần hỗ trợ thêm, vui lòng cung cấp OA ID và  gửi email hoặc  chat với BQT ZOA để được phản hồi sớm nhất.
+ Previous
+ Câu hỏi thường gặp
+ Next
+ Giới thiệu tính năng
+ 1. Giới thiệu tổng quan 1.1  Giải thích thuật ngữ 
+ 1.2  Đối tượng sử dụng 
+ 1.3  Điều kiện sử dụng 
+ 2. Các tính năng chính 2.1  Tạo và Quản lý Template 
+ 2.2  Tạo và quản lý chiến dịch gửi tin 
+ 2.3  Theo dõi chiến dịch và xem báo cáo 
+ 2.4  Tính năng gửi Broadcast 

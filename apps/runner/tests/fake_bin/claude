@@ -1,0 +1,116 @@
+#!/usr/bin/env python3
+"""Fake `claude` CLI for runner tests. Never contacts Anthropic.
+
+Behaviour comes from the JSON file in $FAKE_CLAUDE_CONFIG:
+  {"accounts": {"<label>": "ok" | "oauth" | "weekly_limit"},   label = basename of $CLAUDE_CONFIG_DIR
+                                                               (weekly_limit resets at 2pm three days from now)
+   "mode": "reply" | "tool" | "sleep" | "empty" | "model_error" | "refusal",
+   "sleep_s": 5, "reply": "...", "log": "/path/calls.jsonl"}
+Sessions are emulated like Claude Code: $CLAUDE_CONFIG_DIR/projects/<cwd with non-alnum -> '-'>/<sid>.jsonl,
+each line carries "cwd"; total_cost_usd is cumulative over the session (0.02 per call).
+"""
+import json, os, re, subprocess, sys, time, uuid
+from datetime import datetime, timedelta, timezone
+from pathlib import Path
+
+MONTHS = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+
+cfg = json.loads(Path(os.environ["FAKE_CLAUDE_CONFIG"]).read_text())
+argv = sys.argv[1:]
+cfg_dir = os.environ.get("CLAUDE_CONFIG_DIR", "")
+label = os.path.basename(cfg_dir.rstrip("/")) if cfg_dir else "default"
+
+if argv[:2] == ["auth", "status"]:
+    print(json.dumps({"loggedIn": True, "email": f"{label}@example.test", "subscriptionType": "max"}))
+    sys.exit(0)
+
+assert argv[0] == "-p", argv
+dd = argv.index("--")
+flags, text = argv[1:dd], " ".join(argv[dd + 1:])
+
+def flag(name):
+    return flags[flags.index(name) + 1] if name in flags else None
+
+stdin_data = sys.stdin.read()
+cwd = os.getcwd()
+entry = {"account": label, "flags": flags[:], "text": text, "cwd": cwd, "stdin": stdin_data,
+         "env": {k: os.environ.get(k) for k in ("CLAUDE_CODE_DISABLE_CLAUDE_MDS", "CLAUDE_CODE_DISABLE_AUTO_MEMORY",
+                                                "ANTHROPIC_API_KEY")}}
+sp = flag("--system-prompt")
+entry["flags"][entry["flags"].index("--system-prompt") + 1] = f"<{len(sp)} chars>"
+entry["system_prompt"] = sp
+with open(cfg["log"], "a") as f:
+    f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+
+behaviour = cfg.get("accounts", {}).get(label, "ok")
+if behaviour == "oauth":
+    # exit 0 + is_error, as Kai saw; the session id contains "401" on purpose (claude_pool must not misread it)
+    print(json.dumps({"type": "result", "subtype": "success", "is_error": True,
+                      "result": "OAuth session expired. Please run /login.",
+                      "session_id": "00000000-4010-4000-8000-000000000401"}))
+    sys.exit(0)
+if behaviour == "weekly_limit":
+    # The reset is three days from now in Asia/Ho_Chi_Minh (UTC+7 all year), so the tests pass on any day.
+    reset = datetime.now(timezone(timedelta(hours=7))) + timedelta(days=3)
+    print(json.dumps({"type": "result", "subtype": "success", "is_error": True,
+                      "result": f"You've hit your weekly limit · resets {MONTHS[reset.month - 1]} {reset.day} "
+                                "at 2pm (Asia/Saigon)",
+                      "session_id": str(uuid.uuid4())}))
+    sys.exit(1)
+
+projects = Path(cfg_dir) / "projects" / re.sub(r"[^A-Za-z0-9]", "-", cwd)
+resume = flag("--resume")
+if resume:
+    sfile = projects / f"{resume}.jsonl"
+    if not sfile.exists():
+        sys.stderr.write(f"No conversation found with session ID: {resume}\n")
+        sys.exit(1)
+    sid = resume
+else:
+    sid = cfg.get("new_session_id") or str(uuid.uuid4())
+    if cfg.get("session_ids"):
+        sid = cfg["session_ids"].pop(0)
+        Path(os.environ["FAKE_CLAUDE_CONFIG"]).write_text(json.dumps(cfg))
+
+mode = cfg.get("mode", "reply")
+if mode == "sleep":
+    time.sleep(float(cfg.get("sleep_s", 5)))
+
+reply = cfg.get("reply", "Dạ em chào anh/chị ạ.")
+if mode == "tool":
+    mcp = json.loads(Path(flag("--mcp-config")).read_text())["mcpServers"]["thom"]
+    env = {**os.environ, **mcp.get("env", {})}
+    p = subprocess.Popen([mcp["command"], *mcp["args"]], stdin=subprocess.PIPE, stdout=subprocess.PIPE, text=True,
+                         env=env)
+    def rpc(i, method, params):
+        p.stdin.write(json.dumps({"jsonrpc": "2.0", "id": i, "method": method, "params": params}) + "\n")
+        p.stdin.flush()
+        return json.loads(p.stdout.readline())
+    rpc(1, "initialize", {"protocolVersion": "2025-06-18"})
+    p.stdin.write(json.dumps({"jsonrpc": "2.0", "method": "notifications/initialized"}) + "\n")
+    tools = rpc(2, "tools/list", {})["result"]["tools"]
+    res = rpc(3, "tools/call", {"name": "quote_price", "arguments": {
+        "service_id": "goi-dau", "duration_min": 50, "start_time_local": "14:00", "date_local": "unknown"}})
+    p.stdin.close(); p.wait(5)
+    out = json.loads(res["result"]["content"][0]["text"])
+    reply = f"Dạ gội đầu 50 phút giá {out.get('price_text')} ạ. ({len(tools)} tools)"
+
+projects.mkdir(parents=True, exist_ok=True)
+sfile = projects / f"{sid}.jsonl"
+with sfile.open("a") as f:
+    f.write(json.dumps({"type": "user", "cwd": cwd, "sessionId": sid}) + "\n")
+calls = len(sfile.read_text().splitlines())
+(projects / sid / "tool-results").mkdir(parents=True, exist_ok=True)
+
+if mode == "model_error":
+    print(json.dumps({"type": "result", "subtype": "error_during_execution", "is_error": True,
+                      "result": "API Error: overloaded", "session_id": sid}))
+    sys.exit(1)
+if mode == "empty":
+    reply = "   "
+out = {"type": "result", "subtype": "success", "is_error": False, "duration_ms": 1234, "duration_api_ms": 900,
+       "num_turns": 2, "result": reply, "stop_reason": "refusal" if mode == "refusal" else "end_turn",
+       "session_id": sid, "total_cost_usd": round(0.02 * calls, 6),
+       "usage": {"input_tokens": 4, "cache_creation_input_tokens": 842, "cache_read_input_tokens": 34605,
+                 "output_tokens": 282, "service_tier": "standard"}}
+print(json.dumps(out, ensure_ascii=False))

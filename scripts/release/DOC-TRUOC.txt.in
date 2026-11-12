@@ -1,0 +1,15 @@
+Chatbot thom house bản {version}: file cài cho máy Mac
+File cài chỉ chạy trên máy Mac có macOS 13.5 trở lên; máy Windows và Linux chưa được hỗ trợ.
+
+Trước khi cài lần đầu, anh mở Terminal và chạy lệnh dưới đây (thay đường dẫn cho đúng):
+  shasum -a 256 /Volumes/USB/thomhouse-{version}.command
+16 ký tự đầu mà lệnh in ra phải giống mã bản cài người tạo file gửi riêng cho anh
+(không kể dấu gạch, chữ hoa hay chữ thường). Không giống thì anh đừng chạy file.
+
+Cài lần đầu:
+  bash /Volumes/USB/thomhouse-{version}.command
+Máy đã cài rồi thì cập nhật bằng:
+  ~/ThomHouse/bin/thomhouse update /Volumes/USB/thomhouse-{version}.command
+
+macOS có thể hỏi bằng tiếng Anh cho Terminal đọc ổ USB, ghi vào Desktop hoặc mở trình duyệt;
+anh bấm Allow. Hướng dẫn đầy đủ nằm trong docs/cai-dat-may-moi.md của bản cài.

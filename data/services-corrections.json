@@ -1,0 +1,651 @@
+{
+  "schema_note": "Đề xuất sửa data/services.json, CHƯA áp dụng và CHƯA được chủ doanh nghiệp duyệt. Chỉ gồm điểm lệch mà lượt kiểm lại độc lập ghi confirmed=true, hoặc bước tổng hợp đã tự đọc lại ảnh và thấy rõ. Mọi đường dẫn ảnh tính từ gốc dự án. Sau khi áp dụng phải sinh lại apps/server/src/seed-data.ts bằng apps/server/scripts/gen-seed-data.mjs.",
+  "generated_on": "2026-11-08",
+  "applies_to": {
+    "file": "data/services.json",
+    "catalog_generated_on": "2026-11-07",
+    "catalog_counts": {"services": 23, "variants": 33}
+  },
+  "image_root": "sources/drive-resources/thomhouse-menu",
+  "evidence_reports": [
+    "research/menu-audit/facial.md",
+    "research/menu-audit/healing.md",
+    "research/menu-audit/thugian-hairremoval.md",
+    "research/13-thomhouse-academy-analytics.md",
+    "research/10-brand-space-design-system.md"
+  ],
+  "verified_by_legend": {
+    "audit:<menu>": "người kiểm ảnh của nhóm menu đó đã mở ảnh, cắt phóng to vùng chữ bằng sips và đọc bằng mắt (không OCR)",
+    "verify:confirmed": "lượt kiểm lại độc lập mở lại ảnh và ghi confirmed=true",
+    "synthesis:reread": "bước tổng hợp ngày 2026-11-08 tự mở lại ảnh (bản thu nhỏ hoặc vùng cắt) và đọc được đúng giá trị ghi ở corrected_value"
+  },
+  "corrections": [
+    {
+      "service_id": "goi-mun-5-in-1",
+      "field": "variants[0].duration_min",
+      "services_json_line": 1679,
+      "current_value": 90,
+      "corrected_value": {"duration_min": 60, "duration_max": 90, "printed": "Thời gian: 60- 90 phút"},
+      "image": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/4.png",
+      "verified_by": ["audit:facial", "verify:confirmed", "synthesis:reread"],
+      "priority": "high",
+      "needs_owner_confirmation": true,
+      "note": "Giá 599.000 khớp. Schema hiện chỉ có một số nguyên duration_min, nên cần thêm trường khoảng thời lượng. Có nguồn thứ ba: ảnh chụp màn hình điện thoại IMG_7874.jpg trong sources/drive-resources/thomhouse-space/ in '90-120 phút' (research/10-brand-space-design-system.md). Trang landing page ghi 60-90 phút."
+    },
+    {
+      "service_id": "goi-mun-5-in-1",
+      "field": "process_steps_vi",
+      "services_json_line": 1689,
+      "current_value": [
+        "Làm sạch sừng chết và bã nhờn với whitetox",
+        "Massage kem mỡ làm mềm còi mụn",
+        "Lấy sạch nhân mụn",
+        "Đắp mặt nạ chuyên dụng kháng viêm",
+        "Thoa hoạt chất giảm viêm đỏ se còi mụn",
+        "Bắn ánh sáng xanh SHR phục hồi da nhanh chóng (theo thời gian khuyến mại)"
+      ],
+      "corrected_value": [
+        "Làm sạch sừng chết và bã nhờn với whitetox",
+        "Massage kem mỡ làm mềm còi mụn",
+        "Lấy sạch nhân mụn",
+        "Thoa hoạt chất giảm viêm đỏ se còi mụn",
+        "Đắp mặt nạ chuyên dụng kháng viêm"
+      ],
+      "image": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/5.png",
+      "verified_by": ["audit:facial", "verify:confirmed"],
+      "priority": "high",
+      "needs_owner_confirmation": true,
+      "note": "Ảnh 5 có 5 bước, không có bước SHR và không có chữ 'khuyến mại'; bước 4 và 5 ngược thứ tự so với catalog. Nếu áp dụng, mục flagged_claims về SHR (dòng nguồn batch-04:80) không còn bước tương ứng."
+    },
+    {
+      "service_id": "goi-mun-5-in-1",
+      "field": "name_vi",
+      "services_json_line": 1674,
+      "current_value": "Gói Mụn 5 in 1",
+      "corrected_value": "Gói mụn 5in1",
+      "image": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/4.png",
+      "verified_by": ["audit:facial", "verify:confirmed", "synthesis:reread"],
+      "priority": "low",
+      "apply": "optional",
+      "note": "Chỉ lệch khoảng trắng và chữ hoa. Ảnh 4 còn in 'MỤN SIGNATURE'; ảnh 5 gọi quy trình là 'Chăm da 5in1'. Nên giữ cả hai cách viết làm từ khóa tìm kiếm."
+    },
+    {
+      "service_id": "xoa-tham-quang-mat-co-ban",
+      "field": "variants[0].duration_min",
+      "services_json_line": 1911,
+      "current_value": 60,
+      "corrected_value": 45,
+      "image": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/8.png",
+      "verified_by": ["audit:facial", "verify:confirmed", "synthesis:reread"],
+      "priority": "high",
+      "needs_owner_confirmation": true,
+      "note": "Ảnh in 'Cơ bản – Thời gian: 45 phút – 329,000 VNĐ'. Giá khớp. Trang landing page cũng ghi 45 phút (research/13)."
+    },
+    {
+      "service_id": "xoa-tham-quang-mat-dien-xung-truong",
+      "field": "variants[0].duration_min",
+      "services_json_line": 1979,
+      "current_value": 90,
+      "corrected_value": 60,
+      "image": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/8.png",
+      "verified_by": ["audit:facial", "verify:confirmed", "synthesis:reread"],
+      "priority": "high",
+      "needs_owner_confirmation": true,
+      "note": "Ảnh in 'Công nghệ điện xung trường – Thời gian: 60 phút – 629,000 VNĐ'. Giá khớp. Trang landing page cũng ghi 60 phút (research/13)."
+    },
+    {
+      "service_id": "xoa-tham-quang-mat-dien-xung-truong",
+      "field": "flagged_claims[text='hiệu quả gấp 20 lần điện di ion bình thường']",
+      "services_json_line": 1999,
+      "current_value": "hiệu quả gấp 20 lần điện di ion bình thường",
+      "corrected_value": "hiệu quả gấp 10 lần điện di ion bình thường tại cơ sở, giảm thâm nhăn hiệu quả",
+      "image": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/9.png",
+      "verified_by": ["audit:facial", "verify:confirmed", "synthesis:reread"],
+      "priority": "high",
+      "note": "Câu vẫn là câu cấm, chỉ sửa đúng chữ in. apps/server/src/checker/index.ts dòng 12 chỉ chặn 'gấp 20 lần', chưa chặn 'gấp 10 lần' (xem checker_followups)."
+    },
+    {
+      "service_id": "xoa-tham-quang-mat-co-ban",
+      "field": "process_steps_vi",
+      "current_value": ["Massage ấn huyệt dẫn lưu (menu chỉ có câu mô tả, không chia bước)"],
+      "corrected_value": ["Vệ sinh da", "Chải dụng cụ", "Thải dịch ổ mắt", "Lăn búa lạnh tinh chất phục hồi da mắt", "Đấp nạ dẻo hàn quốc"],
+      "image": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/9.png",
+      "verified_by": ["audit:facial", "verify:confirmed", "synthesis:reread"],
+      "priority": "medium",
+      "needs_owner_confirmation": true,
+      "note": "Tiêu đề 'Quy trình Xóa thâm quầng mắt' không ghi quy trình thuộc gói nào; tôi gán cho cả hai gói và chờ xác nhận. Chữ 'Đấp nạ' chép đúng ảnh, có thể là 'Đắp nạ'."
+    },
+    {
+      "service_id": "xoa-tham-quang-mat-dien-xung-truong",
+      "field": "process_steps_vi",
+      "current_value": ["Massage ấn huyệt mắt kết hợp với plasma đưa tinh chất xuống da bằng công nghệ điện xung trường (menu chỉ có câu mô tả)"],
+      "corrected_value": ["Vệ sinh da", "Chải dụng cụ", "Thải dịch ổ mắt", "Lăn búa lạnh tinh chất phục hồi da mắt", "Đấp nạ dẻo hàn quốc"],
+      "image": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/9.png",
+      "verified_by": ["audit:facial", "verify:confirmed", "synthesis:reread"],
+      "priority": "medium",
+      "needs_owner_confirmation": true,
+      "note": "Cùng quy trình chung với gói cơ bản; ảnh không tách quy trình theo gói."
+    },
+    {
+      "service_id": "xoa-tham-quang-mat-co-ban",
+      "field": "flagged_claims (thêm)",
+      "current_value": ["giảm ngay tình trạng thâm đen, ứ tụ bọng mắt"],
+      "corrected_value": ["giảm ngay tình trạng thâm đen, ứ tụ bọng mắt", "Massage ấn huyệt dẫn lưu giúp khí huyết không còn tắt nghẽn"],
+      "image": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/9.png",
+      "verified_by": ["audit:facial", "synthesis:reread"],
+      "priority": "medium",
+      "note": "Câu nói về khí huyết, một khái niệm y học cổ truyền. Lượt kiểm lại độc lập không xét riêng câu này; bước tổng hợp đã cắt phóng to vùng chữ và đọc rõ."
+    },
+    {
+      "service_id": "xoa-tham-quang-mat-co-ban",
+      "field": "name_vi",
+      "services_json_line": 1907,
+      "current_value": "Xóa thâm quầng mắt – Gói cơ bản",
+      "corrected_value": "Xoá thâm quầng mắt – Cơ bản",
+      "image": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/8.png",
+      "verified_by": ["audit:facial", "verify:confirmed", "synthesis:reread"],
+      "priority": "low",
+      "apply": "optional",
+      "note": "Ảnh không có chữ 'Gói'. 'Xoá' và 'Xóa' đều đúng chính tả; ảnh 9 dùng 'Xóa'. Nghĩa không đổi."
+    },
+    {
+      "service_id": "xoa-tham-quang-mat-dien-xung-truong",
+      "field": "name_vi",
+      "services_json_line": 1975,
+      "current_value": "Xóa thâm quầng mắt – Gói công nghệ điện xung trường",
+      "corrected_value": "Xoá thâm quầng mắt – Công nghệ điện xung trường",
+      "image": "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/8.png",
+      "verified_by": ["audit:facial", "verify:confirmed", "synthesis:reread"],
+      "priority": "low",
+      "apply": "optional",
+      "note": "Ảnh không có chữ 'Gói'. Nghĩa không đổi."
+    },
+    {
+      "service_id": "dien-chan-ngua-dot-quy",
+      "field": "name_vi",
+      "services_json_line": 438,
+      "current_value": "Diện chẩn ngừa đột quỵ",
+      "corrected_value": "Ngừa đột quỵ",
+      "image": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/17.png",
+      "verified_by": ["audit:healing", "verify:confirmed", "synthesis:reread"],
+      "priority": "medium",
+      "needs_owner_confirmation": true,
+      "note": "Bìa 17.png, tiêu đề 18.png và tiêu đề quy trình 19.png đều ghi 'Ngừa đột quỵ'; không ảnh nào có 'Diện chẩn' trong tên. Tên vẫn hứa ngăn một bệnh, nên đổi theo ảnh không làm tên an toàn hơn. Khi đổi phải sinh lại apps/server/src/seed-data.ts và sửa apps/server/test/core-checker.test.ts dòng 11. Nên giữ tên cũ làm tên gọi khác."
+    },
+    {
+      "service_id": "detox-mui-co-the",
+      "field": "name_vi",
+      "services_json_line": 831,
+      "current_value": "Detox mùi cơ thể",
+      "corrected_value": "Detox cơ thể",
+      "image": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/5.png",
+      "verified_by": ["audit:healing", "verify:confirmed", "synthesis:reread"],
+      "priority": "medium",
+      "needs_owner_confirmation": true,
+      "note": "Bìa 5.png in 'Detox cơ thê' (thiếu dấu hỏi), tiêu đề 6.png và 7.png in 'Detox cơ thể'. Thân bài 6.png dùng 'Detox mùi cơ thể' hai lần, nên giữ 'Detox mùi cơ thể' làm tên gọi khác. Trang landing page ghi 'Detox cơ thể'."
+    },
+    {
+      "service_id": "cham-soc-nan-toc",
+      "field": "process_steps_vi[8]",
+      "services_json_line": 2306,
+      "current_value": "Xã phục hồi",
+      "corrected_value": "Xả phục hồi",
+      "image": "sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/9.png",
+      "verified_by": ["audit:thugian-hairremoval", "verify:confirmed"],
+      "priority": "low",
+      "note": "Lỗi chép ở batch-05:164. Slide 4 và 7 (detox-da-dau, goi-dau-thu-gian) vẫn in 'Xã phục hồi', nên hai dịch vụ đó giữ nguyên."
+    },
+    {
+      "service_id": "dien-chan-ngua-dot-quy",
+      "field": "flagged_claims (thêm)",
+      "current_value": null,
+      "corrected_value": ["phòng ngừa từ sớm", "dấu hiệu cho thấy dòng lưu thông đang chậm lại", "Thải độc và phong tán hàn ra bàn chân"],
+      "image": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/18.png",
+      "images_all": ["sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/18.png", "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/19.png"],
+      "verified_by": ["audit:healing", "verify:confirmed"],
+      "priority": "medium",
+      "note": "Câu thứ ba là bước 7 trên 19.png. Bộ kiểm tra bản nháp đã có từ 'thải độc', nên nếu chatbot đọc nguyên văn bước này, bản nháp sẽ bị chặn."
+    },
+    {
+      "service_id": "giai-moi-dung-lau",
+      "field": "flagged_claims (thêm)",
+      "current_value": null,
+      "corrected_value": ["hỗ trợ lưu thông"],
+      "image": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/15.png",
+      "verified_by": ["audit:healing", "verify:confirmed"],
+      "priority": "low"
+    },
+    {
+      "service_id": "thieu-mau-nao",
+      "field": "flagged_claims (thêm)",
+      "current_value": null,
+      "corrected_value": ["việc lưu thông lên đầu dễ bị ảnh hưởng"],
+      "image": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/12.png",
+      "verified_by": ["audit:healing", "verify:confirmed"],
+      "priority": "low"
+    },
+    {
+      "service_id": "dau-that-lung-moi-goi",
+      "field": "flagged_claims (thêm)",
+      "current_value": null,
+      "corrected_value": ["Khi thận không được nuôi dưỡng đầy đủ, hàn tà dễ xâm nhập", "duy trì hiệu quả lâu dài", "bổ khí thận", "thải dịch phù nề", "bộ bổ thận"],
+      "image": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/9.png",
+      "images_all": ["sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/9.png", "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/10.png"],
+      "verified_by": ["audit:healing", "verify:confirmed"],
+      "priority": "medium",
+      "note": "Ba cụm cuối nằm trong bước quy trình trên 10.png; nếu chatbot đọc các bước, cần bỏ hoặc viết lại ba cụm này."
+    },
+    {
+      "service_id": "detox-mui-co-the",
+      "field": "flagged_claims (thêm)",
+      "current_value": null,
+      "corrected_value": ["đó không phải do vệ sinh, mà là dấu hiệu cơ thể đang ứ trệ", "hệ bạch huyết là đường ống thải độc"],
+      "image": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/6.png",
+      "verified_by": ["audit:healing", "verify:confirmed"],
+      "priority": "medium"
+    },
+    {
+      "service_id": "thai-han-giai-cam",
+      "field": "flagged_claims (thêm)",
+      "current_value": null,
+      "corrected_value": ["giải cảm (trong tên dịch vụ)", "mệt kéo dài, dễ cảm gió, đau đầu âm ỉ (quy cho nhiễm hàn)", "hiệu quả được duy trì lâu dài"],
+      "image": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/4.png",
+      "images_all": ["sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/3.png", "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/4.png"],
+      "verified_by": ["audit:healing", "verify:confirmed"],
+      "priority": "medium",
+      "note": "Chữ 'giải cảm' có dấu trên 3.png và 4.png; bìa 2.png in 'giai cam' không dấu."
+    },
+    {
+      "service_id": "detox-da-dau",
+      "field": "flagged_claims (thêm)",
+      "current_value": null,
+      "corrected_value": ["lành tính"],
+      "image": "sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/3.png",
+      "verified_by": ["audit:thugian-hairremoval", "verify:confirmed"],
+      "priority": "low",
+      "note": "Câu trên ảnh: 'theo cách nhẹ nhàng, lành tính'. Khẳng định độ an toàn."
+    },
+    {
+      "service_id": "goi-dau-thu-gian",
+      "field": "flagged_claims (thêm)",
+      "current_value": null,
+      "corrected_value": ["Đi làm về muộn, sợ gội đầu đêm ngấm lạnh sương ốm.", "Tóc yếu, thưa rụng vì guồng quay bận rộn bỏ bê chăm sóc."],
+      "image": "sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/6.png",
+      "verified_by": ["audit:thugian-hairremoval", "verify:confirmed"],
+      "priority": "low",
+      "note": "Câu thứ nhất dọa bệnh. Câu thứ hai mô tả người nên dùng; chatbot không được biến câu này thành lời hứa giảm rụng tóc."
+    }
+  ],
+  "group_level_flags": [
+    {
+      "group": "health",
+      "field": "flagged_claims (cả nhóm)",
+      "text": "Menu giúp bạn khỏe",
+      "image": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/1.png",
+      "verified_by": ["audit:healing", "verify:confirmed"],
+      "note": "Catalog chưa có chỗ ghi câu cấm cho cả nhóm. Mức nhẹ; chatbot có thể gọi nhóm này là menu khỏe."
+    }
+  ],
+  "confirmed_but_no_catalog_change": [
+    {
+      "service_id": "giai-moi-dung-lau",
+      "field": "process_steps_vi",
+      "image": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/16.png",
+      "verified_by": ["audit:healing", "verify:confirmed"],
+      "note": "Catalog khớp ảnh, nhưng ảnh đáng ngờ: slide 16 tiêu đề 'chăm sóc chân' in đúng từng chữ 6 bước vai cổ của slide 13 (thieu-mau-nao); slide giới thiệu 15 nói liệu trình tập trung vào chân. Trang landing page có 6 bước riêng cho chân (research/13). Đề xuất chatbot chưa đọc các bước này cho tới khi chủ doanh nghiệp xác nhận."
+    },
+    {
+      "service_id": "detox-mui-co-the",
+      "field": "process_steps_vi[2]",
+      "image": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/7.png",
+      "verified_by": ["audit:healing", "verify:confirmed"],
+      "note": "Ảnh in 'toàn thán' (lỗi gõ); catalog ghi 'toàn thân' theo batch-02:226. Giữ catalog."
+    },
+    {
+      "service_id": "dau-that-lung-moi-goi",
+      "field": "process_steps_vi[2]",
+      "image": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/10.png",
+      "verified_by": ["audit:healing", "verify:confirmed"],
+      "note": "Ảnh gốc in 'bộ nguyệt'; catalog khớp và đã ghi chú trong conflicts."
+    },
+    {
+      "service_id": "thieu-mau-nao",
+      "field": "process_steps_vi[1]",
+      "image": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/13.png",
+      "verified_by": ["audit:healing", "verify:confirmed"],
+      "note": "Ảnh 13 và 16 in 'Đã thông cơ bó vai, cổ'; có thể là 'Đả thông' (suy luận). Ảnh 3 (thai-han-giai-cam) in 'Bày hàn qua lòng bàn chân'; chưa đoán được chữ đúng. Cần xác nhận trước khi chatbot đọc nguyên văn."
+    },
+    {
+      "service_id": "thai-han-giai-cam",
+      "field": "name_vi",
+      "image": "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/2.png",
+      "verified_by": ["audit:healing", "verify:confirmed"],
+      "note": "Bìa 2.png in 'Thải hàn giai cam', bìa 14.png in 'giãn tinh mạch', bìa 5.png in 'cơ thê'. Catalog viết đúng dấu; lỗi nằm trên ảnh bìa."
+    },
+    {
+      "service_id": "cham-soc-nan-toc",
+      "field": "name_vi",
+      "image": "sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/8.png",
+      "verified_by": ["audit:thugian-hairremoval", "verify:confirmed"],
+      "note": "Ảnh 8, 9 và 12 đều in 'nan'. Catalog khớp ảnh. 'Nang tóc' chỉ là đề xuất; ảnh menu da 3.png cũng in 'nan lông', cùng kiểu lỗi."
+    }
+  ],
+  "catalog_services_without_any_menu_image": [
+    {"service_id": "goi-mun-chuyen-sau", "group": "skin", "note": "Không có trên 21 ảnh menu da. Ảnh 2 có 'Detox da' cùng giá 389.000 nhưng quy trình khác; chưa đủ căn cứ coi là đổi tên."},
+    {"service_id": "cham-soc-da-kich-ung", "group": "skin", "note": "Không có trên 21 ảnh menu da. Ảnh 10 'Cấp dinh dưỡng cơ bản' 599.000 có lựa chọn 'Da nhạy cảm, kích ứng, cháy nắng'; ghép hai dịch vụ chỉ là suy luận."},
+    {"service_id": "mo-vai-nang-mat", "group": "relaxation", "note": "Bộ 57 ảnh menu in không có slide bảng giá thư giãn."},
+    {"service_id": "massage-chan", "group": "relaxation", "note": "Chỉ mức 30 phút 199.000 xuất hiện dưới dạng option trên thu-gian-cham-soc-toc/14.png; mức 45 phút không có ảnh."},
+    {"service_id": "massage-co-vai-gay", "group": "relaxation", "note": "Chỉ mức 30 phút +199.000 xuất hiện dưới dạng option, không ghi khung giờ; ba mức còn lại không có ảnh."},
+    {"service_id": "massage-body-thu-gian", "group": "relaxation", "note": "Không có ảnh."},
+    {"service_id": "cham-soc-dau-bung-kinh", "group": "women", "note": "Bộ ảnh menu in không có thư mục menu phụ nữ."},
+    {"service_id": "se-khit-lam-hong-yoni", "group": "women", "note": "Không có ảnh."},
+    {"service_id": "yoni-retreat", "group": "women", "note": "Không có ảnh."},
+    {"service_id": "nan-chinh-thu-hep-san-chau", "group": "women", "note": "Không có ảnh."},
+    {"service_id": "tieu-u-thong-kinh-nguc", "group": "women", "note": "Không có ảnh; trang landing page cũng không còn dịch vụ này (research/13)."}
+  ],
+  "new_services": [
+    {
+      "kind": "service",
+      "service_id": null,
+      "suggested_id": "detox-da",
+      "group": "skin",
+      "name_on_image": "Detox da",
+      "variants": [
+        {"duration_min": 60, "duration_max": 75, "duration_printed": "60- 75 phút", "price_vnd": 389000, "time_window": null, "condition_note": "Khách chọn 1 trong 2: 'Da mụn: Nặn mụn' hoặc 'Da không mụn: Massage mặt'."}
+      ],
+      "process_steps_vi": ["Thoa detox lam sạch bít tắc nan lông", "Ủ bông làm mềm còi mụn", "Sát khuẩn - nặn mụn trong 30 phút / massage mặt 20 phút", "Điện tím sát khuẩn", "Lăn búa lạnh tinh chất dịu da", "Đấp nạ dẻo hàn quốc"],
+      "flagged_claims": [],
+      "images": ["sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/2.png", "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/3.png"],
+      "verified_by": ["audit:facial", "verify:confirmed", "synthesis:reread"],
+      "note": "Cùng giá với goi-mun-chuyen-sau nhưng quy trình khác. 'nan lông', 'lam sạch', 'Đấp nạ' chép đúng ảnh."
+    },
+    {
+      "kind": "service",
+      "service_id": null,
+      "suggested_id": "massage-mat-thu-gian",
+      "group": "skin",
+      "name_on_image": "Massage mặt thư giãn",
+      "variants": [
+        {"duration_min": 60, "duration_max": null, "duration_printed": "60 phút", "price_vnd": 289000, "time_window": null, "condition_note": null}
+      ],
+      "process_steps_vi": ["Vệ sinh da", "Massage mặt thư giãn", "Massage cổ vai tay mặt ngửa", "Lăn búa lạnh tinh chất dịu da", "Đấp nạ dẻo hàn quốc"],
+      "flagged_claims": [],
+      "images": ["sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/6.png", "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/7.png"],
+      "verified_by": ["audit:facial", "verify:confirmed", "synthesis:reread"]
+    },
+    {
+      "kind": "service",
+      "service_id": null,
+      "suggested_id": "cap-duong-co-ban",
+      "group": "skin",
+      "name_on_image": "Cấp dinh dưỡng cơ bản",
+      "variants": [
+        {"duration_min": 60, "duration_max": 75, "duration_printed": "60- 75 phút", "price_vnd": 599000, "time_window": null, "condition_note": "Khách chọn 1 trong: 'Da nhạy cảm, kích ứng, cháy nắng' hoặc 'Da thâm sạm, mụn, khô, lỗ chân lông to'."}
+      ],
+      "process_steps_vi": ["Làm sạch da", "Massage tinh chất cấp nước", "Nặn mụn nếu có/ massage vai cổ", "Xịt tế bào gốc", "Lăn búa lạnh dinh dưỡng", "Đấp nạ dịu da"],
+      "flagged_claims": ["Lâm sàn trong 7 năm qua, Thơm mang đến cho bạn quy trình nhẹ nhàng nhưng hiệu quả", "Xịt tế bào gốc"],
+      "images": ["sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/10.png", "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/11.png"],
+      "verified_by": ["audit:facial", "verify:confirmed", "synthesis:reread"],
+      "note": "Có thể đã thay cham-soc-da-kich-ung (cùng giá 599.000); đây chỉ là suy luận."
+    },
+    {
+      "kind": "service",
+      "service_id": null,
+      "suggested_id": "cap-duong-plasma-fusion",
+      "group": "skin",
+      "name_on_image": "Cấp dinh dưỡng bằng công nghệ Plasma fusion",
+      "variants": [
+        {"duration_min": 60, "duration_max": null, "duration_printed": "60 phút (in một lần cho cả dịch vụ)", "price_vnd": 999000, "time_window": null, "condition_note": "Mức 'Tinh chất'."},
+        {"duration_min": 60, "duration_max": null, "duration_printed": "60 phút (in một lần cho cả dịch vụ)", "price_vnd": null, "price_min_vnd": 1500000, "price_max_vnd": 2500000, "time_window": null, "condition_note": "Mức 'Dịch chiết tế bào gốc: 1,500,000 VNĐ - 2,500,000 VNĐ'. Ảnh không nói khi nào tính mức nào; nhân viên báo giá cụ thể."}
+      ],
+      "process_steps_vi": ["Vệ sinh da", "Sử dụng Cleanser Snow O₂ sạch sâu", "Massage nâng cơ / nặn mụn", "Ứng dụng năng lượng Plasma theo vấn đề da", "Lăn búa lạnh dịu da", "Đấp nạ chuyên phục hồi"],
+      "flagged_claims": ["Phục hồi liên kết collagen và elastine giúp cơ cổ/mặt săn chắc, đều màu, ấn huyệt dẫn lưu đào thải khí tắt nghẽn", "Dịch chiết tế bào gốc"],
+      "images": ["sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/12.png", "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/13.png"],
+      "verified_by": ["audit:facial", "verify:confirmed", "synthesis:reread"],
+      "note": "Khách chọn 1 trong: 'Chăm sóc da mụn, thu nhỏ lỗ chân lông, sáng màu' hoặc 'Chăm sóc nếp nhăn, nâng cơ'."
+    },
+    {
+      "kind": "service",
+      "service_id": null,
+      "suggested_id": "lan-duong",
+      "group": "skin",
+      "name_on_image": "Lăn dưỡng",
+      "variants": [
+        {"duration_min": 60, "duration_max": null, "duration_printed": "60 phút", "price_vnd": 1500000, "time_window": null, "condition_note": "Mức 'Da cần làm dày sừng'."},
+        {"duration_min": 60, "duration_max": null, "duration_printed": "60 phút", "price_vnd": 2500000, "time_window": null, "condition_note": "Mức 'Giảm mụn, sẹo / nám, nếp nhăn'."}
+      ],
+      "process_steps_vi": ["Vệ sinh da", "Sử dụng Cleanser Snow O₂ sạch sâu", "Sát khuẩn", "Lăn dưỡng", "Lăn búa lạnh dịu da", "Đấp nạ chuyên dụng phục hồi"],
+      "flagged_claims": ["Ứng dụng kĩ thuật tái tạo sừng giúp phục hồi cấu trúc da suy, tạo lớp bảo vệ hoàn hảo, đều màu, thu nhỏ lỗ chân lông, giảm sẹo nhẹ"],
+      "images": ["sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/14.png", "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/15.png"],
+      "verified_by": ["audit:facial", "verify:confirmed", "synthesis:reread"],
+      "note": "Phiên dựng video học viện đã bỏ dịch vụ này vì nghi cần giấy phép y tế; chưa ai kiểm quy định."
+    },
+    {
+      "kind": "service",
+      "service_id": null,
+      "suggested_id": "inner-fill-nang-cap-da",
+      "group": "skin",
+      "name_on_image": "Inner Fill nâng cấp da",
+      "variants": [
+        {"duration_min": 60, "duration_max": 75, "duration_printed": "60 - 75 phút", "price_vnd": 6500000, "time_window": null, "condition_note": "Khách chọn 1 trong: 'Chăm sóc da mụn, thu nhỏ lỗ chân lông, sáng màu' hoặc 'Chăm sóc đốm nâu, nếp nhăn, nâng cơ'."}
+      ],
+      "process_steps_vi": ["Vệ sinh da", "Sử dụng Cleanser Snow O₂ sạch sâu", "Sát khuẩn", "Inner fill hoạt chất theo chỉ định", "Lăn búa lạnh dịu da", "Đấp nạ chuyên dụng phục hồi"],
+      "flagged_claims": ["Inner fill hoạt chất theo chỉ định"],
+      "images": ["sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/16.png", "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/17.png"],
+      "verified_by": ["audit:facial", "verify:confirmed"],
+      "note": "Ảnh không nói hoạt chất đưa vào da bằng cách nào; chatbot không được đoán. Đây là mức giá một buổi cao nhất thấy trên ảnh."
+    },
+    {
+      "kind": "service",
+      "service_id": null,
+      "suggested_id": "bio-pdrn",
+      "group": "skin",
+      "name_on_image": "Bio PDRN Nuôi da căng bóng",
+      "variants": [
+        {"duration_min": 60, "duration_max": null, "duration_printed": "60 phút", "price_vnd": 2500000, "time_window": null, "condition_note": null}
+      ],
+      "process_steps_vi": ["Vệ sinh da", "Sử dụng Cleanser Snow O₂ sạch sâu", "Massage mặt tinh thể nước/ nặn mụn", "Vỗ tinh chất Bio PDRN", "Lăn búa lạnh dịu da", "Nạ chuyên dụng phục hồi"],
+      "flagged_claims": ["Có hiệu quả trong việc điều trị mụn trứng cá và sắc tố. Cải thiện màu da, kết cấu da. Tăng cường độ đàn hồi cho da."],
+      "images": ["sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/18.png", "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/19.png"],
+      "verified_by": ["audit:facial", "verify:confirmed", "synthesis:reread"]
+    },
+    {
+      "kind": "service",
+      "service_id": null,
+      "suggested_id": "bio-pdrn-full",
+      "group": "skin",
+      "name_on_image": "Bio PDRN Nuôi da căng bóng full",
+      "variants": [
+        {"duration_min": 90, "duration_max": null, "duration_printed": "90 phút", "price_vnd": 5000000, "time_window": null, "condition_note": null}
+      ],
+      "process_steps_vi": ["Tẩy trang", "Sử dụng Cleanser Snow O₂", "Sử dụng kem massage nước", "Sử dụng mặt nạ EZ CO₂ (Carboxy Therapy)", "Sử dụng tinh chất Bio PDRN", "Sử dụng mặt nạ chuyên dụng", "Sử dụng kem phục hồi làm dịu", "Xịt khoáng vi sinh", "Bắn trẻ hoá IPL"],
+      "flagged_claims": ["Có hiệu quả trong việc điều trị mụn trứng cá và sắc tố. Cải thiện màu da, kết cấu da. Tăng cường độ đàn hồi cho da.", "Sử dụng mặt nạ EZ CO₂ (Carboxy Therapy)", "Bắn trẻ hoá IPL"],
+      "images": ["sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/20.png", "sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/21.png"],
+      "verified_by": ["audit:facial", "verify:confirmed", "synthesis:reread"],
+      "note": "Có bước IPL; chưa ai tra quy định về việc spa dùng máy IPL."
+    },
+    {
+      "kind": "service",
+      "service_id": null,
+      "suggested_id": "peel-peptide-da-dau",
+      "group": "hair",
+      "name_on_image": "Peel peptide da đầu (tiêu đề quy trình 12.png in 'Peel da đầu')",
+      "variants": [
+        {"duration_min": 15, "duration_max": null, "duration_printed": "15 phút", "price_vnd": 299000, "time_window": null, "condition_note": null}
+      ],
+      "process_steps_vi": ["Chải dụng cụ kích hoạt nan tóc", "Peel hoạt chất vào vùng da đầu cần chăm sóc", "Điện tim sát khuẩn"],
+      "flagged_claims": ["tác nhân gây rụng ẩn sâu trong tế bào", "những cơn ngứa và tình trạng da đầu mẩn đỏ, nhạy cảm", "kích hoạt nan tóc", "sát khuẩn"],
+      "images": ["sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/10.png", "sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/11.png", "sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/12.png"],
+      "verified_by": ["audit:thugian-hairremoval", "verify:confirmed", "synthesis:reread"],
+      "note": "'Điện tim' in không dấu sắc; có thể là 'điện tím' (suy luận). Bản chép batch-05 chỉ có 9 slide nên slide 10-14 chưa từng được chép."
+    },
+    {
+      "kind": "service",
+      "service_id": null,
+      "suggested_id": "triet-long",
+      "group": "hair_removal",
+      "name_on_image": "Triệt lông",
+      "variants": [
+        {"package": "SUẤT LẺ", "zone": "Nách", "duration_min": null, "price_vnd": 150000, "time_window": null},
+        {"package": "SUẤT LẺ", "zone": "Mép - Cằm - Trán", "duration_min": null, "price_vnd": 100000, "time_window": null},
+        {"package": "SUẤT LẺ", "zone": "Viền bi - Ngực", "duration_min": null, "price_vnd": 180000, "time_window": null},
+        {"package": "SUẤT LẺ", "zone": "Mặt - Tay - Cổ - Nữa Chân", "duration_min": null, "price_vnd": 290000, "time_window": null},
+        {"package": "SUẤT LẺ", "zone": "Bikini - Chân - Bụng - Lưng", "duration_min": null, "price_vnd": 340000, "time_window": null},
+        {"package": "SUẤT LẺ", "zone": "Full body", "duration_min": null, "price_vnd": 1800000, "time_window": null},
+        {"package": "COMBO - 20 Buổi", "zone": "Nách", "duration_min": null, "price_vnd": 2000000, "time_window": null, "condition_note": "Năm dòng combo khác bằng (gần) 10 lần giá suất lẻ; dòng này là 13,3 lần. Phép tính quan sát, chưa phải bằng chứng in sai; chatbot báo đúng số trên ảnh cho tới khi chủ doanh nghiệp xác nhận."},
+        {"package": "COMBO - 20 Buổi", "zone": "Mép - Cằm - Trán", "duration_min": null, "price_vnd": 999000, "time_window": null},
+        {"package": "COMBO - 20 Buổi", "zone": "Viền bi - Ngực", "duration_min": null, "price_vnd": 1800000, "time_window": null},
+        {"package": "COMBO - 20 Buổi", "zone": "Mặt - Tay - Cổ - Nữa Chân", "duration_min": null, "price_vnd": 2900000, "time_window": null},
+        {"package": "COMBO - 20 Buổi", "zone": "Bikini - Chân - Bụng - Lưng", "duration_min": null, "price_vnd": 3400000, "time_window": null},
+        {"package": "COMBO - 20 Buổi", "zone": "Full body", "duration_min": null, "price_vnd": 18000000, "time_window": null}
+      ],
+      "process_steps_vi": [],
+      "flagged_claims": [],
+      "images": ["sources/drive-resources/thomhouse-menu/hair-removal-triet-long/1.png", "sources/drive-resources/thomhouse-menu/hair-removal-triet-long/2.png"],
+      "verified_by": ["audit:thugian-hairremoval", "verify:confirmed", "synthesis:reread"],
+      "note": "Ảnh không in thời lượng, khung giờ, tên máy, quy trình hay lưu ý. Ảnh không nói giá mỗi dòng tính cho từng vùng hay cả nhóm vùng. 'Nữa Chân' chép đúng ảnh (cách viết thường gặp là 'nửa chân'). Trang landing page có suất lẻ nhưng không có combo 20 buổi (research/13). Chatbot không được nói triệt vĩnh viễn hay nêu loại máy."
+    },
+    {
+      "kind": "add_on_option",
+      "service_id": null,
+      "suggested_id": "option-detox-da-dau",
+      "group": "hair",
+      "name_on_image": "DETOX DA ĐẦU (option)",
+      "variants": [{"duration_min": null, "price_vnd": 50000, "printed": "50,000 VNĐ (không có dấu cộng, không có thời lượng)", "time_window": null}],
+      "flagged_claims": [],
+      "images": ["sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/14.png"],
+      "verified_by": ["audit:thugian-hairremoval", "verify:confirmed", "synthesis:reread"],
+      "note": "Trùng tên với dịch vụ detox-da-dau (40 phút, 139.000/159.000). Phải đặt tên riêng để chatbot không báo nhầm 50.000 cho dịch vụ 40 phút. Slide không nói option cộng vào dịch vụ nào."
+    },
+    {
+      "kind": "add_on_option",
+      "service_id": null,
+      "suggested_id": "option-massage-mat",
+      "group": "hair",
+      "name_on_image": "MASSAGE MẶT (option)",
+      "variants": [{"duration_min": 10, "price_vnd": 50000, "printed": "10 phút: +50,000 VNĐ", "time_window": null}],
+      "flagged_claims": ["giảm căng thẳng"],
+      "images": ["sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/14.png"],
+      "verified_by": ["audit:thugian-hairremoval", "verify:confirmed", "synthesis:reread"]
+    },
+    {
+      "kind": "add_on_option",
+      "service_id": null,
+      "suggested_id": "option-massage-tay",
+      "group": "hair",
+      "name_on_image": "MASSAGE TAY (option)",
+      "variants": [{"duration_min": 10, "price_vnd": 50000, "printed": "10 phút: +50,000 VNĐ", "time_window": null}],
+      "flagged_claims": ["giảm căng thẳng, tê mỏi tay, kích thích lưu thông máu"],
+      "images": ["sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/14.png"],
+      "verified_by": ["audit:thugian-hairremoval", "verify:confirmed", "synthesis:reread"]
+    },
+    {
+      "kind": "add_on_option",
+      "service_id": null,
+      "suggested_id": "option-massage-co-vai-gay",
+      "matched_service_id": "massage-co-vai-gay",
+      "group": "hair",
+      "name_on_image": "MASSAGE CỔ, VAI, GÁY (option)",
+      "variants": [{"duration_min": 30, "price_vnd": 199000, "printed": "30 phút: +199,000 VNĐ", "time_window": null}],
+      "flagged_claims": ["Giảm đau cổ vai gáy", "cải thiện lưu thông máu"],
+      "images": ["sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/14.png"],
+      "verified_by": ["audit:thugian-hairremoval", "verify:confirmed", "synthesis:reread"],
+      "note": "Dịch vụ riêng cùng tên: 199.000 trước 20h30, 239.000 sau 20h30. Ảnh option không nói giá sau 20h30."
+    },
+    {
+      "kind": "add_on_option",
+      "service_id": null,
+      "suggested_id": "option-massage-chan",
+      "matched_service_id": "massage-chan",
+      "group": "hair",
+      "name_on_image": "MASSAGE CHÂN (option)",
+      "variants": [{"duration_min": 30, "price_vnd": 199000, "printed": "30 phút: +199,000 VNĐ", "time_window": null}],
+      "flagged_claims": ["cải thiện giấc ngủ"],
+      "images": ["sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/14.png"],
+      "verified_by": ["audit:thugian-hairremoval", "verify:confirmed", "synthesis:reread"],
+      "note": "Giá khớp massage-chan 30 phút 199.000 (khung 09:00-24:00)."
+    },
+    {
+      "kind": "mask_product",
+      "service_id": null,
+      "suggested_id": "mask-toc-bo-ket",
+      "group": "hair",
+      "name_on_image": "Mặt nạ tóc Bồ kết (Mask collection)",
+      "variants": [{"duration_min": null, "price_vnd": 60000, "time_window": null}],
+      "flagged_claims": ["Dưỡng tóc chắc khỏe, giảm gãy rụng"],
+      "images": ["sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/13.png"],
+      "verified_by": ["audit:thugian-hairremoval", "verify:confirmed"],
+      "note": "Ảnh không nói đây là hàng bán lẻ hay bước thêm trong dịch vụ."
+    },
+    {
+      "kind": "mask_product",
+      "service_id": null,
+      "suggested_id": "mask-deo-collagen",
+      "group": "hair",
+      "name_on_image": "Mặt nạ cho mặt Mask dẻo Hàn Quốc Collagen (Mask collection)",
+      "variants": [{"duration_min": null, "price_vnd": 50000, "time_window": null}],
+      "flagged_claims": ["cấp ẩm sâu, tăng đàn hồi"],
+      "images": ["sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/13.png"],
+      "verified_by": ["audit:thugian-hairremoval", "verify:confirmed"]
+    },
+    {
+      "kind": "mask_product",
+      "service_id": null,
+      "suggested_id": "mask-phuc-hoi-pdrn",
+      "group": "hair",
+      "name_on_image": "Mặt nạ Phục hồi PDRN (Mask collection)",
+      "variants": [{"duration_min": null, "price_vnd": 90000, "time_window": null}],
+      "flagged_claims": ["Phục hồi và tái tạo da, làm dịu tổn thương"],
+      "images": ["sources/drive-resources/thomhouse-menu/thu-gian-cham-soc-toc/13.png"],
+      "verified_by": ["audit:thugian-hairremoval", "verify:confirmed"],
+      "note": "Slide 13 còn in bốn nhãn chung cho cả bộ mặt nạ: 'Lành tính an toàn', 'Nguyên liệu chọn lọc', 'Không chứa paraben', 'Cho mọi loại da & tóc'. Chatbot không nhắc lại các nhãn này."
+    }
+  ],
+  "new_services_counts": {
+    "services": 10,
+    "service_variants": 23,
+    "add_on_options": 5,
+    "mask_products": 3
+  },
+  "checker_followups": [
+    {
+      "file": "apps/server/src/checker/index.ts",
+      "line": 12,
+      "issue": "FORBIDDEN_TERMS có 'gấp 20 lần' nhưng không có 'gấp 10 lần'; ảnh menu da 9.png in 'gấp 10 lần'. Đề xuất chặn theo mẫu 'gấp' + số + 'lần'."
+    },
+    {
+      "file": "apps/server/src/checker/index.ts",
+      "line": 11,
+      "issue": "Chưa có 'lâm sàng'. Ảnh 11.png in 'Lâm sàn' (thiếu g); checker so khớp sau khi bỏ dấu, nên cần chặn cả hai cách viết."
+    },
+    {
+      "file": "apps/server/src/checker/index.ts",
+      "line": 12,
+      "issue": "'thải độc' đã bị chặn; bước 7 của dien-chan-ngua-dot-quy ('Thải độc và phong tán hàn ra bàn chân') sẽ làm bản nháp bị chặn nếu chatbot đọc nguyên văn các bước."
+    },
+    {
+      "file": "apps/server/test/core-checker.test.ts",
+      "line": 11,
+      "issue": "Dùng chuỗi 'Diện chẩn ngừa đột quỵ'; phải sửa nếu đổi name_vi."
+    },
+    {
+      "file": "apps/server/src/seed-data.ts",
+      "line": 1,
+      "issue": "File sinh từ data/services.json; sau khi áp dụng phải chạy apps/server/scripts/gen-seed-data.mjs. Chưa chạy."
+    }
+  ],
+  "business_facts_evidence": [
+    {
+      "fact": "address",
+      "observation": "Mọi ảnh menu in có in địa chỉ đều ghi '72 đường số 37 , phường Tân Hưng quận 7' (ảnh menu da 6.png có thêm dấu phẩy trước 'quận 7'); không ảnh nào ghi Tân Kiểng.",
+      "images": ["sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/6.png", "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/1.png"],
+      "verified_by": ["audit:facial", "audit:healing", "verify:confirmed", "synthesis:reread"]
+    },
+    {
+      "fact": "business_name",
+      "observation": "21 ảnh menu da in header 'thom house facial studio -Since 2019'; các menu khác in 'thom house healing studio -Since 2019'.",
+      "images": ["sources/drive-resources/thomhouse-menu/facial-cham-soc-da-co-ban/1.png", "sources/drive-resources/thomhouse-menu/healing-giup-ban-khoe/17.png"],
+      "verified_by": ["audit:facial", "verify:confirmed", "synthesis:reread"]
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+# Numbers that make_release.py accepts in a shipped file although they look like a Vietnamese phone number or a
+# Zalo id (docs/contracts.md 16.2.2 step 5). One SHA-256 of the exact matched text per line, then a comment. The
+# number itself is never written here. Checked 2026-11-12 against the allowlisted files.
+20faf05baccf8a477fa337b77c0acb0e8bff77f34664feec6a057bd3cf23235b  example number 091...78 (apps/console/src/labels.ts, scripts/contact_facts_rules.py)
+d99c7a104575ba7f7ec183dc043b8d1c44ebc2c0acc34869bd00fb2e851c8122  example number 090...67 (apps/console labels and customer card, apps/server customers API docs)

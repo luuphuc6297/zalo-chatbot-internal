@@ -1,0 +1,285 @@
+{
+ "analyzer_version": "visits-rules-v1",
+ "generated_at": 1794481021790,
+ "since": null,
+ "owner_id": "1000000009",
+ "contacts": 4,
+ "skipped": {
+  "family": 1
+ },
+ "model": {
+  "enabled": false,
+  "scope": null,
+  "customers_sent": 0,
+  "calls": 0
+ },
+ "customers": [
+  {
+   "zalo_user_id": "p:5550002001",
+   "relationship": "customer",
+   "relationship_confidence": "high",
+   "messages": 14,
+   "first_at": 1793242800000,
+   "last_at": 1794402300000,
+   "visits": [
+    {
+     "date": "2026-10-31",
+     "time": "15:00",
+     "time_known": true,
+     "visited_at_local": "2026-10-31 15:00",
+     "services": [
+      {
+       "service_id": "goi-dau-thu-gian",
+       "service_name": "Gội đầu thư giãn",
+       "basis": "booking"
+      }
+     ],
+     "amount_vnd": 199000,
+     "amount_source": "paid",
+     "technician": "Lan",
+     "confidence": "high",
+     "signals": [
+      "booking_request",
+      "booking_confirmed",
+      "arrival",
+      "payment",
+      "after_visit"
+     ],
+     "evidence_at": [
+      1793243100000,
+      1793433300000,
+      1793439000000,
+      1793439300000,
+      1793498400000
+     ],
+     "source": "chat_rules"
+    },
+    {
+     "date": "2026-11-05",
+     "time": "10:00",
+     "time_known": true,
+     "visited_at_local": "2026-11-05 10:00",
+     "services": [
+      {
+       "service_id": "massage-body-thu-gian",
+       "service_name": "Massage body thư giãn",
+       "basis": "booking"
+      },
+      {
+       "service_id": null,
+       "service_name": "gội đầu",
+       "basis": "visit_day"
+      }
+     ],
+     "amount_vnd": 350000,
+     "amount_source": "paid",
+     "technician": null,
+     "confidence": "high",
+     "signals": [
+      "booking_request",
+      "booking_confirmed",
+      "arrival",
+      "payment"
+     ],
+     "evidence_at": [
+      1793757600000,
+      1793758200000,
+      1793847300000,
+      1793853300000
+     ],
+     "source": "chat_rules"
+    }
+   ],
+   "upcoming": [
+    {
+     "date": "2026-11-17",
+     "time": "09:00",
+     "time_known": true,
+     "visited_at_local": "2026-11-17 09:00",
+     "services": [
+      {
+       "service_id": null,
+       "service_name": "gội đầu",
+       "basis": "booking"
+      }
+     ],
+     "amount_vnd": null,
+     "amount_source": null,
+     "technician": null,
+     "signals": [
+      "booking_request",
+      "booking_confirmed"
+     ],
+     "evidence_at": [
+      1794402000000,
+      1794402300000
+     ],
+     "source": "chat_rules"
+    }
+   ],
+   "phone": {
+    "value": "0912345678",
+    "confidence": "high",
+    "source": "chat",
+    "at": 1793500200000
+   },
+   "benefits": [
+    {
+     "kind": "package",
+     "title": "Gói 10 buổi – Gội đầu",
+     "service_id": null,
+     "total_count": 10,
+     "remaining": 7,
+     "stated_by": "owner",
+     "confidence": "high",
+     "at": 1793854800000
+    }
+   ],
+   "model_pass": {
+    "ran": false,
+    "reason": "disabled"
+   }
+  },
+  {
+   "zalo_user_id": "p:5550002002",
+   "relationship": "customer",
+   "relationship_confidence": "high",
+   "messages": 9,
+   "first_at": 1793584800000,
+   "last_at": 1794189600000,
+   "visits": [
+    {
+     "date": "2026-11-08",
+     "time": "16:00",
+     "time_known": true,
+     "visited_at_local": "2026-11-08 16:00",
+     "services": [
+      {
+       "service_id": "massage-chan",
+       "service_name": "Massage chân",
+       "basis": "booking"
+      }
+     ],
+     "amount_vnd": null,
+     "amount_source": null,
+     "technician": null,
+     "confidence": "high",
+     "signals": [
+      "booking_request",
+      "booking_confirmed",
+      "arrival",
+      "after_visit"
+     ],
+     "evidence_at": [
+      1794103200000,
+      1794103500000,
+      1794128280000,
+      1794189600000
+     ],
+     "source": "chat_rules"
+    }
+   ],
+   "upcoming": [],
+   "phone": {
+    "value": "0987654321",
+    "confidence": "high",
+    "source": "zalo_contact",
+    "at": null
+   },
+   "benefits": [],
+   "model_pass": {
+    "ran": false,
+    "reason": "disabled"
+   }
+  },
+  {
+   "zalo_user_id": "p:5550002003",
+   "relationship": "customer",
+   "relationship_confidence": "high",
+   "messages": 3,
+   "first_at": 1793930400000,
+   "last_at": 1793932200000,
+   "visits": [
+    {
+     "date": "2026-11-08",
+     "time": "14:00",
+     "time_known": true,
+     "visited_at_local": "2026-11-08 14:00",
+     "services": [
+      {
+       "service_id": "massage-body-thu-gian",
+       "service_name": "Massage body thư giãn",
+       "basis": "booking"
+      }
+     ],
+     "amount_vnd": 350000,
+     "amount_source": "quoted",
+     "technician": null,
+     "confidence": "low",
+     "signals": [
+      "booking_request"
+     ],
+     "evidence_at": [
+      1793932200000
+     ],
+     "source": "chat_rules"
+    }
+   ],
+   "upcoming": [],
+   "phone": null,
+   "benefits": [],
+   "model_pass": {
+    "ran": false,
+    "reason": "disabled"
+   }
+  },
+  {
+   "zalo_user_id": "p:5550002004",
+   "relationship": "customer",
+   "relationship_confidence": "high",
+   "messages": 4,
+   "first_at": 1793674800000,
+   "last_at": 1793770200000,
+   "visits": [
+    {
+     "date": "2026-11-04",
+     "time": "11:00",
+     "time_known": true,
+     "visited_at_local": "2026-11-04 11:00",
+     "services": [
+      {
+       "service_id": "goi-dau-thu-gian",
+       "service_name": "Gội đầu thư giãn",
+       "basis": "booking"
+      }
+     ],
+     "amount_vnd": 199000,
+     "amount_source": "paid",
+     "technician": null,
+     "confidence": "high",
+     "signals": [
+      "booking_request",
+      "booking_confirmed",
+      "arrival",
+      "after_visit",
+      "payment"
+     ],
+     "evidence_at": [
+      1793674800000,
+      1793675100000,
+      1793764500000,
+      1793770200000
+     ],
+     "source": "chat_rules"
+    }
+   ],
+   "upcoming": [],
+   "phone": null,
+   "benefits": [],
+   "model_pass": {
+    "ran": false,
+    "reason": "disabled"
+   }
+  }
+ ]
+}

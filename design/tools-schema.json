@@ -1,0 +1,385 @@
+{
+  "_meta": {
+    "title": "thom house Zalo assistant - Claude tool definitions (draft)",
+    "status": "draft_unapproved",
+    "written_on": "2026-11-07",
+    "model": "claude-opus-5-5",
+    "how_to_use": "Send the objects in `tools` (in this exact order, byte-stable) as the `tools` parameter of POST /v1/messages. Strip nothing else: each object already contains only API fields (name, description, input_schema, strict). Server-side policy for each tool lives in `x_server_policy` and must NOT be sent to the API.",
+    "api_notes": [
+      "Opus 5.5 rejects tool_choice {type: any} and {type: tool}; use tool_choice {type: auto} and steer from the system prompt (claude-api skill, shared/tool-use-concepts.md, read 2026-11-07).",
+      "strict: true requires additionalProperties: false on every object; numeric constraints (minimum/maximum) and string constraints (minLength/maxLength/pattern) are not supported in strict mode, so the server validates ranges itself.",
+      "Tools render first in the prompt-cache prefix (tools -> system -> messages). Never reorder, add or remove tools per request; a change invalidates the whole cache.",
+      "Not yet run against the API: schemas were checked only with `python3 -m json.tool` locally."
+    ],
+    "price_format": "All money amounts returned by tools carry both price_vnd (integer) and price_text (string, Vietnamese format '350.000đ'). The model must copy price_text verbatim.",
+    "catalog_versioning": "Every read tool returns catalog_version_id. The server stores it on the drafted message so staff can trace which approved price list a reply used (see research/06-architecture.md, table catalog_versions)."
+  },
+  "tools": [
+    {
+      "name": "search_services",
+      "description": "Search the approved thom house service catalog. Call this whenever the customer asks what services exist, asks about a menu group (thư giãn / khỏe / phụ nữ / da / tóc), names a service loosely or with typos or without diacritics (e.g. 'goi dau', 'massage co vai gay', 'mun 5in1'), or describes a need you want to match to services. Returns matching services with their group, approved display name, durations and price variants from the ACTIVE catalog version. Use group filter to list a whole menu: when listing a menu you must list every service returned, never a subset. Prices in the result are the only prices you may state; never state a price you did not get from a tool result in this conversation.",
+      "strict": true,
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Free text in the customer's words, Vietnamese with or without diacritics. Use an empty string when you only filter by group."
+          },
+          "group": {
+            "type": "string",
+            "enum": ["any", "relaxation", "health", "women", "skin", "hair"],
+            "description": "Menu group. relaxation = menu thư giãn, health = menu khỏe (y học cổ truyền), women = menu chăm sóc sức khỏe phụ nữ, skin = menu da, hair = menu tóc. Use 'any' when unsure."
+          },
+          "include_prices": {
+            "type": "boolean",
+            "description": "true when you will mention prices in your reply."
+          }
+        },
+        "required": ["query", "group", "include_prices"]
+      }
+    },
+    {
+      "name": "get_service_details",
+      "description": "Get the approved details of ONE service: display name, group, durations, price variants with time windows, approved process steps, approved short description, approved cautions, combo or gift information and data-status flags. Call this before you explain how a service is done (quy trình, các bước), before you describe what a service includes, and before you mention cautions. If a field comes back empty or with status 'missing' or 'unapproved', do not fill the gap from your own knowledge: say the studio's staff will explain that part, and offer handoff_to_staff if the customer wants it now.",
+      "strict": true,
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "service_id": {
+            "type": "string",
+            "description": "Service id exactly as returned by search_services, e.g. 'goi-dau-thu-gian'."
+          }
+        },
+        "required": ["service_id"]
+      }
+    },
+    {
+      "name": "quote_price",
+      "description": "Compute the price of one service for a given duration and start time. The server applies the approved price rules deterministically (day window 09:00-20:30, night window 'sau 20h30', single-price services, foot massage single window 09:00-24:00). Call this whenever the customer asks how much a service costs at a specific time or day, changes the duration (e.g. 60 -> 75 phút), or asks about evening or late-night prices. If the result has status 'ambiguous', give the customer every candidate price with its condition and say staff will confirm; never pick one yourself. If status is 'invalid_duration', tell the customer which durations exist. If status is 'outside_known_hours' or 'hours_unconfirmed', do not promise the studio is open at that time.",
+      "strict": true,
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "service_id": {
+            "type": "string",
+            "description": "Service id from search_services."
+          },
+          "duration_min": {
+            "type": "integer",
+            "description": "Requested duration in minutes. Use 0 when the customer did not say and the service has more than one duration; the server then returns all durations."
+          },
+          "start_time_local": {
+            "type": "string",
+            "description": "Requested start time in Asia/Ho_Chi_Minh as HH:MM (24h), e.g. '20:30'. Convert phrases: '8h tối' -> '20:00', '8 rưỡi tối' -> '20:30', '9h sáng' -> '09:00'. Use 'unknown' when no time was given."
+          },
+          "date_local": {
+            "type": "string",
+            "description": "Requested date as YYYY-MM-DD in Asia/Ho_Chi_Minh, resolved from the current date given in the conversation context ('mai', 'thứ 7 này'). Use 'unknown' when no date was given."
+          }
+        },
+        "required": ["service_id", "duration_min", "start_time_local", "date_local"]
+      }
+    },
+    {
+      "name": "list_active_promotions",
+      "description": "List promotions that the studio owner has APPROVED and that are valid right now. Call this only when the customer asks about ưu đãi, khuyến mãi, giảm giá, voucher, combo, quà tặng, or asks for a discount. Never invent, extend, combine or negotiate a promotion; quote the approved wording and conditions exactly. If the list is empty, say there is no program at the moment and do not offer any discount. Do not call this to push promotions on customers who did not ask.",
+      "strict": true,
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "service_id": {
+            "type": "string",
+            "description": "Service id if the customer asked about one service; 'any' otherwise."
+          }
+        },
+        "required": ["service_id"]
+      }
+    },
+    {
+      "name": "create_booking_request",
+      "description": "Record a booking REQUEST for staff to confirm. This does not reserve a slot and the studio has no availability data, so after calling it you must say the request was received and staff will confirm the time; never say the booking is confirmed, held or guaranteed. Call it only when you have: a service (or 'chua_chon' if the customer wants staff to advise), a preferred date, a preferred time or time window, the number of people, a name to address the customer, and EITHER the customer's explicit agreement to share a phone number in this chat OR the customer's choice to be contacted only through this Zalo chat. Ask for missing items one or two at a time. Do not call it if the conversation contains an unresolved red flag (pregnancy, recent birth, illness, medication, surgery, skin lesion, adverse reaction, minor); use handoff_to_staff instead.",
+      "strict": true,
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "service_ids": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "One or more service ids from search_services, or ['chua_chon'] when the customer wants staff to recommend."
+          },
+          "duration_min": {
+            "type": "integer",
+            "description": "Chosen duration in minutes for the first service; 0 if not chosen."
+          },
+          "preferred_date_local": {
+            "type": "string",
+            "description": "YYYY-MM-DD in Asia/Ho_Chi_Minh."
+          },
+          "preferred_time_window": {
+            "type": "string",
+            "description": "Customer's preferred start time or window as HH:MM or HH:MM-HH:MM, e.g. '19:00' or '18:00-20:00'."
+          },
+          "party_size": {
+            "type": "integer",
+            "description": "Number of people. Server rejects values below 1 or above 6 (groups above 6 go to staff)."
+          },
+          "customer_name": {
+            "type": "string",
+            "description": "Name the customer gave for the booking, as written by the customer."
+          },
+          "contact_method": {
+            "type": "string",
+            "enum": ["zalo_chat_only", "phone_shared_with_consent"],
+            "description": "zalo_chat_only = staff reply in this Zalo chat. phone_shared_with_consent = customer typed a phone number and agreed it may be used to confirm the booking."
+          },
+          "phone": {
+            "type": "string",
+            "description": "Vietnamese phone number exactly as typed by the customer; empty string when contact_method is zalo_chat_only. Never copy a number that appears anywhere except the customer's own message."
+          },
+          "notes_for_staff": {
+            "type": "string",
+            "description": "Short neutral note in Vietnamese, e.g. 'khách muốn KTV nữ', 'đi 2 người, 1 người gội đầu 1 người massage chân'. Do not write health details here; health details go through handoff_to_staff."
+          },
+          "price_quoted_text": {
+            "type": "string",
+            "description": "The exact price_text you gave the customer from quote_price, or empty string."
+          }
+        },
+        "required": [
+          "service_ids",
+          "duration_min",
+          "preferred_date_local",
+          "preferred_time_window",
+          "party_size",
+          "customer_name",
+          "contact_method",
+          "phone",
+          "notes_for_staff",
+          "price_quoted_text"
+        ]
+      }
+    },
+    {
+      "name": "handoff_to_staff",
+      "description": "Hand the conversation to a human staff member and stop answering the topic yourself. Call this when: the customer asks for a human (gặp nhân viên, người thật, tư vấn viên); any red flag appears (pregnancy, postpartum, chronic or serious illness, medication, recent surgery, skin lesions or wounds, a reaction after a session, a likely minor); the customer asks whether a service suits a specific medical condition; a complaint, refund, cancellation, rescheduling or payment question; harassment or sexual requests; a request about personal data (xem, sửa, xóa dữ liệu, rút đồng ý); a question you cannot answer from tool results or approved facts; a price status 'ambiguous' the customer wants settled now; groups above 6 people. After calling it, send the customer one short message saying a staff member will reply, without promising a response time unless the tool result gives one.",
+      "strict": true,
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "reason_code": {
+            "type": "string",
+            "enum": [
+              "customer_requested_human",
+              "pregnancy",
+              "postpartum",
+              "chronic_or_serious_condition",
+              "medication",
+              "recent_surgery",
+              "skin_lesion_or_wound",
+              "adverse_reaction_after_visit",
+              "possible_minor",
+              "medical_suitability_question",
+              "complaint",
+              "refund_or_payment",
+              "reschedule_or_cancel",
+              "harassment_or_inappropriate",
+              "data_rights_request",
+              "unknown_answer",
+              "price_ambiguity",
+              "large_group",
+              "emergency_symptoms",
+              "other"
+            ]
+          },
+          "urgency": {
+            "type": "string",
+            "enum": ["urgent", "normal"],
+            "description": "urgent for adverse_reaction_after_visit, emergency_symptoms, harassment_or_inappropriate, complaint. normal otherwise."
+          },
+          "summary_for_staff": {
+            "type": "string",
+            "description": "Two to four neutral Vietnamese sentences: what the customer wants, what you already told them (including any price_text), what is unresolved. Quote the customer's own words for health details; do not interpret or diagnose."
+          }
+        },
+        "required": ["reason_code", "urgency", "summary_for_staff"]
+      }
+    },
+    {
+      "name": "record_contact_preference",
+      "description": "Record that the customer wants to STOP receiving a kind of message, or wants to be asked for consent to receive one. Call it immediately when the customer says things like 'đừng nhắn nữa', 'không nhận tin khuyến mãi', 'huỷ đăng ký', 'stop', 'ngung', 'thôi khỏi hỏi thăm'. You cannot grant consent yourself: when the customer says they want promotions or follow-up messages, use action 'request_opt_in' and the server sends the official consent message with buttons. Never argue with or delay an opt-out.",
+      "strict": true,
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "preference_type": {
+            "type": "string",
+            "enum": ["promotions", "followup_care", "all_proactive_messages", "ai_assistant"],
+            "description": "promotions = tin khuyến mãi, mời quay lại. followup_care = tin cảm ơn và hỏi thăm sau buổi làm. all_proactive_messages = mọi tin OA chủ động gửi. ai_assistant = customer no longer wants to chat with the AI assistant (server routes the chat to staff)."
+          },
+          "action": {
+            "type": "string",
+            "enum": ["opt_out", "request_opt_in"]
+          },
+          "customer_words": {
+            "type": "string",
+            "description": "The customer's own words that triggered this call, copied verbatim from their latest message."
+          }
+        },
+        "required": ["preference_type", "action", "customer_words"]
+      }
+    },
+    {
+      "name": "attach_menu_images",
+      "description": "Attach thom house menu images (slides of the printed menu) to this reply. Use it when the customer asks to see the menu, the price list or pictures of a service ('cho xem menu', 'gửi bảng giá', 'có hình không'). group 'overview' attaches the cover of each menu; a group name attaches that menu's price slides (for 'xem menu cụ thể'); service_id attaches the slides of one catalog service. The server picks the slides; slides that print health claims are refused and only staff can send them. The images are sent after your text once staff approve; keep the text short, say you are sending the menu image(s), and still quote prices only from quote_price. Call it at most twice per reply; at most 10 images go out.",
+      "strict": true,
+      "input_schema": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "group": {
+            "type": "string",
+            "enum": ["none", "overview", "facial", "healing", "thu-gian-toc", "hair-removal"],
+            "description": "overview = bìa của cả 4 menu. facial = menu chăm sóc da cơ bản (skin). healing = menu giúp bạn khỏe (health). thu-gian-toc = menu thư giãn và chăm sóc tóc (hair). hair-removal = menu triệt lông (not in the catalog: do not quote these prices). Use 'none' when you pass a service_id."
+          },
+          "service_id": {
+            "type": "string",
+            "description": "Catalog service id from search_services when the customer asks about one service, e.g. 'goi-dau-thu-gian'. Use 'none' when you pass a group."
+          }
+        },
+        "required": ["group", "service_id"]
+      }
+    },
+    {
+      "name": "get_customer_profile",
+      "description": "Đọc hồ sơ của khách trong cuộc trò chuyện hiện tại: cách xưng hô, trạng thái khách, lần đến gần nhất, nhịp quay lại, dịch vụ thường dùng, mức chi và quyền lợi chưa dùng. Không cần tham số. Số tiền chỉ để cân nhắc cách tư vấn, không được nêu với khách.",
+      "strict": true,
+      "input_schema": { "type": "object", "properties": {}, "required": [], "additionalProperties": false }
+    }
+  ],
+  "x_server_policy": {
+    "search_services": {
+      "access": "read_only",
+      "server_must": [
+        "Read only the catalog_version with status 'active'.",
+        "Match without diacritics and with common typos (normalize NFD, strip marks, lowercase); return every service of a group when group != 'any' and query is empty.",
+        "Return display_name_vi from the approved catalog, not name_vi from data/services.json, so that renamed services (pending owner decision on names that state disease outcomes) propagate without prompt changes.",
+        "Return price_text formatted 'NNN.NNNđ'."
+      ],
+      "returns_example": {
+        "catalog_version_id": "cv_2026_11_draft",
+        "services": [
+          {
+            "service_id": "goi-dau-thu-gian",
+            "group": "hair",
+            "display_name_vi": "Gội đầu thư giãn",
+            "is_signature": false,
+            "variants": [
+              {"duration_min": 50, "time_window": "09:00-20:30", "price_vnd": 199000, "price_text": "199.000đ"},
+              {"duration_min": 50, "time_window": "after_20:30", "price_vnd": 229000, "price_text": "229.000đ"}
+            ]
+          }
+        ]
+      }
+    },
+    "get_service_details": {
+      "access": "read_only",
+      "server_must": [
+        "Return only fields whose approval_status is 'approved'; return other fields as {status: 'unapproved'} or {status: 'missing'} with no text, so unapproved claims (flagged_claims in data/services.json) never reach the model.",
+        "Never return flagged_claims, conflicts, or derived_doc_unapproved cautions as customer-facing text."
+      ]
+    },
+    "quote_price": {
+      "access": "read_only",
+      "deterministic": true,
+      "server_must": [
+        "Compute from the active catalog only; the model never computes prices.",
+        "Window rule (PROPOSAL, owner must confirm): a start time from 09:00 up to and including 20:29 is day price; a start time from 20:31 is night price; a start time of exactly 20:30 returns status 'ambiguous' with both candidates, because the menu says '9h – 20h30' and 'Sau 20h30' and does not say whether 20:30 belongs to the day window (batch-01:54-55).",
+        "If the session starts in the day window but ends after 20:30 (e.g. start 20:00, 60 phút), return status 'ambiguous' with both candidates and rule_status 'unconfirmed' until the owner decides whether the night price follows start time or end time (open question in research/01-knowledge-audit.md section C).",
+        "Foot massage (massage-chan) has one window 09:00-24:00 and one price per duration.",
+        "Services without time windows (health, women, skin groups, Chăm sóc nan tóc) return a single price regardless of time.",
+        "If duration_min is not offered, return status 'invalid_duration' and the list of valid durations.",
+        "If start time is before 09:00, return 'outside_known_hours'. If start time is after 20:30 and opening hours are not approved, add hours_status 'unconfirmed' (opening hours conflict: bundle:57 vs 13:178).",
+        "Return price_text formatted 'NNN.NNNđ' for every candidate."
+      ],
+      "returns_example_ambiguous": {
+        "status": "ambiguous",
+        "service_id": "massage-body-thu-gian",
+        "duration_min": 60,
+        "start_time_local": "20:30",
+        "candidates": [
+          {"condition_vi": "nếu tính theo khung 9h – 20h30", "price_vnd": 429000, "price_text": "429.000đ"},
+          {"condition_vi": "nếu tính theo khung sau 20h30", "price_vnd": 499000, "price_text": "499.000đ"}
+        ],
+        "rule_status": "unconfirmed",
+        "hours_status": "unconfirmed",
+        "catalog_version_id": "cv_2026_11_draft"
+      }
+    },
+    "list_active_promotions": {
+      "access": "read_only",
+      "server_must": [
+        "Return only promotions with status 'approved' and valid_from <= now <= valid_to (research/06-architecture.md, table promotions).",
+        "Return approved_text_vi verbatim plus conditions; the model may not paraphrase conditions.",
+        "Today data/business-facts.json has promotions status 'missing', so this tool returns an empty list until the owner approves a program."
+      ]
+    },
+    "create_booking_request": {
+      "access": "write",
+      "server_must_authorize": [
+        "Conversation bot_state is 'bot_active' and the customer gave AI-assistant consent (consent record exists).",
+        "phone is stored only if contact_method is 'phone_shared_with_consent' AND the phone string appears verbatim in an inbound customer message of this conversation; otherwise reject with error 'phone_not_from_customer'.",
+        "Validate party_size 1-6, date not in the past, service ids exist in the active catalog.",
+        "Idempotency key = conversation_id + normalized(service_ids, date, time window); a duplicate call returns the existing request_id.",
+        "Rate limit: at most 3 open requests per customer per day.",
+        "Create row in booking_requests with status 'new'; never 'confirmed'. Notify staff in the desktop app.",
+        "When the separate booking app is connected later, emit booking_request.created; confirmation still comes from staff or that app, never from the model."
+      ],
+      "returns_example": {"status": "created", "request_id": "br_01J...", "staff_confirmation": "pending", "staff_response_target": null}
+    },
+    "handoff_to_staff": {
+      "access": "write",
+      "server_must_authorize": [
+        "Always accept (handoff must never fail closed).",
+        "Set conversations.bot_state = 'handoff_requested'; from that moment the model is not called for this conversation until staff release it (research/06-architecture.md, kill switch table).",
+        "For urgency 'urgent', push a notification to every staff device; outside working hours, also queue a fixed auto-message from the server (not the model) with the approved hotline once it exists.",
+        "Store summary_for_staff with access restricted to staff roles allowed to read health data (Nghị định 356/2025 khoản 2 Điều 4, per research/07-vn-legal-compliance.md)."
+      ]
+    },
+    "record_contact_preference": {
+      "access": "write",
+      "server_must_authorize": [
+        "opt_out: apply immediately, without staff approval, and cancel every scheduled job of that type for the customer; log with timestamp and customer_words for at least 1 year (Nghị định 91/2020 khoản 7 Điều 11, per research/07-vn-legal-compliance.md).",
+        "request_opt_in: do not change consent; send the fixed consent message with buttons (oa.query.show) from the server. Consent is recorded only from the button event, never from model output.",
+        "ai_assistant opt_out: set bot_state to 'staff_takeover' permanently for this customer until the customer opts in again via the consent button."
+      ]
+    },
+    "attach_menu_images": {
+      "access": "draft_attachment",
+      "server_must": [
+        "Exactly one of group / service_id is set; the other is 'none'. Slides come from data/menu-images.json only: overview = cover of every group, a group = its price_list slides, a service = the slides listing that service_id.",
+        "Refuse slides with has_medical_claim = true (status 'refused', reason 'medical_claim_slides_staff_only'); a service whose name-and-price slide is a claim slide is refused as a whole.",
+        "Attached keys of all calls in the job are the draft's attachments (drafts.attachments_json), de-duplicated, at most 10. A draft with attachments never auto-sends; the checker blocks a draft whose attachments include a claim slide.",
+        "Approve queues the text row, then one cs_images outbox row with the keys that waits for the text row to be sent. The bridge resolves keys to local JPEGs through ~/.thomhouse-bot/menu-images/manifest.json; no file path ever comes from the model."
+      ],
+      "returns_example": {"status": "attached", "scope": "group:thu-gian-toc", "attached": [{"key": "thu-gian-toc/2", "group_label": "Thư giãn và chăm sóc tóc", "slide": 2, "title": "Detox da đầu"}], "already_attached": [], "skipped_claim_slides": ["thu-gian-toc/13", "thu-gian-toc/14"], "total_attached": 4, "max_images": 10, "note": "..."}
+    },
+    "get_customer_profile": {
+      "access": "read_only",
+      "server_must": [
+        "Take no input; the customer is the one of the leased job (docs/contracts.md section 14.6). Never accept a customer id from the model.",
+        "Return the customer facts of customerFactsForModel: addressing, customer state, last visit, return rhythm, usual services, spend level and unused benefits. Amounts are for the model's judgement only and must not be quoted to the customer.",
+        "Never return a phone number (only has_phone) and never name a sensitive service (they are only counted in other_services).",
+        "An internal contact (role manager or staff) answers {found: false, reason: 'internal_contact'}; a customer without data answers {found: false, reason: 'no_data'}."
+      ],
+      "returns_example_no_data": {"found": false, "reason": "no_data"}
+    }
+  }
+}

@@ -1,0 +1,576 @@
+#!/bin/bash
+# thom house release header (docs/contracts.md 16.2.6, 16.4.6, 16.5). make_release.py fills in the six variables
+# below, then appends the marker line and the signed payload: a tar.gz of thomhouse-<version>/. bash 3.2 and stock
+# macOS tools only. Every path below ends with exit or exec, so bash never reads the payload as script.
+#
+# Order: options; the operating system (before anything is read or written); --doctor; refusal on an installed
+# device; the payload SHA-256; --dry-run (16.4.5); the preflight of step 2 (before the lock, so a refusal writes
+# nothing); the bootstrap lock (rev F6); the release id and the signature (step 1); unpack and the cached copy
+# (step 3); exec of install/bootstrap.sh, which keeps this PID (step 4).
+#
+# Test seams, never set on a device: THOMHOUSE_TOOL_PATH replaces /usr/bin:/bin:/usr/sbin:/sbin as the folders of
+# the tools this header runs (and the end of the CLI's PATH); THOMHOUSE_PROC_VERSION replaces /proc/version.
+
+RELEASE_VERSION="@RELEASE_VERSION@"
+PAYLOAD_SHA256="@PAYLOAD_SHA256@"
+PAYLOAD_BYTES="@PAYLOAD_BYTES@"
+PAYLOAD_SIG_B64="@PAYLOAD_SIG_B64@"
+MENU_ID="@MENU_ID@"
+BUILT_AT="@BUILT_AT@"
+
+set -u
+umask 077
+CALLER_PATH="${PATH:-}"
+SYSTEM_PATH="${THOMHOUSE_TOOL_PATH:-/usr/bin:/bin:/usr/sbin:/sbin}"
+PATH="$SYSTEM_PATH"
+export PATH
+
+say() { printf '%s\n' "$*"; }
+
+# ---------------------------------------------------------------- 1. options
+OPT_DRY=0
+OPT_YES=0
+OPT_DOCTOR=0
+OPT_TRUST=0
+OPT_SKIP_HUMAN=0
+OPT_MENU=""
+OPT_MOVE_IN=""
+
+abs_path() {
+  case "$1" in
+    /*) printf '%s' "$1" ;;
+    *) printf '%s/%s' "$PWD" "$1" ;;
+  esac
+}
+
+usage() {
+  say "Lệnh gõ chưa đúng. Cách gõ:"
+  say "  bash thomhouse-$RELEASE_VERSION.command [--dry-run] [--yes] [--doctor] [--trust-channel]"
+  say "      [--skip-human] [--menu FILE] [--move-in FILE]"
+  exit 2
+}
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --dry-run) OPT_DRY=1 ;;
+    --yes) OPT_YES=1 ;;
+    --doctor) OPT_DOCTOR=1 ;;
+    --trust-channel) OPT_TRUST=1 ;;
+    --skip-human) OPT_SKIP_HUMAN=1 ;;
+    --menu) [ $# -ge 2 ] || usage; OPT_MENU="$(abs_path "$2")"; shift ;;
+    --menu=*) OPT_MENU="$(abs_path "${1#--menu=}")" ;;
+    --move-in) [ $# -ge 2 ] || usage; OPT_MOVE_IN="$(abs_path "$2")"; shift ;;
+    --move-in=*) OPT_MOVE_IN="$(abs_path "${1#--move-in=}")" ;;
+    *) usage ;;
+  esac
+  shift
+done
+
+SELF="${BASH_SOURCE[0]:-}"
+case "$SELF" in
+  "") usage ;;
+  /*) ;;
+  *) SELF="$PWD/$SELF" ;;
+esac
+
+# ---------------------------------------------------------------- 2. operating system (16.5)
+refuse_os() {
+  say "$1"
+  say "Anh báo người gửi file; chương trình chưa thay đổi gì trên máy này."
+  exit 3
+}
+
+OS_NAME="$(uname -s 2>/dev/null)"
+case "$OS_NAME" in
+  Darwin) ;;
+  Linux)
+    if grep -qi microsoft "${THOMHOUSE_PROC_VERSION:-/proc/version}" 2>/dev/null; then
+      refuse_os "Bản cài này chỉ chạy trên máy Mac có macOS 13.5 trở lên; Windows và WSL chưa được hỗ trợ."
+    fi
+    refuse_os "Bản cài này chỉ chạy trên máy Mac có macOS 13.5 trở lên; máy Linux chưa được hỗ trợ."
+    ;;
+  MINGW* | MSYS* | CYGWIN*)
+    refuse_os "Bản cài này chỉ chạy trên máy Mac có macOS 13.5 trở lên; máy Windows chưa được hỗ trợ."
+    ;;
+  *)
+    OSN="${OS_NAME:-?}"
+    refuse_os "Bản cài này chỉ chạy trên máy Mac có macOS 13.5 trở lên; hệ điều hành $OSN chưa được hỗ trợ."
+    ;;
+esac
+
+# ---------------------------------------------------------------- shared helpers (same in bootstrap.sh)
+expand_home() {
+  case "$1" in
+    "~") printf '%s' "$HOME" ;;
+    "~/"*) printf '%s/%s' "$HOME" "${1#\~/}" ;;
+    /*) printf '%s' "$1" ;;
+    *) printf '%s/%s' "$PWD" "$1" ;;
+  esac
+}
+
+tilde() {
+  case "$1" in
+    "$HOME") printf '~' ;;
+    "$HOME"/*) printf '~%s' "${1#"$HOME"}" ;;
+    *) printf '%s' "$1" ;;
+  esac
+}
+
+VERSIONS_ENV=""
+venv() {
+  local line
+  while IFS= read -r line; do
+    case "$line" in
+      "$1="*) printf '%s' "${line#*=}"; return 0 ;;
+    esac
+  done <<EOF
+$VERSIONS_ENV
+EOF
+  printf '%s' "${2:-}"
+}
+
+first_version() { sed -n 's/[^0-9]*\([0-9][0-9]*\.[0-9][0-9]*\.[0-9][0-9]*\).*/\1/p' | head -n 1; }
+
+run_version() {
+  [ -x "$1" ] || return 0
+  "$1" --version 2>&1 </dev/null | first_version
+}
+
+num() {
+  local n="${1%%[!0-9]*}"
+  printf '%s' "${n:-0}"
+}
+
+ver_ge() {
+  local a1 a2 a3 b1 b2 b3
+  [ -n "$1" ] || return 1
+  IFS=. read -r a1 a2 a3 <<EOF
+$1
+EOF
+  IFS=. read -r b1 b2 b3 <<EOF
+$2
+EOF
+  a1="$(num "${a1:-}")"; a2="$(num "${a2:-}")"; a3="$(num "${a3:-}")"
+  b1="$(num "${b1:-}")"; b2="$(num "${b2:-}")"; b3="$(num "${b3:-}")"
+  [ "$a1" -gt "$b1" ] && return 0
+  [ "$a1" -lt "$b1" ] && return 1
+  [ "$a2" -gt "$b2" ] && return 0
+  [ "$a2" -lt "$b2" ] && return 1
+  [ "$a3" -ge "$b3" ]
+}
+
+host_of() { printf '%s' "$1" | sed -e 's#^[A-Za-z]*://##' -e 's#[/:].*##'; }
+
+mb() {
+  if [ -n "$1" ]; then printf '%s' $(( ($1 + 999999) / 1000000 )); else printf '?'; fi
+}
+
+ANSWER=""
+ask_ck() {
+  local line
+  if [ "$1" = 1 ] && [ "$OPT_YES" = 1 ]; then
+    say "Chương trình tự trả lời c vì lệnh có --yes."
+    ANSWER=c
+    return 0
+  fi
+  if [ ! -t 0 ]; then
+    say "Không có ai gõ phím trong cửa sổ này, nên chương trình tự trả lời k."
+    ANSWER=k
+    return 0
+  fi
+  while :; do
+    if ! IFS= read -r line; then
+      say "Không có ai gõ phím trong cửa sổ này, nên chương trình tự trả lời k."
+      ANSWER=k
+      return 0
+    fi
+    line="$(printf '%s' "$line" | tr -d ' \t\r' | tr 'A-Z' 'a-z')"
+    case "$line" in
+      c | co | "có" | "Có") ANSWER=c; return 0 ;;
+      "" | k | khong | "không" | "Không") ANSWER=k; return 0 ;;
+    esac
+    say "Anh gõ một trong các chữ c, k rồi Enter."
+  done
+}
+
+tool_found() {
+  local d IFS=:
+  for d in $PATH; do
+    [ -x "$d/$1" ] && return 0
+  done
+  return 1
+}
+
+build_env() {
+  local u np name
+  u="${USER:-$(id -un 2>/dev/null)}"
+  np="${no_proxy:-${NO_PROXY:-}}"
+  for name in 127.0.0.1 localhost ::1; do
+    case ",$np," in
+      *",$name,"*) ;;
+      *) np="${np:+$np,}$name" ;;
+    esac
+  done
+  ENV_ARGS=(HOME="$HOME" USER="$u" LOGNAME="$u" LANG=en_US.UTF-8 TERM="${TERM:-xterm-256color}"
+    TMPDIR="${TMPDIR:-/tmp}"
+    PATH="$APP_HOME/runtime/node/bin:$APP_HOME/runtime/python/bin:$APP_HOME/runtime/bin:$SYSTEM_PATH"
+    THOMHOUSE_APP_HOME="$APP_HOME" THOMHOUSE_BOT_HOME="$BOT_HOME"
+    DISABLE_UPDATES=1 ZALO_AGENT_NO_UPDATE_CHECK=1 WRANGLER_SEND_METRICS=false PROFILE_LLM_ENABLED=false)
+  for name in http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY ZALO_CONFIG_DIR; do
+    if [ -n "${!name:-}" ]; then ENV_ARGS+=("$name=${!name}"); fi
+  done
+  for name in $(compgen -e); do
+    case "$name" in
+      THOMHOUSE_APP_HOME | THOMHOUSE_BOT_HOME) ;;
+      THOMHOUSE_*) ENV_ARGS+=("$name=${!name}") ;;
+    esac
+  done
+  ENV_ARGS+=(no_proxy="$np" NO_PROXY="$np")
+}
+
+# ---------------------------------------------------------------- bash doctor (16.7 checks 1 to 5)
+# Keep this block identical in selfextract.sh.in and thomhouse.sh.in (test_release_launcher checks it).
+DOCTOR_TOOLS="curl shasum tar lsof ssh-keygen pbcopy pbpaste open sips hdiutil launchctl sw_vers sysctl"
+doctor_line() {
+  if [ -n "${4:-}" ]; then say "[$1] $2: $3 Cách sửa: $4"; else say "[$1] $2: $3"; fi
+}
+free_gb() {
+  local kb
+  kb="$(df -Pk "$HOME" 2>/dev/null | awk 'NR==2 {print $4}')"
+  printf '%s' $(( $(num "$kb") * 1024 / 1000000000 ))
+}
+bash_doctor() {
+  local rc=0 os v gb missing t pyv fix
+  os="$(uname -s 2>/dev/null)"
+  if [ "$os" = Darwin ]; then
+    v="$(sw_vers -productVersion 2>/dev/null)"
+    if ver_ge "$v" "$MACOS_MIN"; then
+      doctor_line "ĐẠT" "Hệ điều hành" "macOS $v"
+    else
+      doctor_line "LỖI" "Hệ điều hành" "macOS $v, chatbot cần $MACOS_MIN trở lên." \
+        "anh cập nhật macOS trong Cài đặt hệ thống rồi chạy lại."
+      rc=1
+    fi
+  else
+    doctor_line "LỖI" "Hệ điều hành" "${os:-?} chưa được hỗ trợ." "chatbot chỉ chạy trên máy Mac."
+    rc=1
+  fi
+  if [ "$(sysctl -n hw.optional.arm64 2>/dev/null)" = 1 ]; then
+    doctor_line "ĐẠT" "Chip" "Apple Silicon"
+  else
+    doctor_line "CHÚ Ý" "Chip" "máy Intel chưa được chạy thử." \
+      "nếu gặp lỗi, anh gửi kết quả lệnh này cho người phụ trách."
+  fi
+  gb="$(free_gb)"
+  if [ "$gb" -ge "$(num "$DISK_MIN_GB")" ]; then
+    doctor_line "ĐẠT" "Dung lượng trống" "$gb GB"
+  else
+    doctor_line "LỖI" "Dung lượng trống" "chỉ còn $gb GB, cần ít nhất $DISK_MIN_GB GB." \
+      "anh xóa bớt tệp rồi chạy lại."
+    rc=1
+  fi
+  missing=""
+  for t in $DOCTOR_TOOLS; do
+    tool_found "$t" || missing="${missing:+$missing, }$t"
+  done
+  if [ -z "$missing" ]; then
+    doctor_line "ĐẠT" "Công cụ của macOS" "đủ"
+  else
+    doctor_line "LỖI" "Công cụ của macOS" "thiếu $missing." "đây là lỗi lạ trên macOS; anh báo người phụ trách."
+    rc=1
+  fi
+  pyv="$(run_version "$APP_HOME/runtime/python/bin/python3")"
+  if [ -n "$pyv" ] && { [ -z "$PY_VERSION" ] || [ "$pyv" = "$PY_VERSION" ]; }; then
+    doctor_line "ĐẠT" "Python" "$pyv"
+  else
+    if [ -f "$APP_HOME/installed.json" ]; then
+      fix="bash $(tilde "$APP_HOME")/app/install/bootstrap.sh --python-only"
+    else
+      fix="anh chạy lại file thomhouse-$1.command."
+    fi
+    doctor_line "LỖI" "Python" "chưa có Python $PY_VERSION." "$fix"
+    rc=1
+  fi
+  return $rc
+}
+# ---------------------------------------------------------------- end of the bash doctor
+
+APP_HOME="$(expand_home "${THOMHOUSE_APP_HOME:-$HOME/ThomHouse}")"
+BOT_HOME="$(expand_home "${THOMHOUSE_BOT_HOME:-$HOME/.thomhouse-bot}")"
+for folder in "$APP_HOME" "$BOT_HOME"; do
+  case "$folder" in
+    *[[:space:]]*)
+      say "Thư mục $folder có dấu cách, nên chương trình không dùng thư mục đó."
+      say "Anh chọn thư mục không có dấu cách."
+      exit 3
+      ;;
+  esac
+done
+AH="$(tilde "$APP_HOME")"
+REL="$APP_HOME/releases/$RELEASE_VERSION"
+LOCKD="$APP_HOME/.bootstrap.lock.d"
+
+payload() { tail -c "$PAYLOAD_BYTES" "$SELF"; }
+payload_file() { payload | tar -xzOf - "thomhouse-$RELEASE_VERSION/$1" 2>/dev/null; }
+
+load_pins() {
+  MACOS_MIN="$(venv MACOS_MIN 13.5)"
+  DISK_MIN_GB="$(venv DISK_MIN_GB 3)"
+  PY_VERSION="$(venv PY_VERSION)"
+}
+
+damaged() {
+  say "File cài đặt bị hỏng hoặc đã bị sửa nên chương trình chưa cài gì. Anh chép lại file rồi chạy lại."
+  exit 3
+}
+
+# ---------------------------------------------------------------- 3. --doctor, installed device
+if [ "$OPT_DOCTOR" = 1 ]; then
+  VERSIONS_ENV="$(payload_file install/versions.env)"
+  load_pins
+  bash_doctor "$RELEASE_VERSION"
+  exit $?
+fi
+
+if [ -f "$APP_HOME/installed.json" ]; then
+  say "Máy này đã cài chatbot thom house, nên file cài không chạy lại từ đầu."
+  say "Cập nhật bằng file này: ~/ThomHouse/bin/thomhouse update $SELF"
+  say "Các bước còn lại: ~/ThomHouse/bin/thomhouse continue"
+  exit 3
+fi
+
+# ---------------------------------------------------------------- 4. payload SHA-256
+SIZE="$(wc -c <"$SELF" 2>/dev/null | tr -cd 0-9)"
+case "$PAYLOAD_BYTES" in "" | *[!0-9]*) damaged ;; esac
+[ -n "$SIZE" ] && [ "$SIZE" -gt "$PAYLOAD_BYTES" ] || damaged
+MARK="$(head -c $(( SIZE - PAYLOAD_BYTES )) "$SELF" | tail -n 1)"
+[ "$MARK" = "__PAY""LOAD__" ] || damaged
+[ "$(payload | shasum -a 256 | cut -d' ' -f1)" = "$PAYLOAD_SHA256" ] || damaged
+VERSIONS_ENV="$(payload_file install/versions.env)"
+[ -n "$VERSIONS_ENV" ] || damaged
+load_pins
+
+if [ "$(sysctl -n hw.optional.arm64 2>/dev/null)" = 1 ]; then PLAT=darwin_arm64; else PLAT=darwin_x64; fi
+
+release_ok() { [ -f "$1/MANIFEST.sha256" ] && (cd "$1" && shasum -a 256 -c MANIFEST.sha256 >/dev/null 2>&1); }
+
+pick_python() {
+  local p v n
+  p="$APP_HOME/runtime/python/bin/python3"
+  v="$(run_version "$p")"
+  if ver_ge "$v" 3.11.0; then printf '%s' "$p"; return 0; fi
+  for n in python3.14 python3.13 python3.12 python3.11 python3; do
+    p="$(PATH="$CALLER_PATH" command -v "$n" 2>/dev/null)" || continue
+    [ -n "$p" ] && [ "$p" != /usr/bin/python3 ] || continue
+    v="$(run_version "$p")"
+    if ver_ge "$v" 3.11.0; then printf '%s' "$p"; return 0; fi
+  done
+  return 0
+}
+
+# ---------------------------------------------------------------- --dry-run (16.4.5)
+if [ "$OPT_DRY" = 1 ]; then
+  DRY="$(mktemp -d "${TMPDIR:-/tmp}/thomhouse-dry-run.XXXXXX")" || exit 1
+  if ! payload | tar -xzf - -C "$DRY" 2>/dev/null; then
+    rm -rf "$DRY"
+    damaged
+  fi
+  DREL="$DRY/thomhouse-$RELEASE_VERSION"
+  say "Kế hoạch cài chatbot thom house bản $RELEASE_VERSION (chạy thử, máy không thay đổi gì):"
+  say "  1. [đã xong] Kiểm tra file cài đặt"
+  say "  2. [sẽ làm] Kiểm tra máy"
+  if release_ok "$REL"; then
+    say "  3. [đã xong] Giải nén chương trình"
+  else
+    say "  3. [sẽ làm] Giải nén chương trình"
+  fi
+  if [ -n "$PY_VERSION" ] && [ "$(run_version "$APP_HOME/runtime/python/bin/python3")" = "$PY_VERSION" ]; then
+    say "  4. [đã xong] Cài Python"
+  else
+    PY_HOST="$(host_of "$(venv "PY_URL_$PLAT")")"
+    PY_MB="$(mb "$(venv "PY_BYTES_$PLAT")")"
+    say "  4. [sẽ làm] Cài Python: Python $PY_VERSION từ $PY_HOST, $PY_MB MB, vào $AH/runtime"
+  fi
+  PYBIN="$(pick_python)"
+  if [ -n "$PYBIN" ]; then
+    build_env
+    set -- install --dry-run --from-bootstrap --release-file "$SELF"
+    [ "$OPT_SKIP_HUMAN" = 1 ] && set -- "$@" --skip-human
+    [ -n "$OPT_MENU" ] && set -- "$@" --menu "$OPT_MENU"
+    [ -n "$OPT_MOVE_IN" ] && set -- "$@" --move-in "$OPT_MOVE_IN"
+    /usr/bin/env -i "${ENV_ARGS[@]}" "$PYBIN" -I "$DREL/install/thomhouse.py" "$@" </dev/null
+  else
+    n=5
+    for title in "Cài Node.js, pnpm và Claude Code" "Điều khoản bộ công cụ Zalo" "Cài thư viện của chương trình" \
+      "Kích hoạt bản cài" "Tạo file cấu hình và mã bí mật" "Chuyển dữ liệu từ máy cũ" "Chép ảnh menu gốc" \
+      "Cập nhật cơ sở dữ liệu" "Đăng ký tài khoản Claude cho chatbot" "Đăng nhập Claude" "Bật chatbot" \
+      "Đăng nhập Zalo" "Lấy tin nhắn cũ từ điện thoại" "Phân tích danh bạ khách" \
+      "Phân tích các buổi làm trong tin nhắn" "Gắn nhãn khách trong Zalo" "Đưa mã nhân viên vào console" \
+      "Tự bật chatbot khi đăng nhập máy" "Tạo nút bấm trên màn hình" "Kiểm tra ảnh menu" "Kiểm tra lần cuối"; do
+      mark="sẽ làm"
+      if [ "$n" = 10 ] && [ -z "$OPT_MOVE_IN" ]; then mark="bỏ qua"; fi
+      printf '%3d. [%s] %s\n' "$n" "$mark" "$title"
+      n=$((n + 1))
+    done
+  fi
+  rm -rf "$DRY"
+  exit 0
+fi
+
+# ---------------------------------------------------------------- 6. preflight, the bash part of step 2
+MV="$(sw_vers -productVersion 2>/dev/null)"
+if ! ver_ge "$MV" "$MACOS_MIN"; then
+  MV="${MV:-?}"
+  say "Máy đang chạy macOS $MV; chatbot cần macOS $MACOS_MIN trở lên. Anh cập nhật macOS rồi chạy lại."
+  exit 3
+fi
+if [ "$(id -u 2>/dev/null)" = 0 ]; then
+  say "Anh chạy lại lệnh cài bằng tài khoản thường của máy, không dùng sudo."
+  exit 3
+fi
+if [ "$PLAT" = darwin_x64 ]; then
+  say "Máy Intel chưa được chạy thử. Anh vẫn cài? [c = có / k = không]"
+  ask_ck 1
+  if [ "$ANSWER" != c ]; then
+    say "Anh chọn dừng; chương trình chưa thay đổi gì trên máy này."
+    exit 4
+  fi
+  if [ -z "$(venv PY_URL_darwin_x64)" ] || [ -z "$(venv PY_SHA256_darwin_x64)" ] ||
+    [ -z "$(venv NODE_URL_darwin_x64)" ] || [ -z "$(venv NODE_SHA256_darwin_x64)" ]; then
+    say "File cài này chưa có bản cho máy Intel."
+    exit 3
+  fi
+fi
+GB="$(free_gb)"
+if [ "$GB" -lt "$(num "$DISK_MIN_GB")" ]; then
+  doctor_line "LỖI" "Dung lượng trống" "chỉ còn $GB GB, cần ít nhất $DISK_MIN_GB GB." "anh xóa bớt tệp rồi chạy lại."
+  exit 3
+fi
+MISSING=""
+for t in $DOCTOR_TOOLS; do
+  tool_found "$t" || MISSING="${MISSING:+$MISSING, }$t"
+done
+if [ -n "$MISSING" ]; then
+  doctor_line "LỖI" "Công cụ của macOS" "thiếu $MISSING." "đây là lỗi lạ trên macOS; anh báo người phụ trách."
+  exit 3
+fi
+
+say_locked() {
+  say "Một lệnh cài hoặc cập nhật khác đang chạy trên máy này. Anh chờ lệnh đó xong rồi chạy lại."
+}
+
+if [ -f "$APP_HOME/.install.lock" ]; then
+  HOLDER="$(tr -cd 0-9 <"$APP_HOME/.install.lock")"
+  if [ -n "$HOLDER" ] && kill -0 "$HOLDER" 2>/dev/null; then
+    case "$(ps -o command= -p "$HOLDER" 2>/dev/null)" in
+      *thomhouse.py*) say_locked; exit 3 ;;
+    esac
+  fi
+fi
+if [ -f "$BOT_HOME/moved-out.json" ]; then
+  say "Dữ liệu chatbot của máy này đã chuyển sang máy khác, nên chương trình không bật chatbot ở đây."
+  say "Khi máy kia đã tắt chatbot, anh xóa file $(tilde "$BOT_HOME")/moved-out.json rồi chạy lại file cài."
+  exit 3
+fi
+
+# ---------------------------------------------------------------- 5. the bootstrap lock (rev F6)
+CREATED_APP_HOME=0
+take_lock() {
+  local pid
+  if [ ! -d "$APP_HOME" ]; then CREATED_APP_HOME=1; fi
+  mkdir -p "$APP_HOME" || exit 3
+  chmod 700 "$APP_HOME" 2>/dev/null
+  if mkdir "$LOCKD" 2>/dev/null; then
+    printf '%s\n' "$$" >"$LOCKD/pid"
+    return 0
+  fi
+  pid=""
+  [ -f "$LOCKD/pid" ] && pid="$(tr -cd 0-9 <"$LOCKD/pid")"
+  if [ -n "$pid" ] && [ "$pid" != "$$" ] && kill -0 "$pid" 2>/dev/null; then
+    case "$(ps -o command= -p "$pid" 2>/dev/null)" in
+      *bootstrap.sh* | *thomhouse.py* | *.command*) say_locked; exit 3 ;;
+    esac
+  fi
+  rm -rf "$LOCKD"
+  if mkdir "$LOCKD" 2>/dev/null; then
+    printf '%s\n' "$$" >"$LOCKD/pid"
+    return 0
+  fi
+  say_locked
+  exit 3
+}
+
+leave() {
+  if [ -f "$LOCKD/pid" ] && [ "$(tr -cd 0-9 <"$LOCKD/pid")" = "$$" ]; then rm -rf "$LOCKD"; fi
+  if [ "$CREATED_APP_HOME" = 1 ]; then rmdir "$APP_HOME" 2>/dev/null; fi
+  exit "$1"
+}
+
+take_lock
+
+# ---------------------------------------------------------------- 7. release id and signature (step 1)
+FILE_SHA="$(shasum -a 256 "$SELF" | cut -d' ' -f1)"
+ID16="$(printf '%s' "$FILE_SHA" | cut -c1-16 | tr 'a-f' 'A-F')"
+RELEASE_ID="${ID16:0:4}-${ID16:4:4}-${ID16:8:4}-${ID16:12:4}"
+if [ "$OPT_TRUST" != 1 ]; then
+  say "Cài chatbot thom house bản $RELEASE_VERSION lên máy này."
+  say "Mã bản cài: $RELEASE_ID. Anh so mã này với mã hiện trên máy đã tạo file cài."
+  say "Khớp thì gõ c rồi Enter. Không khớp thì gõ k rồi Enter và báo người gửi file."
+  ask_ck 0
+  if [ "$ANSWER" != c ]; then
+    say "Anh chọn dừng; chương trình chưa thay đổi gì trên máy này."
+    leave 4
+  fi
+fi
+
+b64d() {
+  if printf 'QQ==' | base64 -D >/dev/null 2>&1; then base64 -D; else base64 -d; fi
+}
+
+VT="$(mktemp -d "${TMPDIR:-/tmp}/thomhouse-verify.XXXXXX")" || leave 1
+printf '%s' "$PAYLOAD_SIG_B64" | b64d >"$VT/payload.sig" 2>/dev/null
+payload_file install/trust/allowed_signers >"$VT/allowed_signers"
+payload | ssh-keygen -Y verify -f "$VT/allowed_signers" -I thomhouse-release -n thomhouse-release \
+  -s "$VT/payload.sig" >/dev/null 2>&1
+SIG_RC=$?
+rm -rf "$VT"
+if [ "$SIG_RC" != 0 ]; then
+  say "File cài không mang chữ ký của người làm file cài, nên chương trình không dùng file này."
+  say "Anh báo người gửi file."
+  leave 3
+fi
+
+# ---------------------------------------------------------------- 8. unpack and the cached copy (step 3)
+if ! release_ok "$REL"; then
+  STAGE="$APP_HOME/releases/.staging-$RELEASE_VERSION"
+  mkdir -p "$APP_HOME/releases" || leave 1
+  rm -rf "$STAGE"
+  mkdir "$STAGE" || leave 1
+  if ! payload | tar -xpzf - -C "$STAGE" --strip-components 1 2>/dev/null || ! release_ok "$STAGE"; then
+    rm -rf "$STAGE"
+    say "File cài đặt bị hỏng hoặc đã bị sửa nên chương trình chưa cài gì. Anh chép lại file rồi chạy lại."
+    leave 3
+  fi
+  if [ -e "$REL" ] || [ -L "$REL" ]; then
+    ASIDE="$APP_HOME/releases/.broken-$RELEASE_VERSION-$(date +%Y%m%d-%H%M%S)"
+    mv "$REL" "$ASIDE" && rm -rf "$ASIDE"
+  fi
+  if ! mv "$STAGE" "$REL"; then
+    rm -rf "$STAGE"
+    leave 1
+  fi
+fi
+mkdir -p "$APP_HOME/cache/releases" && chmod 700 "$APP_HOME/cache" "$APP_HOME/cache/releases"
+CACHED="$APP_HOME/cache/releases/thomhouse-$RELEASE_VERSION.command"
+if [ "$(shasum -a 256 "$CACHED" 2>/dev/null | cut -d' ' -f1)" != "$FILE_SHA" ]; then
+  cp "$SELF" "$CACHED.tmp" && chmod 600 "$CACHED.tmp" && mv -f "$CACHED.tmp" "$CACHED"
+fi
+
+# ---------------------------------------------------------------- 9. bootstrap.sh (step 4), same PID
+set -- --release-file "$SELF"
+[ "$OPT_YES" = 1 ] && set -- "$@" --yes
+[ "$OPT_SKIP_HUMAN" = 1 ] && set -- "$@" --skip-human
+[ "$OPT_TRUST" = 1 ] && set -- "$@" --trust-channel
+[ -n "$OPT_MENU" ] && set -- "$@" --menu "$OPT_MENU"
+[ -n "$OPT_MOVE_IN" ] && set -- "$@" --move-in "$OPT_MOVE_IN"
+exec /bin/bash "$REL/install/bootstrap.sh" "$@"

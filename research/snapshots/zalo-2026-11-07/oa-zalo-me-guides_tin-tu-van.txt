@@ -1,0 +1,62 @@
+ Tin Tư vấn | Zalo Official Account 
+ Skip to main content 
+ HƯỚNG DẪN VẬN HÀNH
+ Đăng ký và Xác thực 
+ Thanh toán 
+ Thiết lập tài khoản OA 
+ Quản lý nội dung 
+ Tin nhắn 
+ Tổng quan các loại tin nhắn trên Zalo Official Account 
+ Tin Tư vấn 
+ Tin Broadcast 
+ ZBS Template Message 
+ Câu hỏi thường gặp 
+ Công cụ gửi tin 
+ Gọi thoại 
+ Quản lý hội thoại 
+ Nhóm Chat GMF 
+ Tối ưu vận hành 
+ Mở rộng 
+ Nhà phát triển 
+ Tin nhắn 
+ Tin Tư vấn 
+ On this page 
+ Tin Tư vấn
+ Tin Tư vấn là loại tin Cơ bản của OA, dùng để phản hồi trực tiếp tới khách hàng và hỗ trợ tư vấn, giải đáp về sản phẩm, dịch vụ khi khách hàng yêu cầu.
+ I. Tổng quan tin Tư vấn ​ 
+ 1. Điều kiện để gửi tin: Người dùng có phát sinh tương tác với OA và đang không chặn OA, chi tiết như sau:
+ Khi người dùng thực hiện một trong các tương tác:
+ Gửi tin nhắn đến OA
+ Gửi tin trong nhóm chat GMF
+ Gọi thoại đến OA
+ Đồng ý nhận cuộc gọi từ OA
+ Bình luận (comment) bài viết OA
+ Tương tác với OA Chatbot
+ Nhấn Menu hoặc CTA query
+ Nhấn vào Widget của OA
+ 👉 OA có thể gửi tin Tư vấn đến người dùng.
+ Khi người dùng thực hiện một trong các tương tác:
+ Quan tâm OA
+ Nhấn nút "Nhắn tin" trên trang Thông tin OA
+ 👉 OA có thể gửi lời chào ngay sau khi người dùng thực hiện hành động. 
+ ✨ Xem thêm chi tiết về định nghĩa tương tác tại đây .
+ 2. Công cụ gửi tin: Trang Quản lý OA - OA Manager (trên Web và Mini App), OA OpenAPI, chi tiết như sau:
+ Công cụ Trang Quản lý OA - OA Manager có thể gửi tin Tư vấn đến người dùng trong vòng 365 ngày kể từ tương tác cuối của người dùng.
+ Công cụ OA OpenAPI có thể gửi tin Tư vấn đến người dùng trong vòng 07 ngày kể từ tương tác cuối của người dùng. Xem thêm chi tiết tài liệu kỹ thuật để gửi tin Tư vấn qua OpenAPI tại đây .
+ 3. Hiển thị tin trên thiết bị của người dùng: Hiển thị trên điện thoại và máy tính.
+ 4. Thời gian gửi tin: 24/24
+ 5. Thông báo đến người dùng: 24/24
+ 6. Chi phí: 
+ Tin Tư vấn gửi trong khung 48 giờ kể từ tương tác cuối của người dùng hoàn toàn miễn phí.
+ Tin Tư vấn ngoài khung 48 giờ kể từ tương tác cuối của người dùng, giá tin Tư vấn ngoài khung được tính theo bảng giá tại đây .
+ II. Ứng dụng: ​ 
+ Tin Tư vấn với đa dạng định dạng từ văn bản, hình ảnh, tập tin,... Doanh nghiệp có thể tối ưu bằng cách kết hợp tin Tư vấn với các tính năng khác như Chatbot, Lời chào, Menu để tư vấn nhanh chóng, mang lại trải nghiệm hỗ trợ liền mạch cho khách hàng.
+ ✨ Xem thêm tổng quan các loại tin của Zalo Official Account tại đây .
+ ----------------------------
+ Nếu có thắc mắc khác, vui lòng cung cấp OA ID và gửi email hoặc chat với BQT ZOA để được phản hồi sớm nhất.
+ Previous
+ Tổng quan các loại tin nhắn trên Zalo Official Account
+ Next
+ Tin Broadcast
+ I. Tổng quan tin Tư vấn 
+ II. Ứng dụng: 

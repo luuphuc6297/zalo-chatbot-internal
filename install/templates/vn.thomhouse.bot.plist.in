@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- thom house chatbot: start at login (thomhouse autostart on). Written by the installer from
+     install/templates/vn.thomhouse.bot.plist.in; removed by thomhouse autostart off and uninstall. -->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>vn.thomhouse.bot</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>@APP_HOME@/bin/thomhouse</string>
+    <string>start</string>
+    <string>--quiet</string>
+  </array>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>AbandonProcessGroup</key>
+  <true/>
+  <key>StandardOutPath</key>
+  <string>@APP_HOME@/logs/autostart.log</string>
+  <key>StandardErrorPath</key>
+  <string>@APP_HOME@/logs/autostart.log</string>
+</dict>
+</plist>

@@ -1,0 +1,91 @@
+ Khởi tạo Zalo Official Account | Zalo Official Account 
+ Skip to main content 
+ HƯỚNG DẪN VẬN HÀNH
+ Đăng ký và Xác thực 
+ Khởi tạo Zalo Official Account 
+ Lựa chọn danh mục 
+ Hướng dẫn đặt tên Zalo OA 
+ Lý do OA bị khóa và cách khắc phục 
+ Hướng dẫn xác thực 
+ Hồ sơ xác thực 
+ Xác thực theo lĩnh vực hoạt động 
+ Xử lý hồ sơ bị từ chối 
+ Hỗ trợ tạo, xác thực, cài đặt OA cho chuỗi cửa hàng 
+ Thanh toán 
+ Thiết lập tài khoản OA 
+ Quản lý nội dung 
+ Tin nhắn 
+ Công cụ gửi tin 
+ Gọi thoại 
+ Quản lý hội thoại 
+ Nhóm Chat GMF 
+ Tối ưu vận hành 
+ Mở rộng 
+ Nhà phát triển 
+ Đăng ký và Xác thực 
+ Khởi tạo Zalo Official Account 
+ On this page 
+ Khởi tạo Zalo Official Account
+ Zalo Official Account doanh nghiệp (OA doanh nghiệp) là tài khoản chính thức của doanh nghiệp trên Zalo, giúp doanh nghiệp và khách hàng/người quan tâm tương tác với nhau dễ dàng hơn thông qua các tính năng.
+ Hồ sơ quảng cáo : dành riêng cho người dùng chưa có Giấy đăng ký kinh doanh, chỉ hoạt động với mục đích chạy quảng cáo trên Zalo (không áp dụng với các nền tảng khác). Hồ sơ quảng cáo không thể sử dụng các tính năng: Nhắn tin, Broadcast và Bài viết, Chatbot, Gọi thoại. Tuy nhiên, trong quá trình sử dụng người dùng có thể bổ sung Giấy phép kinh doanh để thành OA xác thực và sử dụng đa dạng các tính năng. Đăng ký tài khoản Hồ sơ quảng cáo tại đây .
+ OA xác thực : dành cho Doanh nghiệp/Hộ kinh doanh có Giấy phép Đăng ký kinh doanh, cung cấp các tính năng giúp phát triển kinh doanh và chăm sóc khách hàng (CSKH) trực tuyến phù hợp với đa dạng quy mô doanh nghiệp. Sau khi xác thực, OA sẽ có tick xác thực và đặc biệt có thể quản lý bởi nhiều tài khoản admin trên nhiều thiết bị. Anh/chị có thể sử dụng các tính năng khác nhau của OA tùy thuộc vào từng loại Gói dịch vụ OA đăng ký. Tham khảo chi tiết tại đây .
+ Hướng dẫn thao tác tạo và xác thực OA ​ 
+ 💡Toàn bộ quá trình khởi tạo và xác thực Zalo OA đều có thể thao tác trên cả máy tính và điện thoại, mang lại sự tiện lợi và linh hoạt tối đa.
+ Bước 1: Đăng nhập tài khoản Zalo (cá nhân) ​ 
+ Truy cập đường dẫn http://oa.zalo.me/manage/register 
+ Đăng nhập tài khoản Zalo (cá nhân) bằng mật khẩu hoặc quét mã QR Code từ ứng dụng Zalo.
+ ⚠ Lưu ý: Chỉ có SĐT Việt Nam (+84) đã xác thực Zalo cá nhân thành công mới được hỗ trợ tạo và quản lý OA.
+ Bước 2: Tạo Official Account  ​ 
+ 👉 Cung cấp thông tin đăng ký kinh doanh ​ 
+ Vui lòng lựa chọn 1 trong 3 cách sau:
+ Nộp Giấy đăng ký kinh doanh ;
+ Nhập mã số thuế ;
+ Bổ sung sau .
+ Lưu ý : Đối với lựa chọn Nhập mã số thuế và Bổ sung sau , admin OA cần bổ sung thông tin trong vòng 14 ngày kể từ khi tạo OA.
+ 👉 Hoàn thiện thông tin OA ​ 
+ Tên Official Account cần được đặt theo định dạng sau:
+ Tên OA = [Tiền tố] + Tên chính + [Hậu tố] 
+ Tên chính là tên doanh nghiệp/ HKD/ cửa hàng hoặc tên thương hiệu/ nhãn hiệu hoặc sản phẩm/ dịch vụ . Tham khảo hướng dẫn tại đây .
+ Danh mục hoạt động: Lựa chọn danh mục phù hợp với lĩnh vực đã đăng ký kinh doanh. Tham khảo hướng dẫn tại đây .
+ Thông tin giới thiệu: Cung cấp thông tin giới thiệu về doanh nghiệp/HKD một cách minh bạch, dễ hiểu và không gây nhầm lẫn cho người xem.
+ Ảnh đại diện: Là logo chính thức, bảng hiệu, sản phẩm hoặc dịch vụ mà doanh nghiệp đang kinh doanh.
+ Ảnh bìa: Là hình ảnh liên quan đến sản phẩm, dịch vụ của tài khoản OA.
+ ➞ Nhấn Tạo OA 
+ Bước 3: Xác thực Official Account ​ 
+ Sau khi tạo OA, vui lòng hoàn thiện xác thực OA. Trong trường hợp hồ sơ chưa sẵn sàng, Doanh nghiệp cần bổ sung trong vòng 14 ngày.
+ 👉 Cung cấp tài liệu xác thực ​ 
+ Tài liệu bắt buộc : Admin OA lựa chọn 1 trong 2 tài liệu sau đây để xác thực:
+ Giấy phép đăng ký kinh doanh ; hoặc
+ Công văn xác thực (theo mẫu tải  tại đây ).
+ Tài liệu bổ sung : Áp dụng với các trường hợp sau:
+ Trường hợp 1: OA hoạt động trong ngành, nghề kinh doanh có điều kiện 
+ Bổ sung Yếu tố kinh doanh theo ngành, nghề : Giấy phép hoạt động trong ngành nghề đầu tư, kinh doanh có điều kiện theo danh sách, xem chi tiết tại đây .
+ Trường hợp 2 : Tên OA khác với tên trên Giấy đăng ký kinh doanh (bao gồm tên được đặt theo tên thương hiệu/ nhãn hiệu hoặc tên sản phẩm/ dịch vụ )
+ Bổ sung Yếu tố kinh doanh theo tên sản phẩm/ dịch vụ : Giấy tờ hoặc thông tin liên quan xác minh tên sản phẩm/ dịch vụ của doanh nghiệp hoặc doanh nghiệp được kinh doanh theo hợp đồng/ uỷ quyền, xem chi tiết tại đây .
+ ➞ Nhấn Nộp hồ sơ 
+ Lưu ý: 
+ Để đăng ký OA thành công, doanh nghiệp phải đang hoạt động trong các ngành nghề được quy định rõ ràng bởi Pháp luật Việt Nam. Tham khảo chính sách tại đây .
+ Các hoạt động kinh doanh không được kiểm duyệt đăng ký OA doanh nghiệp: sản phẩm và dịch vụ tài chính gây nhầm lẫn hoặc lừa đảo, bao gồm nhưng không giới hạn: quyền chọn nhị phân, phát hành tiền ảo ra công chúng, hoặc các vấn đề về đồng tiền ảo nói chung, đấu giá kiểu thầu hoặc các mô hình kinh doanh tương tự khác.
+ Đối với các doanh nghiệp hoạt động lĩnh vực tài chính - ngân hàng - bảo hiểm (dựa theo quy định của Pháp Luật Việt Nam) cần thực hiện xác thực tài khoản để sử dụng OA. Bao gồm nhưng không giới hạn các hoạt động kinh doanh, đầu tư sau: tín dụng, tiền gửi, chứng khoán, ví điện tử, dịch vụ trung gian thanh toán, bảo hiểm, đại lý bảo hiểm, dịch vụ thuế, v.v.;
+ 👉 Xác nhận thông tin Doanh nghiệp/ Hộ kinh doanh ​ 
+ Sau khi cung cấp tài liệu xác thực, admin OA cần:
+ Tiến hành kiểm tra và hoàn thiện thông tin đăng ký kinh doanh;
+ Nhấn Nộp xác thực .
+ Hoàn tất xác thực OA để kích hoạt đầy đủ các tính năng của OA Doanh nghiệp. Xem chi tiết hướng dẫn thiết lập tài khoản tại đây. 
+ Bước 4: Theo dõi kết quả   ​ 
+ BQT Zalo OA sẽ xét duyệt yêu cầu xác thực OA theo quy trình và chính sách trong vòng 2-3 ngày làm việc, tuy nhiên trong một số trường hợp, có thể mất nhiều thời gian hơn;
+ Trong quá trình xét duyệt, BQT Zalo OA có thể yêu cầu OA cung cấp thêm thông tin hoặc các giấy tờ khác với mục đích đảm bảo Doanh nghiệp/HKD đã đăng ký thành lập và đang hoạt động theo quy định của pháp luật Việt Nam;
+ Kết quả xét duyệt xác thực sẽ được gửi tin nhắn thông báo đến Admin OA từ  “Zalo Official Account” và thông báo mục “Tin nhắn hệ thống” trên OA Manager  tại đây 
+ Các bước cần thực hiện nếu OA bị từ chối xác thực :  ​ 
+ Tham khảo Hướng dẫn xử lý hồ sơ bị từ chối   tại đây .
+ Admin OA cần đọc kỹ nội dung thông báo để hiểu rõ lý do bị từ chối xác thực và thực hiện điều chỉnh thông tin hoặc bổ sung giấy tờ theo hướng dẫn (nếu có)
+ Admin OA thực hiện xác thực lại bằng cách cung cấp lại Bộ hồ sơ xác thực trong vòng 14 ngày, bao gồm: toàn bộ giấy tờ xác thực đã gửi trước đó cùng với giấy tờ/ thông tin được yêu cầu bổ sung thêm.
+ ------------------
+ Nếu có thắc mắc khác, vui lòng cung cấp OA ID và gửi email hoặc chat với BQT ZOA để được phản hồi sớm nhất.
+ Next
+ Lựa chọn danh mục
+ Hướng dẫn thao tác tạo và xác thực OA Bước 1: Đăng nhập tài khoản Zalo (cá nhân) 
+ Bước 2: Tạo Official Account  
+ Bước 3: Xác thực Official Account 
+ Bước 4: Theo dõi kết quả   
+ Các bước cần thực hiện nếu OA bị từ chối xác thực :  

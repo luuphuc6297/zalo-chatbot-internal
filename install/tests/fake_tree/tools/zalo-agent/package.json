@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@ardennguyen/zalo-agent-cli": "2.5.9"
+  }
+}

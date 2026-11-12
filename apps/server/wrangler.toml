@@ -1,0 +1,34 @@
+name = "thomhouse-bot"
+main = "src/index.ts"
+compatibility_date = "2026-10-01"
+compatibility_flags = ["nodejs_compat"]
+
+# ENV defaults to "prod" so a plain `wrangler deploy` never exposes /dev/*. Local dev sets ENV=dev in .dev.vars.
+[vars]
+ENV = "prod"
+ZALO_MODE = "mock" # mock | real | personal; the local app on the personal Zalo account sets ZALO_MODE=personal in .dev.vars
+WEBHOOK_SIGNATURE_MODE = "observe"
+DEBOUNCE_MS = "10000"
+LEASE_MS = "90000"
+RUNNER_OFFLINE_MS = "120000"
+TAKEOVER_DEFAULT_MS = "43200000"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "thomhouse-main"
+database_id = "feeeff2b-5db6-4d4c-b9e6-5e069c8731ff" # placeholder; set after `wrangler d1 create thomhouse-main`
+migrations_dir = "migrations"
+
+[[durable_objects.bindings]]
+name = "CONVERSATION"
+class_name = "ConversationDO"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["ConversationDO"]
+
+[triggers]
+crons = ["* * * * *"]
+
+[observability]
+enabled = true

@@ -1,0 +1,72 @@
+ Hướng dẫn xác thực | Zalo Official Account 
+ Skip to main content 
+ HƯỚNG DẪN VẬN HÀNH
+ Đăng ký và Xác thực 
+ Khởi tạo Zalo Official Account 
+ Lựa chọn danh mục 
+ Hướng dẫn đặt tên Zalo OA 
+ Lý do OA bị khóa và cách khắc phục 
+ Hướng dẫn xác thực 
+ Hồ sơ xác thực 
+ Xác thực theo lĩnh vực hoạt động 
+ Xử lý hồ sơ bị từ chối 
+ Hỗ trợ tạo, xác thực, cài đặt OA cho chuỗi cửa hàng 
+ Thanh toán 
+ Thiết lập tài khoản OA 
+ Quản lý nội dung 
+ Tin nhắn 
+ Công cụ gửi tin 
+ Gọi thoại 
+ Quản lý hội thoại 
+ Nhóm Chat GMF 
+ Tối ưu vận hành 
+ Mở rộng 
+ Nhà phát triển 
+ Đăng ký và Xác thực 
+ Hướng dẫn xác thực 
+ On this page 
+ Hướng dẫn xác thực Zalo OA
+ Sau khi hoàn thành các bước Khởi tạo Zalo Official Account tại đây , admin OA truy cập đường dẫn  http://oa.zalo.me/manage/cert/submit để nộp xác thực .
+ Lưu ý:   OA cần nộp hồ sơ xác thực trong vòng 14 ngày từ khi tạo OA.
+ Quý Doanh nghiệp vui lòng thực hiện xác thực tài khoản OA theo  chính sách , dựa trên hướng dẫn sau:
+ Bước 1: Cung cấp tài liệu xác thực ​ 
+ 1. Tài liệu bắt buộc ​ 
+ Admin OA lựa chọn 1 trong 2 tài liệu sau đây để xác thực:
+ Giấy phép đăng ký kinh doanh ; hoặc
+ Công văn xác thực (theo mẫu tải  tại đây ).
+ Sau đó, admin OA tiến hành scan hoặc chụp ảnh bản gốc các giấy tờ và tải lên hệ thống.
+ Lưu ý: 
+ Giấy Đăng ký kinh doanh, hoặc giấy phép khác, admin OA cần cung cấp đầy đủ các trang thông tin và có dấu mộc, chữ ký của cơ quan cấp.
+ Công văn cần được người có thẩm quyền của doanh nghiệp ký xác nhận và đóng mộc đỏ (hoặc chữ ký số). Không áp dụng cho Hộ kinh doanh.
+ Ngoài ra, trong quá trình xác thực, chúng tôi có thể yêu cầu Quý Doanh nghiệp gửi bổ sung thêm giấy tờ hoặc thông tin khác, theo Chính sách xác thực tài khoản .
+ 2. Tài liệu bổ sung ​ 
+ Các trường hợp sau đây cần bổ sung 01 Yếu tố kinh doanh để được hỗ trợ xác thực:
+ Trường hợp 1: OA hoạt động trong ngành, nghề kinh doanh có điều kiện 
+ Bổ sung Yếu tố kinh doanh theo ngành, nghề : Giấy phép hoạt động trong ngành nghề đầu tư, kinh doanh có điều kiện theo danh sách, xem chi tiết tại đây .
+ Trường hợp 2 : Tên OA khác với tên trên Giấy đăng ký kinh doanh (bao gồm tên được đặt theo tên thương hiệu/ nhãn hiệu hoặc tên sản phẩm/ dịch vụ )
+ Bổ sung Yếu tố kinh doanh theo tên sản phẩm/ dịch vụ : Giấy tờ hoặc thông tin liên quan xác minh tên sản phẩm/ dịch vụ của doanh nghiệp hoặc doanh nghiệp được kinh doanh theo hợp đồng/ uỷ quyền, xem chi tiết tại đây .
+ Bước 2: Hoàn thiện thông tin đăng ký kinh doanh ​ 
+ Sau khi cung cấp tài liệu xác thực, admin OA cần tiến hành kiểm tra và hoàn thiện thông tin đăng ký kinh doanh.
+ Lưu ý: 
+ Thông tin doanh nghiệp phải tương ứng với thông tin thể hiện trên Giấy Đăng ký kinh doanh/ Công văn đã tải lên.
+ Thông tin người đại diện pháp luật gồm: Tên, Số CMND/CCCD/Hộ chiếu phải điền chính xác (Số điện thoại có thể là số của người có liên quan, không nhất thiết là của người đại diện).
+ Sau đó thao tác Nộp xác thực → Quản trị viên sẽ nhận được thông báo thời gian chờ duyệt & kết quả từ OA Zalo Official Account.
+ Bước 3: Theo dõi kết quả   ​ 
+ BQT Zalo OA sẽ xét duyệt yêu cầu xác thực OA theo quy trình và chính sách trong vòng 2-3 ngày làm việc, tuy nhiên trong một số trường hợp, có thể mất nhiều thời gian hơn;
+ Trong quá trình xét duyệt, BQT Zalo OA có thể yêu cầu OA cung cấp thêm thông tin hoặc các giấy tờ khác với mục đích đảm bảo Doanh nghiệp/HKD đã đăng ký thành lập và đang hoạt động theo quy định của pháp luật Việt Nam;
+ Kết quả xét duyệt xác thực sẽ được gửi tin nhắn thông báo đến Admin OA từ  “Zalo Official Account” và thông báo mục “Tin nhắn hệ thống” trên OA Manager  tại đây 
+ Các bước cần thực hiện nếu OA bị từ chối xác thực :  ​ 
+ Tham khảo Hướng dẫn xử lý hồ sơ bị từ chối   tại đây .
+ Admin OA cần đọc kỹ nội dung thông báo để hiểu rõ lý do bị từ chối xác thực và thực hiện điều chỉnh thông tin hoặc bổ sung giấy tờ theo hướng dẫn (nếu có)
+ Admin OA thực hiện xác thực lại bằng cách cung cấp lại Bộ hồ sơ xác thực trong vòng 14 ngày, bao gồm: toàn bộ giấy tờ xác thực đã gửi trước đó cùng với giấy tờ/ thông tin được yêu cầu bổ sung thêm.
+ ----------------------------------------
+ Nếu có thắc mắc khác hoặc khiếu nại, vui lòng gửi email đến  oa@zalo.me để được giải đáp và tư vấn hồ sơ xác thực phù hợp.
+ Previous
+ Lý do OA bị khóa và cách khắc phục
+ Next
+ Hồ sơ xác thực
+ Bước 1: Cung cấp tài liệu xác thực 1. Tài liệu bắt buộc 
+ 2. Tài liệu bổ sung 
+ Bước 2: Hoàn thiện thông tin đăng ký kinh doanh 
+ Bước 3: Theo dõi kết quả   
+ Các bước cần thực hiện nếu OA bị từ chối xác thực :  

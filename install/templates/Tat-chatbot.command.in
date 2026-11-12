@@ -1,0 +1,3 @@
+#!/bin/bash
+# thomhouse-shortcut v1
+exec "@APP_HOME@/bin/thomhouse" stop

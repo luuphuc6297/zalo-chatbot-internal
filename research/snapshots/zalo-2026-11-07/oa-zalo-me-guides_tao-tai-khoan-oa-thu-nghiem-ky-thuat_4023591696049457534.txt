@@ -1,0 +1,58 @@
+ Tạo tài khoản OA thử nghiệm kỹ thuật | Zalo Official Account 
+ Skip to main content 
+ HƯỚNG DẪN VẬN HÀNH
+ Đăng ký và Xác thực 
+ Thanh toán 
+ Thiết lập tài khoản OA 
+ Quản lý nội dung 
+ Tin nhắn 
+ Công cụ gửi tin 
+ Gọi thoại 
+ Quản lý hội thoại 
+ Nhóm Chat GMF 
+ Tối ưu vận hành 
+ Mở rộng 
+ Nhà phát triển 
+ Khởi tạo ứng dụng và cấp quyền 
+ Tạo tài khoản OA thử nghiệm kỹ thuật 
+ Nhà phát triển 
+ Tạo tài khoản OA thử nghiệm kỹ thuật 
+ On this page 
+ Tạo tài khoản OA thử nghiệm kỹ thuật
+ Nhằm giúp đội ngũ kỹ thuật (IT) của Doanh nghiệp có thể kiểm tra mức độ tích hợp đấu nối API của Zalo Official Account trước khi triển khai thực tế trên tài khoản OA chính thức nhằm tương tác với khách hàng. BQT Zalo OA hỗ trợ kiểm duyệt tài khoản OA thử nghiệm kỹ thuật (OA Test) .
+ ⚠ Lưu ý: 
+ Doanh nghiệp cần có ít nhất một OA Doanh nghiệp (OA chính thức) đã xác thực thành công, để được hỗ trợ tạo OA thử nghiệm kỹ thuật (OA Test). Đây là tài khoản dùng cho mục đích kiểm thử, không phải OA chính thức và không sử dụng cho hoạt động kinh doanh .
+ OA Test sẽ được BQT chuyển sang danh mục OA Test và không thể chuyển đổi lại thành OA Doanh nghiệp. Tài khoản này chỉ giới hạn tối đa 100 người quan tâm và không hiển thị khi tìm kiếm trên ứng dụng Zalo.
+ Các yêu cầu tạo OA Test nhằm trải nghiệm tính năng, không liên quan việc tích hợp API sẽ không được hỗ trợ . Doanh nghiệp vui lòng tạo và xác thực OA theo quy trình thông thường và tiến hành đăng ký Gói dịch vụ để sử dụng. Việc sử dụng trong thời gian đủ dài sẽ giúp doanh nghiệp trải nghiệm đầy đủ các tính năng và theo dõi được hiệu quả thực tế. Tham khảo Bảng giá các gói dịch vụ tại đây .
+ Hướng dẫn tạo OA Test ​ 
+ Bước 1: Truy cập đường dẫn https://oa.zalo.me/home  ➞ Chọn Tạo Official Account ngay .
+ Bước 2: Đăng nhập tài khoản Zalo (cá nhân) .
+ Đăng nhập bằng số điện thoại và mật khẩu đã đăng ký; hoặc
+ Quét mã QR Code từ ứng dụng Zalo.
+ ⚠ Lưu ý: Người thao tác cần có tài khoản Zalo cá nhân được xác thực thành công và đăng ký SĐT Việt Nam có đầu số (+84).
+ Bước 3: Chọn loại tài khoản Doanh nghiệp ➞ Chọn loại Tài khoản OA xác thực .
+ Bước 4: Tiến hành đăng ký thông tin OA.
+ Danh mục hoạt động: Chọn một trong các danh mục phù hợp với lĩnh vực đã đăng ký kinh doanh của doanh nghiệp/ hộ kinh doanh.
+ Tên Official Account: là tên doanh nghiệp và bắt buộc có thêm chữ Test  hoặc Testing ​.
+ Thông tin giới thiệu: Cung cấp thông tin giới thiệu đề cập đầy đủ tài khoản thử nghiệm của doanh nghiệp và mục đích.
+ Ảnh đại diện & Ảnh bìa: Là hình ảnh logo, biển hiệu của doanh nghiệp.
+ ➞ Nhấn Tạo tài khoản OA .
+ Bước 5: Sau khi tạo OA, QTV vui lòng gửi mail đến ➡ oa@zalo.me kèm các thông tin sau để được hỗ trợ chuyển đổi mục đích sử dụng Test:
+ OA ID
+ Tên Official Account
+ Tên doanh nghiệp
+ Mã số doanh nghiệp
+ Mục đích sử dụng tài khoản OA Test (Ví dụ: Nhu cầu tích hợp với hệ thống nào, sử dụng với những use cases cụ thể là gì)
+ Họ và tên người tạo tài khoản
+ Chức vụ tại doanh nghiệp
+ Email liên hệ
+ Số điện thoại liên hệ
+ APP ID
+ BQT sẽ kiểm tra thông tin doanh nghiệp cung cấp để xem xét kiểm duyệt trong tối đa 2 ngày làm việc kể từ khi nhận email. 
+ Sau khi OA được xác thực và nhận phản hồi email từ BQT, admin OA đã có thể truy cập và sử dụng OA Test .
+ ⚠️ Lưu ý: BQT sẽ kiểm tra thông tin doanh nghiệp cung cấp để xem xét kiểm duyệt trong tối đa 2 ngày làm việc kể từ khi nhận email. Trong thời gian 7 ngày, vui lòng thực hiện liên kết OA và App và tiến hành thử nghiệm kỹ thuật. BQT có toàn quyền thu hồi OA Test trong trường hợp Doanh nghiệp không sử dụng đúng mục đích.
+ -----------------------------------
+ Nếu có thắc mắc khác, vui lòng cung cấp OA ID và gửi email hoặc chat /gọi thoại với BQT ZOA để được phản hồi sớm nhất.
+ Previous
+ Khởi tạo ứng dụng và cấp quyền
+ Hướng dẫn tạo OA Test 
