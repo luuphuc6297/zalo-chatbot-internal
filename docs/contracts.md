@@ -1039,6 +1039,8 @@ First reply (fixed the evening of 2026-11-12). In the live run-through the lead 
 
 `scripts/import_visits.py <file.csv> [--apply]` (from the repository root, `python3 -I`) posts a CSV file to `POST /staff/visits/import` in parts of at most 2 000 rows, always with a dry run first; `--apply` then writes. It reads comma, semicolon, tab or pipe separated UTF-8 (with or without BOM) or UTF-16 files, matches column names without accents and case (Vietnamese and English aliases, `--column FIELD=NAME`, `--header-row N`), reads `dd/mm/yyyy` dates (`--date-order mdy` for month first) with noon as the default time, and amounts such as `450000`, `450.000`, `450,000đ` (not `450k`). It always sends `visited_at_local`, sends a catalog `service_id` when the service name equals a catalog name, leaves out customer codes that are not `cus_` ids and invoice ids shared by several rows, and reports five local reasons before sending (`bad_zalo_id`, `bad_phone`, `bad_duration`, `bad_technician`, `bad_external_id`). It prints counts, sheet row numbers and reason codes only, uses `STAFF_TOKEN` and `SERVER_URL` from the environment or `apps/server/.dev.vars` and refuses a non-local server.
 
+On a device installed with section 16, runtimes and dependencies are installed by `thomhouse install` after the owner agrees; `start_local.sh` still installs only from lockfiles, and refuses to start while `$BOT_HOME/moved-out.json` exists. It also stops before `wrangler d1 migrations apply` while `$BOT_HOME/d1.restore-needed.json` exists, because its backup hook (`thomhouse.py backup --if-pending-migrations`) then exits 1 (16.4.3 step 12, rev review).
+
 ### Known gaps (rooms, roles, customer summary)
 
 - Real room turns ran in the live run-through of 2026-11-12 (17:12 to 17:31 on the build Mac: real platform with Claude bots, local stack in personal mode, bridge and listener on the fake Zalo engine, one fake customer). After the rules file was copied by hand into the lead's workspace, the lead asked the customer bot through `coordinate_bots`, the customer bot called `get_customer_profile`, the lead called `quote_price`, and the draft was stored `pending`; with the auto reply switch on, the next customer message gave a room turn whose draft was sent by the fake engine; with the switch off, a staff reply was copied into the room by the observation loop after 17 s. Not seen live: the JSON of a failed or timed-out `wait`, `interrupt --tree`, `team apply --wait-idle` while a bot is busy, the runner's own copy of the rules into the workspace (tested with the fake platform only), and whether the real lead follows the first-reply line.
@@ -1536,3 +1538,2380 @@ Decisions where the code differs from or goes beyond the drafts (each is describ
 - Model pass: model values limited to the values of 15.4 (`visit_day` or `window`, `paid` or `quoted`, `stated_by` and `at` from the newest cited line); counts only next to a package word; titles rebuilt from counts; technicians limited to given names or `số N`; one model package per title key; `claude_pool` stores error kinds only, with mode 0600.
 - Server: table `chat_phone_dismissed` and column `phone_decision_id`; counters `skipped_deleted` and `phones_taken`; a dismissed upcoming booking is also a tombstone for a visit on that date; the facts row is written only when it changed; write counters from `meta.changes`, with the audit row after the data batches; the stricter eligible list; the paid-only amount on confirm; the same-day and same-title 409s; the phone accept's other-holder 409; `recorded_day` and `recorded_title` in views; `phone_suggestion` null in `GET` while the customer has a phone; a corrected `service_id` must be in the active catalog; role changes and phone edits clean up chat rows at once; the summary leaves `chat` out instead of sending null; chat benefits with a recorded title are not counted; sensitive category words hide a benefit title from the model.
 - Console: one sentence without visit data for every summary; quoted and list prices not prefilled; past bookings grouped without buttons; the confirm button hidden on a recorded day; the analyzer version as a tooltip only.
+
+
+## 16. Install on a new device
+
+Status: written 2026-11-12 before the code, by the lead designer, from three competing designs and four surveys
+(`scratchpad/installer/understand/{inventory,portability,lifecycle,distribution}.md`). The base is the
+"reproducible" design (one self-verifying release file, pinned private runtimes, signed updates, backup before every
+migration); ideas from the "guided" design (QR through the engine's JSON events, a disabled Claude account until
+login, a Vietnamese text catalog with tests) and the "minimal" design (one `check()` per step shared by install and
+doctor, pins read from the files that already hold them, runtime PATH in `start_local.sh`) are grafted in. Additive:
+no existing behaviour changes, except three small changes in `scripts/start_local.sh` (16.3.2) and one sentence in
+14.10. Code: `install/**`, `scripts/release/**`. Tests: `install/tests/`. Guide for the owner (Vietnamese):
+`docs/cai-dat-may-moi.md`. Nothing in this section was run; every size of new code is an estimate.
+
+Revision 2 (2026-11-12, afternoon): the 25 findings F1 to F25 of the review were resolved, the owner's answers of
+2026-11-12 were applied (only Macs; independent installations; the Zalo engine licence notice), the visit analyzer runs
+by default, and 16.3.3 was completed so that WP2 to WP5 can be built in parallel after WP1. Markers at the end of a
+changed passage: `(rev F<n>)` for finding n, `(rev owner)` for an owner answer, `(rev facts)` for a changed project
+fact, `(rev visits)` for the visit analyzer step, `(rev iface)` for an interface added for the parallel build.
+Additive as before, except the `start_local.sh` changes, now five (16.3.2), and a new small change in
+`scripts/stop_local.sh` (rev F12, F15). The revision ran only the read-only checks named in the facts below (Python,
+bash and `lsof` in the scratch folder, byte reads of the Claude Code binary); no installer code exists yet.
+
+Revision 2 was then checked independently on the same day (the critic's scenarios walked again, every claim about a
+project file re-read). Its corrections carry the marker `(rev check)`: they close contradictions that revision 2
+introduced (other-stack detection, step checks that can only warn, declined required steps, an unfinished U10
+rollback, commands that ran on a moved-out device or during an unfinished update, a WP5 call into WP3, the place of
+the `moved-out.json` guard in `start_local.sh`) and correct project facts that moved since.
+
+The WP1 build (2026-11-12, evening) added interface details that the other packages rely on; they carry the
+marker `(rev wp1)` in 16.3.3: an optional `paths` argument of `make_ctx`, checkout-mode `logs` and `history`
+under BOT_HOME, `PinError` from `download.fetch` for a placeholder hash, the `core.starting` line of
+`stack.start`, `logs/migrations.log`, `--repo-root` in `bridgecli.init_env`, and how `stack.other_stacks`
+sees another installation's server.
+
+After the WP2 to WP5 builds (2026-11-12, night), the integration step and an independent review with repairs
+(2026-11-13), the code in `install/` and `scripts/release/` passes 497 installer tests and 14 bridge harness tests.
+Where that code and the text above disagree, the code wins, and the text says what the code does in a short amendment
+at the place it concerns: `(rev wp4)` for what the doctor build (WP4) found, `(rev review)` for the deviations that
+the WP2, WP3 and WP5 builds reported and for what the integration step, the review and its repair changed. The
+sentence "Nothing in this section was run" holds only for the design text, not for these amendments.
+
+Facts this section relies on that are new or corrected since the surveys (checked 2026-11-12 by reading the files):
+
+- `scripts/start_local.sh` is now 428 lines (modified 13:50 today, `wc -l`); lines up to 255 are unchanged, later
+  lines moved by up to five. Line numbers below are the current ones.
+- Terminal.app does not show the Zalo QR code: in human mode the engine writes an iTerm2 inline-image escape and a
+  `data:` URL (`tools/zalo-agent/node_modules/@ardennguyen/zalo-agent-cli/src/utils/qr-display.js:73-84`), so
+  `docs/chay-local-zalo-ca-nhan.md:50` holds only for iTerm2-like terminals. With `--json` the engine prints one line
+  per event: `qr` (`image`, `file`, `dataUrl`; `qr-display.js:59-69`), `qr_scanned` (`name`, `avatar`;
+  `commands/login.js:99`), `qr_declined`, `qr_expired`, `login_success` (`ownId`, `name`; `login.js:157`) and
+  `login_error`. The QR web page binds 127.0.0.1 unless `--qr-url` is passed, and falls back to ports 8080, 3000 and
+  9000 when 18927 is busy (`login.js:72-84`, `utils/qr-http-server.js:43-44`).
+- Two existing commands print personal data in their normal output: `claude_pool.py status` prints the Claude
+  account email (`scripts/runner/claude_pool.py:212`, `:242-245`), and the bridge doctor prints the Zalo account id
+  in its `zalo_login` line (`apps/zalo-bridge/bridge/doctor.py:121`). The installer reads them as data and never
+  shows their text.
+- When no pool account is usable (all disabled), the runner does not claim jobs and checks again every 30 s
+  (`apps/runner/runner/poller.py:253-256`, `claude_runner.py:356-357`); enabling an account needs no restart.
+- `bridge.rooms.find_node_dir` returns the PATH folder of `node` without resolving symlinks (`rooms.py:60-63`), so a
+  symlinked runtime folder gives a stable `OPENMAUSBOT_NODE_DIR`.
+- `wrangler d1 export --local` ignores `--persist-to` (reported by the reproducible design, `cli.js:240151-240160`;
+  not re-checked here), so backups copy the SQLite files themselves.
+- The chat-facts build has written `scripts/visit_rules.py`, `scripts/contact_facts_rules.py`,
+  `scripts/visit_model_pass.py` and `scripts/analyze_visits.py` (800 lines at 16:08 and still changing; tests
+  `scripts/tests/wip_*.py`).
+  `apps/server/migrations/0011_chat_facts.sql` exists (15:39) and `POST /staff/chat-facts/import` and
+  `GET /staff/chat-facts/eligible` are routed (`apps/server/src/index.ts:107-108`); both are still being built by
+  another team, so this section treats them as present but tolerates a 404. Every chat-facts endpoint answers 409
+  before 0011 is applied (`apps/server/src/staff-api/chat-facts.ts:10`). `analyze_visits.py --push` exits 1 on any
+  push failure; a 404 is told apart only by the text `(HTTP 404)` on stderr (the `PushFailed` raised in `_post`,
+  printed by `_run` as `analyze_visits: … (HTTP 404) …`; exit codes in its docstring). The file is still being
+  edited, so this section cites it by text, not by line (rev facts, rev check).
+- `docs/contracts.md` section 14.10 now starts at line 1015 (heading `### 14.10 Local processes`); section 15 is not
+  in `docs/contracts.md` yet. Edits find 14.10 by its heading, never by line number. (rev facts)
+- `python3 -I` does not put the script's folder on `sys.path`: `python3 -I <dir>/entry.py` that imports a package
+  beside it fails with `ModuleNotFoundError` (run in the scratch folder with Python 3.14.6). The project's other `-I`
+  scripts insert their own folder near the top (`_HERE = str(Path(__file__).resolve().parent)` in
+  `scripts/analyze_visits.py`, `scripts/visit_rules.py` and `scripts/contact_facts_rules.py`; the line numbers moved
+  during the day). (rev F2, rev check)
+- Claude Code 2.1.319 (binary read as bytes, never run): the `install` command's handler starts with
+  `if(i.DISABLE_UPDATES)process.stdout.write("Updates are disabled by your administrator. …"),process.exit(0)`.
+  `claude auth status` prints JSON `{loggedIn, authMethod, apiProvider, …}` and exits 0 when logged in, 1 otherwise;
+  `authMethod` is one of `claude.ai`, `api_key` (also a Console `/login managed key`), `api_key_helper`,
+  `oauth_token`, `third_party`, `none`; `email` and `subscriptionType` are added only for `claude.ai`, and
+  `subscriptionType` may be null there. (rev F1, F8)
+- `requireRunner` answers 400 without `X-Runner-Id` and otherwise writes `runner_status.last_seen_at`
+  (`apps/server/src/lib/auth.ts:22-38`); `RUNNER_ID` defaults to `mac-runner-1` when the key is missing
+  (`apps/runner/runner/config.py:138`), but `init-env` writes `RUNNER_ID=mac-local-1` into `apps/runner/.env` when
+  the key is missing (`apps/zalo-bridge/bridge/envfiles.py`, `runner.set("RUNNER_ID", "mac-local-1", …)`), so an
+  installed device reports `mac-local-1` (rev check). The runner posts `/runner/status` on its own timer even when no
+  pool account is usable (`apps/runner/runner/poller.py`, `report_status` before the `pool_has_account` test).
+  The bridge doctor reports `listener` as `fail` when the daemon is not running
+  (`apps/zalo-bridge/bridge/doctor.py:146`) and its statuses are `ok`, `warn`, `fail` (`doctor.py:3`). (rev F7, F9)
+- With `http_proxy` set and no `no_proxy`, Python's `urllib.request.proxy_bypass("127.0.0.1")` is False; with only
+  `no_proxy=127.0.0.1,localhost,::1` set, `getproxies()` is `{'no': …}` and loopback is bypassed, which also stops
+  `urllib` from reading the macOS system proxy settings (run with Python 3.14.6 and `env -i`). The runner, bridge,
+  `seed_dev.py` and `analyze_contacts.py` use plain `urllib.request.urlopen` (`apps/runner/runner/api.py:34`,
+  `apps/zalo-bridge/bridge/api.py:75`, `scripts/seed_dev.py:87`, `scripts/analyze_contacts.py:1823`). (rev F4)
+- `/bin/bash` 3.2.57 runs no `EXIT` trap when the shell `exec`s (`bash -c 'trap … EXIT; exec /usr/bin/true'` printed
+  nothing). (rev F6)
+- Miniflare keeps local D1 at `<persist>/v3/d1/miniflare-D1DatabaseObject/<hash>.sqlite`, beside a
+  `metadata.sqlite` and a second `<hash>.sqlite`; Durable Objects are under `v3/do/thomhouse-bot-ConversationDO/`
+  (`find apps/server/.wrangler/state -maxdepth 4`, names only). (rev F13)
+- OpenMausBot listens on 127.0.0.1:8799 and 127.0.0.1:8800 (`lsof -nP -iTCP -sTCP:LISTEN`, 16:10). (rev F16)
+- The Zalo engine's `package.json` says `"license": "CC-BY-NC-SA-4.0"` and its `NOTICE` says commercial use,
+  including use in a company's business operations, is not licensed
+  (`tools/zalo-agent/node_modules/@ardennguyen/zalo-agent-cli/NOTICE:16-17`). The owner was told on 2026-11-12.
+  (rev owner)
+
+### 16.1 Purpose and invariants
+
+The owner builds one release file on the build Mac (macOS arm64) and carries it to each device. On a device, one
+command installs the runtimes, the dependencies and the program, creates the configuration, starts the stack and
+walks the person through the steps only a human can do, in Vietnamese. The same program updates, backs up, restores,
+moves and uninstalls an installation, and `thomhouse doctor` checks every prerequisite and every step. Each device is
+an independent installation with its own Zalo account, data, secrets and Claude login, and its console stays on
+127.0.0.1; nothing synchronises devices (owner decision 2026-11-12). Only Macs are targets: macOS 13.5 or newer on
+Apple Silicon is supported, Intel Macs are untested, and Linux and Windows are refused with one Vietnamese sentence
+(16.5, 16.9). (rev owner)
+
+Words used below. Build Mac: the owner's Mac with the project at `~/Projects/lulu-thomhouse` ("checkout mode").
+Device: a Mac that runs an installed release. `APP_HOME`: `THOMHOUSE_APP_HOME`, default `~/ThomHouse`. `BOT_HOME`:
+`THOMHOUSE_BOT_HOME`, default `~/.thomhouse-bot`, unchanged meaning. Launcher: `~/ThomHouse/bin/thomhouse`. Owner:
+can run one Terminal command. Staff: reception staff, not technical.
+
+Invariants (every file, every test):
+
+1. Nothing listens beyond this machine. The installer opens no listening socket of its own. The services keep the
+   bindings of `start_local.sh`: server 127.0.0.1:8787 (`:208-209`), console 127.0.0.1:5173 (`:406`), OpenMausBot
+   127.0.0.1:8799 (`:314`) and its second port, today 127.0.0.1:8800. The Zalo login is never started with
+   `--qr-url`. Doctor check `listen_local_only` fails when any socket of the services, of OpenMausBot or of the
+   listener daemon listens on another address. (rev F16)
+2. The installer never runs `openmausbot` itself; only `start_local.sh` starts it (14.10). No tunnel, LAN, relay,
+   domain, Tailscale, public URL or login option of OpenMausBot is ever passed; doctor check `openmausbot_options`
+   fails when the running platform has one.
+3. Automatic replies stay off by default. The installer never writes the `flags` table, never calls
+   `PUT /staff/flags`, `PUT /staff/conversations/:id/auto-reply` or `PUT /staff/conversations/:id/mode`, and never
+   sets `THOMHOUSE_DRAFT_ENGINE` itself, not even on a move (16.8.5). The only write of that key is the existing
+   `init-env` default `claude`, made only when `apps/runner/.env` does not mention the key (`envfiles.py`), so
+   `rooms` is never turned on by the installer. It reads flags only through `GET /staff/flags`. (rev F16, rev check)
+4. Secrets are never printed or logged. Token values are read into memory only to copy them between the env files
+   (`repair --env`), to send `STAFF_TOKEN` to 127.0.0.1, or to put `STAFF_TOKEN` on the clipboard (`staff-token`,
+   cleared after at most `THOMHOUSE_CLIPBOARD_CLEAR_S` seconds, at most 300). The installer never sends
+   `RUNNER_TOKEN` anywhere (rev F7, F16). Values are compared as SHA-256 digests. Every log line
+   passes a filter that replaces any value of `RUNNER_TOKEN`, `STAFF_TOKEN`, `ZALO_PERSONAL_WEBHOOK_SECRET`,
+   `ZALO_OA_SECRET_KEY` and `ZALO_APP_SECRET_KEY` (16 characters or longer) with `***`.
+5. Customer data and secrets are never part of a release. `make_release.py` packs an allowlist only, fails on any
+   denylisted path, fails when a packed file contains a live secret value of the build Mac, and fails on a private
+   key block (16.2.2).
+6. No API key in the main path. The launcher starts every command with `env -i` and never passes
+   `ANTHROPIC_API_KEY`, `ANTHROPIC_AUTH_TOKEN` or `CLAUDE_CODE_OAUTH_TOKEN` (16.4.2). Doctor check `no_api_key`
+   fails when an env file sets one of the first two.
+7. `PROFILE_LLM_ENABLED` stays false. The launcher sets `PROFILE_LLM_ENABLED=false`; both analyzers are started with
+   it; doctor check `profile_llm_off` fails when an env file or the environment sets it to a truthy value.
+8. Message text, display names, phone numbers, Zalo ids and the Claude account email are never printed or logged by
+   the installer. Output of `zalo-agent login` and `zalo-agent sync` is read as JSON or discarded, never logged;
+   the bridge doctor and `claude_pool.py status` are read as data and only mapped to the installer's own lines.
+9. Nothing is installed without consent. Before any download the person sees name, version, source, size and target
+   folder, and answers `c`. No `sudo`, no shell profile edit (`~/.zshrc`, `~/.zprofile`, `~/.bash_profile`), no
+   system setting. The installer writes only under `APP_HOME`, `BOT_HOME`, `~/.local/bin` and `~/.local/share/claude`
+   (through Anthropic's installer, after consent; what that installer writes for itself besides these, for example a
+   temporary download folder, was not checked, rev check), `~/Library/LaunchAgents/vn.thomhouse.bot.plist` and three files on
+   `~/Desktop` (each after consent), `~/.Trash` or, when macOS refuses that move, `~/thomhouse-bot-da-xoa-<stamp>`
+   (uninstall, rev F24), a new folder under `$TMPDIR` (dry run, removed at the end), and the clipboard
+   (`staff-token`).
+10. Typed confirmations (`dong y`, `khoi phuc`, `xoa du lieu`) and the shared-data question of step 2 are never
+    answered by `--yes` and never by a non-interactive stdin; a non-interactive stdin answers every `c/k` question
+    with `k` and every `c/s` question with `s`. (rev F20)
+11. Loopback traffic never goes through a proxy. Every child process gets `no_proxy` and `NO_PROXY` that contain
+    `127.0.0.1,localhost,::1`, whether or not a proxy variable is set; the installer's own HTTP calls use an opener
+    without proxies. Proxy variables themselves are passed on, so Claude Code, npm, pnpm and curl still reach the
+    internet on a Mac that needs a proxy. (rev F4)
+
+### 16.2 Distribution: how a device gets the program
+
+#### 16.2.1 Artifacts
+
+| Artifact | Content | Size | Required |
+|---|---|---|---|
+| `thomhouse-<ver>.command` | bash 3.2 header (16.2.6), a line `__PAYLOAD__`, then a deterministic `tar.gz` of the allowlisted tree | about 3.3 MB of files before compression (inventory 8) | yes |
+| `thomhouse-menu-<menu_id>.tar` | the 57 menu slide PNGs named by `data/menu-images.json`, plus `MENU.json` | about 173 MB (inventory 8) | only for menu images |
+| `thomhouse-<ver>-DOC-TRUOC.txt` | plain-text Vietnamese note (16.4.7 "Note beside the file"): Mac only, how to check the release id, the first-install command, the update command, the English macOS prompts | about 1 KB | yes, carried beside the `.command` (rev F19) |
+| `thomhouse-<ver>.sha256` | `shasum -a 256` line of the `.command`; stays on the build Mac as the reference for the release id | 100 bytes | build Mac only (rev F5) |
+
+`<ver>` is `MAJOR.MINOR.PATCH`, set by the owner (`--version`). `<menu_id>` is the first 16 hex characters of the
+SHA-256 of the lines `<path> <sha256>\n` of every slide, sorted by path. The menu archive is separate so that a code
+update does not carry 173 MB again; it is needed again only when `menu_id` changes.
+
+The owner carries the files by USB stick, AirDrop or private storage. No hosting, no git and no repository
+credential is needed on a device. The documented way has three commands, all typed in Terminal (rev F5, rev check):
+
+```
+shasum -a 256 /Volumes/<USB>/thomhouse-<ver>.command      # before a first install: compare the first 16 characters
+bash /Volumes/<USB>/thomhouse-<ver>.command               # first install, and resuming it before step 8
+~/ThomHouse/bin/thomhouse update /Volumes/<USB>/thomhouse-<ver>.command   # every update
+```
+
+The release id is the first 16 hex characters of the SHA-256 of the whole `.command` file, header included. The
+owner compares it with the id `make_release.py` printed on the build Mac (or with `thomhouse-<ver>.sha256` kept
+there), never with a copy that travelled with the file. An update never executes the file: the installed program
+reads the payload as data and checks its signature against the stored trust (16.2.6). Running the `.command` on a
+device that is already installed only prints the update command and exits 3. (rev F5)
+
+Double-clicking the file in Finder also runs it in Terminal. A file that arrived through a browser or AirDrop may be
+blocked by Gatekeeper on double-click (general knowledge, not checked); `bash <file>` is the documented form for that
+reason. Reading the file from a USB stick makes macOS ask, in English, whether Terminal may access a removable
+volume, before any line of the header runs; only the note beside the file and the guide can explain that prompt.
+(rev F18)
+
+#### 16.2.2 Building a release (build Mac only)
+
+```
+python3 -I scripts/release/refresh_pins.py [--python 3.14.6] [--node 24.19.0] [--claude 2.1.319] [--platforms darwin-arm64,darwin-x64]
+python3 -I scripts/release/make_release.py --init-key [--sign-key PATH]
+python3 -I scripts/release/make_release.py --version X.Y.Z [--menu] [--out DIR] [--sign-key PATH] [--check-only]
+```
+
+`refresh_pins.py` (network; the owner runs it when runtime versions change and once before the first release):
+downloads `https://nodejs.org/dist/v<node>/SHASUMS256.txt` and the python-build-standalone release checksum list
+over HTTPS, and writes URL, SHA-256 and byte size per platform into `install/versions.json`
+(`"hash_source": "https"`). It regenerates `install/lock/pnpm/package-lock.json` with
+`npm install --package-lock-only --ignore-scripts` in a temporary folder from `install/lock/pnpm/package.json`, and
+records the byte size of the pnpm tarball named by the lock's `resolved` URL. It also records
+`claude_code.platforms.darwin-arm64.{sha256, bytes}` from the build Mac's own binary
+`~/.local/share/claude/versions/<claude>` (no network; exit 1 when that version is not installed there);
+`darwin-x64` stays null (rev F22). It never edits any other file. Exit codes: 0 written; 1 a download, checksum list
+or the Claude binary is missing (nothing written); 2 bad arguments. As built, `--platforms` defaults to `darwin-arm64`
+only, `--claude` also sets `claude_code.min`, and `--pbs-release TAG` picks the python-build-standalone release
+(default: the newest one that has every requested archive). (rev review)
+
+`make_release.py --init-key`: runs `ssh-keygen -t ed25519 -C thomhouse-release -f <key>` (ssh-keygen asks for the
+passphrase itself) and writes `install/trust/allowed_signers` as one line
+`thomhouse-release namespaces="thomhouse-release" <public key>`. Refuses (exit 1) when `<key>` exists. Default key
+`--sign-key ~/.ssh/thomhouse-release` (environment `THOMHOUSE_RELEASE_KEY`).
+
+`make_release.py --version` does, in order, and stops at the first failure with exit 1, naming the path, pin or
+check, never a value:
+
+1. Refuse with exit 3 when `VERSION.json` exists at the project root (an installed copy, not a checkout).
+2. Pins complete: in `install/versions.json` the `darwin-arm64` entries of `python` and `node` have `url`, `sha256`
+   and `bytes`; `install/lock/pnpm/package-lock.json` exists and its root dependency equals the version in
+   `package.json` `packageManager`; `install/trust/allowed_signers` exists and holds the public key of `--sign-key`.
+3. Pins agree: `pins.agreement(<project root>)` (16.3.3) returns `[]`. It compares `ENGINE_VERSION` in
+   `scripts/start_local.sh:28`, `ENGINE_VERSION` in `apps/zalo-bridge/bridge/config.py:38`, the
+   `@ardennguyen/zalo-agent-cli` dependency in `tools/zalo-agent/package.json` and the root dependency in its
+   `package-lock.json`; and the `openmausbot` dependency in `tools/openmausbot/package.json` with its lock's root
+   dependency. Doctor check 15 calls the same function. (rev iface)
+4. Collect the files of `scripts/release/allowlist.txt` (16.2.3). Fail on a line that matches no file (except lines
+   marked `(optional)`), a path that matches `install/denylist.txt` (16.2.4), a symlink, a file other than a menu
+   slide larger than 5 MB, or a file with mode 0600. (rev facts) As built, 5 MB is 5 MiB, and "mode 0600" means
+   any file with no group or other permission bit. (rev review)
+5. Scan of every packed file, in memory; a hit fails the build and is reported as path, line number and rule, never
+   the value (rev F25):
+   - live secrets: every value of 16 or more characters of `KEY=value` lines in `apps/server/.dev.vars`,
+     `apps/runner/.env` and `apps/zalo-bridge/.env`; and every token of 16 or more characters of every file in
+     `.secrets/` except `*.example`, after splitting each line on whitespace and `=`, `:`, `?`, `&`, `/`, `"`, `'`,
+     `,`; a token made only of letters, digits, dots and hyphens that contains a dot (a host name) is not a secret.
+     As built, env-file values are split into tokens the same way as `.secrets/` lines (also on `;`), so
+     `SERVER_URL=http://127.0.0.1:8787` does not fail every build, and an `UPPER_SNAKE` token (a variable name) is
+     never a secret (rev review);
+   - a block with both `-----BEGIN` and `PRIVATE KEY`;
+   - a Vietnamese phone number, regular expression `(?<!\d)(\+?84|0)[35789]\d{8}(?!\d)`, and a run of 15 to 20
+     digits (a Zalo id), except a string whose SHA-256 is listed in `scripts/release/placeholders.txt` (one hex
+     digest and a comment per line; today's allowlist has two placeholder numbers in 8 places, critic scan). As
+     built, both rules use letter-or-digit boundaries (`(?<![0-9A-Za-z])`, `(?![0-9A-Za-z])`), so a hex digest never
+     counts, and the phone rule also catches a number written with spaces, dots or hyphens and `+84` followed by a
+     separator: `(\+?84[ .-]?|0)[35789]\d(?:[ .-]?\d){7}`. A placeholder hash matches the exact text, the digits
+     without separators, or the national form with a leading `0`, so one `placeholders.txt` line covers every way of
+     writing the same number (rev review);
+   - the build Mac's `$HOME` path.
+6. Every packed `.py` file compiles (`compile()`), every `.json` parses, every `.sh` and `.sh.in` passes `bash -n`.
+7. Generate into the payload: `VERSION.json` (16.2.5), `MANIFEST.json`, `MANIFEST.sha256` and
+   `install/versions.env` (a `KEY=value` copy of the pins for bash).
+8. Pack `thomhouse-<ver>/…` as tar.gz with members sorted by path, mtime 0, uid and gid 0, empty user and group
+   names, mode 0755 for files with an executable bit and 0644 for the others, gzip mtime 0. The same tree gives the
+   same bytes.
+9. Sign the payload: `ssh-keygen -Y sign -f <key> -n thomhouse-release <payload>`.
+10. Write `<out>/thomhouse-<ver>.command` (mode 0755) from `install/selfextract.sh.in` with the header variables
+    filled in, then `__PAYLOAD__` and the payload bytes. With `--menu`, also write `<out>/thomhouse-menu-<menu_id>.tar`
+    holding `MENU.json` (`{"schema": 1, "menu_id", "files": [{"path", "sha256", "bytes"}]}`) and every slide under
+    `slides/<path relative to sources/drive-resources/thomhouse-menu>`. Every `slides[].file` of
+    `data/menu-images.json` must start with `sources/drive-resources/thomhouse-menu/`, else exit 1. As built, the
+    `MENU.json` paths, and the lines that make up `menu_id`, are relative to
+    `sources/drive-resources/thomhouse-menu`; on a device the slides unpack to `shared/menu-slides/<menu_id>/` with
+    `MENU.json` beside them, and `release.link_menu` never replaces a real folder (checkout mode) (rev review).
+11. Write `<out>/thomhouse-<ver>.sha256` (the `shasum -a 256` line of the whole `.command`) and
+    `<out>/thomhouse-<ver>-DOC-TRUOC.txt` from `scripts/release/DOC-TRUOC.txt.in` with `{version}` filled in (never
+    the release id, because the note travels with the file). Print the file names, sizes, file count, the release
+    id (the first 16 hex characters of the SHA-256 of the whole `.command` file, upper case, in four groups:
+    `3F9A-21C7-0B44-D1E8`) and the `menu_id`. (rev F5, F19)
+
+`--check-only` runs steps 1 to 6 and writes nothing. Default `--out ~/thomhouse-releases` (created with mode 0700).
+Exit codes: 0 built; 1 a check failed; 2 bad arguments; 3 refused (installed copy).
+
+As built (rev review): step 2 also requires `"hash_source": "https"` in `install/versions.json` and refuses `"test"`
+there. Test pins come only from the file named by `THOMHOUSE_RELEASE_TEST_PINS`, which must hold
+`"hash_source": "test"`; it replaces `install/versions.json` for the checks and in the payload, and the builder warns
+that the release is a test build. Build output is English, because a static test forbids Vietnamese letters in `.py`
+files outside `text_vi`.
+
+#### 16.2.3 Allowlist (`scripts/release/allowlist.txt`, glob per line, `**` = any depth)
+
+```
+package.json
+pnpm-lock.yaml
+pnpm-workspace.yaml
+apps/server/src/**
+apps/server/migrations/*.sql
+apps/server/scripts/**
+apps/server/package.json
+apps/server/tsconfig.json
+apps/server/wrangler.toml
+apps/server/.dev.vars.example
+apps/console/src/**
+apps/console/index.html
+apps/console/package.json
+apps/console/tsconfig.json
+apps/console/vite.config.ts
+apps/console/.env.example
+apps/desktop/main.js
+apps/desktop/preload.js
+apps/desktop/package.json
+apps/runner/runner/**
+apps/runner/.env.example
+apps/zalo-bridge/bridge/**
+apps/zalo-bridge/.env.example
+scripts/start_local.sh
+scripts/stop_local.sh
+scripts/seed_dev.py
+scripts/build_menu_images.py
+scripts/runner/claude_pool.py
+scripts/analyze_contacts.py
+scripts/import_visits.py
+scripts/analyze_visits.py
+scripts/visit_rules.py
+scripts/contact_facts_rules.py
+scripts/visit_model_pass.py
+data/services.json
+data/business-facts.json
+data/menu-images.json
+data/reply-templates.json
+design/system-prompt-draft.md
+design/tools-schema.json
+tools/zalo-agent/package.json
+tools/zalo-agent/package-lock.json
+tools/openmausbot/package.json
+tools/openmausbot/package-lock.json
+install/**                            (except install/tests/**)
+docs/cai-dat-may-moi.md
+```
+
+`apps/desktop/package.json` ships because `pnpm install --frozen-lockfile` needs every workspace member
+(`pnpm-workspace.yaml:1-4`); the Electron binary is not downloaded, because only `install-electron` downloads it
+(inventory 4). `tools/zalo-agent/package-lock.json` ships although `.gitignore:15` ignores the folder: it is the
+engine's only lock. Files matching `**/__pycache__/**`, `**/*.pyc`, `**/*.test.ts`, `**/*.test.tsx` and `.DS_Store`
+are dropped from globs silently. `apps/server/src/seed-data.ts` ships and is marked `runtime_written` (it is
+regenerated at every server start, `start_local.sh:204`). The four chat-facts scripts are required lines now, because
+they exist (rev facts); a line that matches no file fails the build, and a line may end with `(optional)` to allow
+that.
+
+#### 16.2.4 Denylist (`install/denylist.txt`; a match fails the build)
+
+The denylist moved from `scripts/release/` into `install/`, so it ships: doctor check 11 and update phase U1 match a
+release's `MANIFEST.json` against it on the device through `release.denylisted()` (rev iface).
+
+```
+.secrets/**            **/.env            **/.env.*  (except **/.env.example)
+**/.dev.vars           **/.env.local      **/node_modules/**     **/.wrangler/**
+.venv/**               **/dist/**         results/**             research/**
+report/**              sources/**         **/*.sqlite*           **/*.db
+design/eval-set.jsonl  data/services-corrections.json            scripts/tests/**
+scripts/eval/**        **/wip_*           apps/*/tests/**        apps/server/test/**
+install/tests/**       scripts/release/**
+```
+
+`sources/**` covers the menu slides too: they travel only in the menu archive.
+
+#### 16.2.5 Payload files generated by `make_release.py`
+
+| File | Content |
+|---|---|
+| `VERSION.json` | `{"schema": 1, "version": "1.4.0", "menu_id": "<16 hex>"}` (no build time, so the payload stays deterministic; the `features` object is gone, rev visits) |
+| `MANIFEST.json` | `{"schema": 1, "files": [{"path", "sha256", "bytes", "mode", "runtime_written"}]}` for every packed file except itself and `MANIFEST.sha256` |
+| `MANIFEST.sha256` | the same files in `shasum -a 256` format, for bash |
+| `install/versions.env` | `MACOS_MIN`, `DISK_MIN_GB`, `PY_VERSION`, `PY_URL_<plat>`, `PY_SHA256_<plat>`, `PY_BYTES_<plat>`, `NODE_VERSION`, `NODE_URL_<plat>`, `NODE_SHA256_<plat>`, `NODE_BYTES_<plat>`, `PNPM_VERSION`, `PNPM_BYTES`, `CLAUDE_VERSION`, `CLAUDE_MIN`, `CLAUDE_INSTALLER_URL`, `CLAUDE_APPROX_MB`, `CLAUDE_SHA256_<plat>` (empty when null, rev F22), where `<plat>` is `darwin_arm64` or `darwin_x64`. The launcher reads `PY_VERSION` from this file at every run (rev F10) |
+
+`install/versions.json` (kept in the project, the one place for runtime pins):
+
+```json
+{ "schema": 1, "macos_min": "13.5", "disk_min_gb": 3,
+  "python": { "version": "3.14.6", "min": "3.11",
+              "platforms": { "darwin-arm64": { "url": "…", "sha256": "…", "bytes": 0 }, "darwin-x64": { … } } },
+  "node":   { "version": "24.19.0", "min_stack": "22.19.0", "min_rooms_major": 24,
+              "platforms": { "darwin-arm64": { "url": "https://nodejs.org/dist/v24.19.0/node-v24.19.0-darwin-arm64.tar.gz", "sha256": "…", "bytes": 0 }, "darwin-x64": { … } } },
+  "pnpm":   { "bytes": 0 },
+  "claude_code": { "version": "2.1.319", "min": "2.1.319", "installer_url": "https://claude.ai/install.sh", "approx_installed_mb": 310,
+                   "platforms": { "darwin-arm64": { "sha256": "…", "bytes": 0 }, "darwin-x64": { "sha256": null, "bytes": null } } },
+  "hash_source": "https" }
+```
+
+The `features` object and its `chat_facts_import` flag are removed: the flag existed only to gate the visit
+analyzer, which now runs by default (step 19, rev visits). `claude_code.platforms` holds the SHA-256 of the binary
+that Anthropic's installer leaves in `~/.local/share/claude/versions/<version>` (rev F22).
+
+The builder writes this file with `"sha256": null` and `"bytes": null`; `refresh_pins.py` fills them. The pnpm
+version is not repeated here: it is read from `package.json` `packageManager`. The Zalo engine and OpenMausBot
+versions are read from `tools/*/package.json`. `approx_installed_mb` is the size measured on the build Mac
+(314,452 KB, distribution 3.4).
+
+#### 16.2.6 The `.command` file and the trust model
+
+Header variables (filled by `make_release.py`): `RELEASE_VERSION`, `PAYLOAD_SHA256`, `PAYLOAD_BYTES`,
+`PAYLOAD_SIG_B64` (base64 of the armored SSH signature, one line), `MENU_ID`, `BUILT_AT`. The header contains the
+string `__PAYLOAD__` only once, as the marker line; the payload starts at the next byte.
+
+The header is not covered by the signature, so the trust model never relies on the header of a file that is not yet
+trusted (rev F5):
+
+- First install on a device (no `APP_HOME/installed.json`): the file the person runs is trusted as a whole; the only
+  protection against a forged file is the owner's `shasum -a 256` comparison of 16.2.1, which the guide and the note
+  beside the file ask for before the first run. The header extracts the payload, recomputes its SHA-256 and refuses a
+  mismatch (exit 3, nothing written); this catches a truncated or damaged copy. It then shows the release id it
+  computes from the whole file (`shasum -a 256 "${BASH_SOURCE[0]}"`) and asks the owner to compare it (skipped with
+  `--trust-channel`; `--yes` does not answer this question, and without a terminal the answer is `k`, exit 4,
+  rev review); this catches a wrong or damaged file, not a forged one. After `c`, it verifies the payload
+  signature against the payload's own `install/trust/allowed_signers`, and step 8 stores that file as
+  `APP_HOME/trust/allowed_signers` (mode 0600): trust on first use.
+- Installed device (`APP_HOME/installed.json` exists): the header runs only `--doctor`; any other run, `--dry-run`
+  included, prints the "already installed" screen of 16.4.7 and exits 3 before it unpacks or writes anything. A
+  header `--dry-run` would run the payload's Python without checking it against the stored trust; the checked way
+  is `thomhouse update FILE --dry-run` (rev check). Updates, repair
+  and every later use of a release file go through installed code: `release.verify_file()` reads the header
+  variables as data, never executes the file, takes the payload after the `__PAYLOAD__` line and verifies it with
+  `ssh-keygen -Y verify -f APP_HOME/trust/allowed_signers -I thomhouse-release -n thomhouse-release -s <sig> < <payload>`.
+  A failure refuses with exit 3. A changed header with an intact payload therefore still verifies, and a changed
+  payload never does.
+- Runtime downloads are checked against the SHA-256 in `versions.json`; npm and pnpm check every package against the
+  sha512 integrity of the lockfiles (distribution 2.2); the Claude Code binary is checked after Anthropic's installer
+  ran (step 5, rev F22).
+
+#### 16.2.7 Layout on a device
+
+```
+~/ThomHouse/                          APP_HOME, 0700: program only, no customer data
+  bin/thomhouse                       launcher, 0700 (from install/thomhouse.sh.in)
+  app -> releases/1.4.0               the live program (relative symlink); start and stop always go through it
+  releases/1.4.0/                     unpacked payload + node_modules + env files (0600) + .thomhouse-deps.json
+  releases/1.3.2/                     the previous release, kept for rollback (one only)
+  releases/.staging-<ver>/            during unpack only
+  runtime/python -> python-3.14.6-aarch64-apple-darwin/
+  runtime/node   -> node-v24.19.0-darwin-arm64/
+  runtime/pnpm-10.32.1/               npm ci of install/lock/pnpm
+  runtime/bin/pnpm -> ../pnpm-10.32.1/node_modules/.bin/pnpm
+  runtime/bin/claude -> ~/.local/bin/claude   (absolute link, rev F11, F15)
+  releases/<ver>/.npmrc               one line store-dir=<APP_HOME>/cache/pnpm-store, written by step 7 (rev F21)
+  shared/menu-slides/<menu_id>/       the slides; each release links sources/drive-resources/thomhouse-menu here
+  cache/downloads/<sha256>.<ext>      verified downloads, reused; any other file there is hashed and used when its
+                                      SHA-256 matches a pin (rev F11); cache/pnpm-store/, cache/npm/
+  cache/releases/thomhouse-<ver>.command   copy of each installed release file (for repair), 0600
+  trust/allowed_signers               0600
+  installed.json                      version stamp, 0600 (16.4.4)
+  install-steps.json                  step journal and update journal, 0600
+  history.jsonl                       one line per install, update, rollback, restore, move, uninstall, 0600
+  logs/                               0700: install.log, runtimes.log, deps.log, update.log, ops.log, start.log,
+                                      autostart.log (0600)
+  .install.lock                       fcntl.flock lock of every changing command; holds the holder's PID (rev F3)
+  .bootstrap.lock.d/pid               the header's lock before Python runs (rev F6)
+~/.thomhouse-bot/                     BOT_HOME as today (0700), plus backups/ (0700) and backups/.lock (rev F3)
+  moved-out.json                      present only after move-out; start_local.sh refuses to start (rev F12)
+  d1.restore-needed.json              present only while step 12 has not copied d1 back from its backup (16.4.3);
+                                      start, step 15, the start_local.sh backup hook and move-out refuse (rev review)
+  backups/.partial-<id>/              a backup being written; leftovers are removed by the next backup (rev review)
+~/.local/bin/claude                   Claude Code, from Anthropic's installer
+```
+
+`start_local.sh` derives `ROOT` with `cd … && pwd` (`:22`), which keeps the logical path `~/ThomHouse/app`, so the
+paths `init-env` writes once (`ZALO_AGENT_BIN` through `app`, `OPENMAUSBOT_NODE_DIR` = `~/ThomHouse/runtime/node/bin`
+through the symlink) stay valid across updates. The installer refuses (exit 3) an `APP_HOME` or `BOT_HOME` that
+contains whitespace.
+
+### 16.3 Files
+
+#### 16.3.1 New files
+
+Line counts are estimates. Package names refer to 16.11.
+
+| File | Package | Purpose |
+|---|---|---|
+| `install/thomhouse.py` (about 220) | WP1 | CLI entry. Its first statements after the standard-library imports insert `str(Path(__file__).resolve().parent)` at `sys.path[0]`, because `python3 -I` does not add the script folder (rev F2). Then argparse for every command of 16.4.1, `--version`, the dispatch table of 16.3.3 with `InstallLock` for changing commands, lazy imports; a module that is not there yet answers exit 2 |
+| `install/thomhouse_installer/__init__.py` | WP1 | package marker, `SCHEMA = 1` |
+| `install/thomhouse_installer/context.py` (about 90) | WP1 | `Ctx`, `Exit`, the exit-code constants (16.3.3) |
+| `install/thomhouse_installer/paths.py` (about 100) | WP1 | every path of 16.2.7 from `HOME`, `THOMHOUSE_APP_HOME`, `THOMHOUSE_BOT_HOME`; installed versus checkout mode |
+| `install/thomhouse_installer/platforms.py` (about 90) | WP1 | OS from `uname -s` (and WSL), macOS version (`sw_vers -productVersion`), CPU (`sysctl -n hw.optional.arm64`), free disk |
+| `install/thomhouse_installer/pins.py` (about 110) | WP1 | reads `versions.json`, `package.json` `packageManager`, `tools/*/package.json`; `agreement()` of 16.2.2 step 3 (rev iface) |
+| `install/thomhouse_installer/consent.py` (about 70) | WP1 | the only place that asks; rules of invariant 10 |
+| `install/thomhouse_installer/proc.py` (about 140) | WP1 | child environment (16.4.2), process runner with log file and secret filter |
+| `install/thomhouse_installer/state.py` (about 180) | WP1 | `installed.json`, `install-steps.json` (steps and update journal), `history.jsonl`, `moved-out.json`, backup listing, atomic writes, `InstallLock` (rev F3, F12, F14, iface) |
+| `install/thomhouse_installer/download.py` (about 100) | WP1 | verified downloads with curl; reuse of any matching file in `cache/downloads` (rev F11) |
+| `install/thomhouse_installer/stack.py` (about 200) | WP1 | start, stop, PID rule, other stacks, health gate, loopback HTTP (the commands `start`, `stop`, `restart` moved to WP5 `service.py`, rev iface) |
+| `install/thomhouse_installer/migrations.py` (about 140) | WP1 | D1 file, applied and pending migrations, apply, active catalog id (rev F7, F13) |
+| `install/thomhouse_installer/accounts.py` (about 110) | WP1 | the Claude pool read through a fresh load of `claude_pool.py`, `claude auth status`, pool commands (rev F8, F23, iface) |
+| `install/thomhouse_installer/bridgecli.py` (about 90) | WP1 | `python3 -m bridge.main` calls: `doctor --json`, `listener`, `sync-labels`, `init-env` (rev iface) |
+| `install/thomhouse_installer/envs.py` (about 50) | WP1 | read-only access to the three env files (rev iface) |
+| `install/thomhouse_installer/text_vi/__init__.py`, `text_vi/core.py` | WP1 | `t(key, **fmt)`; merges the catalogs of all packages; common texts |
+| `install/versions.json` | WP1 | runtime pins (16.2.5), hashes null until `refresh_pins.py` runs |
+| `install/tests/__init__.py`, `install/tests/support.py` | WP1 | `InstallerTestCase` (16.10) |
+| `install/tests/fake_bin/*`, `install/tests/fake_tree/**` | WP1 | fakes and a fake release tree (16.10) |
+| `install/tests/test_core_*.py` | WP1 | 16.10, including `test_core_cli.py` (rev F2) |
+| `scripts/release/make_release.py` (about 450), `refresh_pins.py` (about 220), `allowlist.txt`, `placeholders.txt`, `DOC-TRUOC.txt.in` | WP2 | 16.2.2 to 16.2.4 (rev F19, F25) |
+| `install/denylist.txt` | WP2 | the denylist of 16.2.4, shipped (moved from `scripts/release/`, rev iface) |
+| `install/selfextract.sh.in` (about 180, bash 3.2) | WP2 | `.command` header: OS sentence per `uname -s`, refusal on an installed device, hash, lock with PID, preflight, release id of the whole file, signature, unpack, then `bootstrap.sh` (rev F5, F6, F19) |
+| `install/bootstrap.sh` (about 190, bash 3.2) | WP2 | runtime detection at the launcher's fixed locations (never a PATH lookup, rev check), plan and consent for all four runtimes, Python install (cache file found by hash), then exec of the Python CLI; `--python-only` repair mode (rev F5, F11) |
+| `install/thomhouse.sh.in` (about 70, bash 3.2) | WP2 | launcher template (16.4.2): only `APP_HOME` and `BOT_HOME` filled in, `PY_VERSION` read at run time, loopback `no_proxy`, the bash doctor when Python is missing (rev F4, F10, F15) |
+| `install/lock/pnpm/package.json`, `install/lock/pnpm/package-lock.json` | WP2 | pnpm pinned with sha512 (lock generated by `refresh_pins.py`) |
+| `install/trust/allowed_signers` | WP2 (written by `--init-key` on the build Mac, not by the builder) | release public key |
+| `install/thomhouse_installer/release.py` (about 280) | WP2 | read the header as data, verify, unpack, switch `app`, write the launcher, denylist match, prune, menu slides (rev F5, F10, iface) |
+| `install/thomhouse_installer/runtimes.py` (about 260) | WP2 | plan and install Node, pnpm, Claude Code; Claude binary check; `runtime/bin/claude` link; switch symlinks (rev F1, F11, F22) |
+| `install/thomhouse_installer/deps.py` (about 150) | WP2 | frozen installs, the release's `.npmrc`, and the stamp (rev F21) |
+| `install/thomhouse_installer/repair.py` (about 120) | WP2 | `thomhouse repair` |
+| `install/thomhouse_installer/text_vi/release.py` | WP2 | texts of WP2 |
+| `install/tests/test_release_*.py`, `install/tests/fakes_release/` (optional) | WP2 | 16.10 |
+| `install/thomhouse_installer/steps.py` (about 300) | WP3 | the step table of 16.4.3, `install`, `continue`, dry-run plan |
+| `install/thomhouse_installer/human.py` (about 300) | WP3 | Claude login, Zalo login, history sync, analyzers, labels, staff token |
+| `install/thomhouse_installer/text_vi/setup.py` | WP3 | texts of WP3 |
+| `install/tests/test_setup_*.py`, `install/tests/fakes_setup/` (optional) | WP3 | 16.10 |
+| `install/thomhouse_installer/doctor.py` (about 400), `safety.py` (about 140) | WP4 | 16.7 |
+| `install/thomhouse_installer/text_vi/doctor.py` | WP4 | every doctor line of 16.7 |
+| `install/tests/test_doctor_*.py` | WP4 | 16.10 |
+| `docs/cai-dat-may-moi.md` | WP4 | Vietnamese guide for the owner: make a release, install, the human steps, update, backup, restore, move, uninstall, operating systems |
+| `install/thomhouse_installer/backup.py` (about 260), `update.py` (about 300), `move.py` (about 220), `uninstall.py` (about 140), `autostart.py` (about 110), `service.py` (about 80) | WP5 | 16.8, autostart and shortcuts; `service.py` holds the commands `start`, `stop`, `restart` (rev iface) |
+| `install/templates/vn.thomhouse.bot.plist.in`, `Bat-chatbot.command.in`, `Kiem-tra-chatbot.command.in`, `Tat-chatbot.command.in` | WP5 | LaunchAgent and Desktop shortcuts |
+| `install/thomhouse_installer/text_vi/ops.py` | WP5 | texts of WP5 |
+| `install/tests/test_ops_*.py` | WP5 | 16.10 |
+| `install/tests/test_integration_flows.py`, `test_integration_stubs.py` | integration | the real five-package chain through the header (install, update with a new Python and a migration, rollback, same-version update), and a check that the test stand-ins keep the real modules' signatures (rev review) |
+| `install/tests/test_hardening.py` | review repair | tests of the repairs to the core modules `stack.py`, `download.py` and `text_vi/core.py` (rev review) |
+
+#### 16.3.2 Existing files that change
+
+| File | Package | Exact change | Why |
+|---|---|---|---|
+| `scripts/start_local.sh` after line 23 | WP5 | Add: `APP_HOME="${THOMHOUSE_APP_HOME:-$HOME/ThomHouse}"`; when `[[ -f "$ROOT/VERSION.json" ]]`, prepend, in this order of the final PATH, `$APP_HOME/runtime/node/bin`, `$APP_HOME/runtime/python/bin`, `$APP_HOME/runtime/bin` (each only when the folder exists; `~/.local/bin` is no longer added, because `runtime/bin/claude` links to the Claude Code that the installer checked, rev F15) and `export PATH`. About 8 lines. | A hand-run start on a device finds the private runtimes. The build Mac and the existing tests have no `VERSION.json`, so nothing changes there. |
+| `scripts/start_local.sh` right before `mkdir -p "$RUN_DIR" "$LOG_DIR" "$D1_DIR"` (after the `case "$MODE"` check; today line 144) | WP5 | Add: `[[ ! -f "$BOT_HOME/moved-out.json" ]] \|\| die "dữ liệu chatbot trong $BOT_HOME đã chuyển sang máy khác, nên script không bật chatbot ở máy này. Muốn bật lại ở đây, chạy lệnh move-back của thomhouse."` 1 line. It must come after `die` is defined (`:62-65`): the script runs with `set -euo pipefail`, so a call before the definition would stop with exit 127 and no message (rev check). | A Mac whose data moved out, the build Mac included, can no longer start a second listener on the same Zalo account (rev F12). The existing tests never create that file. |
+| `scripts/start_local.sh` line 151 | WP5 | Hint text becomes `"Cài pnpm 10.32.1: chạy ~/ThomHouse/bin/thomhouse install, hoặc xem docs/cai-dat-may-moi.md."` | Corepack is not shipped from Node 25 on (distribution 3.2). |
+| `scripts/start_local.sh` lines 169-175 | WP5 | Inside the existing `if`: when `"$ENGINE_DIR/package-lock.json"` exists, run `npm ci --prefix "$ENGINE_DIR" --no-fund --no-audit`; otherwise keep the current `npm install … --save-exact` command. The `die` message and log file stay. About 6 lines. | Frozen engine install with integrity checks on every device (distribution 2.4). The step title `2/9 Engine zalo-agent-cli` stays (`apps/zalo-bridge/tests/test_local_scripts.py:124`). |
+| `scripts/start_local.sh` before line 206 (inside the `else` branch, before `d1 migrations apply`) | WP5 | `if [[ -f "$ROOT/install/thomhouse.py" ]]; then THOMHOUSE_BOT_HOME="$BOT_HOME" python3 -I "$ROOT/install/thomhouse.py" backup --stopped --reason before-migration --if-pending-migrations --quiet >>"$LOG_DIR/backup.log" 2>&1 \|\| die "chưa sao lưu được dữ liệu nên chưa áp migration; xem $LOG_DIR/backup.log"; fi` | Today pending migrations are applied with no backup (lifecycle 7.4), also on the build Mac. The temporary roots of the existing tests have no `install/`, so those tests are unaffected. The hook works while an install, update or restore holds `InstallLock`, because `backup` never takes that lock (16.8.2, rev F3), and it imports its package because of the `sys.path` line of `thomhouse.py` (rev F2). |
+| `scripts/stop_local.sh` after line 16 (after `BOT_HOME`) | WP5 | The same PATH block as `start_local.sh` (runtime folders first, only with `"$ROOT/VERSION.json"`). About 8 lines. | A hand-run stop on a device without developer tools would otherwise call the `/usr/bin/python3` shim at line 95 and leave the listener running (rev F15). |
+| `docs/run-local.md` | WP4 | Line 36: `pnpm install` becomes `pnpm install --frozen-lockfile`. New short section after line 39, "Cài lên máy khác thế nào?", one paragraph pointing to `docs/cai-dat-may-moi.md`. | One documented way (R1). |
+| `README.md` | WP4 | Append a section "Cài trên máy của studio" of three sentences with a link to `docs/cai-dat-may-moi.md`. | R11. |
+| `docs/chay-local-zalo-ca-nhan.md` | WP4 | Line 108: replace the absolute path of the owner's folder with `tools/zalo-agent/node_modules/.bin/zalo-agent` and add "Trên máy cài bằng trình cài: `~/ThomHouse/bin/thomhouse sync-history`." Line 50: say that the QR code shows in the browser page `http://127.0.0.1:18927/qr`, not in Terminal.app. | Machine-specific path (portability 4.5); the QR correction above. |
+| `docs/contracts.md` | WP4 | Append this section as section 16 after section 15 (or after 14 if 15 has not landed; re-read the file right before the edit). Add to 14.10, found by its heading `### 14.10 Local processes`, the sentence: "On a device installed with section 16, runtimes and dependencies are installed by `thomhouse install` after the owner agrees; `start_local.sh` still installs only from lockfiles, and refuses to start while `$BOT_HOME/moved-out.json` exists." | 14.10 promises that nothing new is installed without the owner's go-ahead (today `docs/contracts.md:1015-1029`; the line numbers move, rev facts). |
+
+Not changed: every file under `apps/`, root `package.json`, `pnpm-workspace.yaml`, `.gitignore`. The root `test`
+script does not run `install/tests`; the other builds use that script today, so adding it is left for later.
+`scripts/stop_local.sh` now changes (row above, rev F15).
+
+The line numbers named in the rows for `docs/run-local.md` and `docs/chay-local-zalo-ca-nhan.md` moved before the
+edits were made (the `pnpm install` command to line 37, the QR sentence to line 52, the sync command to line 111);
+the edits were placed by the surrounding text, as was the 14.10 sentence (rev wp4). The 14.10 sentence also says
+that the backup hook stops `start_local.sh` before the migrations while `BOT_HOME/d1.restore-needed.json` exists,
+because `backup --if-pending-migrations` exits 1 then (16.4.3 step 12, rev review).
+
+#### 16.3.3 Module interfaces (keep these names and signatures; private helpers are free)
+
+The next build writes WP1 first and then WP2 to WP5 in parallel against this subsection, so every call that crosses
+a package is listed here with its exact name, signature, return shape, exceptions and exit codes. A function that is
+not listed here is private to its package. All modules are under `install/thomhouse_installer/` and are written for
+Python 3.11 or newer with the standard library only (the checkout's `python3` may be 3.11, `start_local.sh:157`).
+(rev iface)
+
+Exit codes and errors (WP1, `context.py`). Every error a package raises for the person subclasses `InstallerError`;
+the dispatcher of `thomhouse.py` prints `t(err.key, **err.fmt)` and returns `err.code`, so it never imports another
+package's exception classes.
+
+```python
+EXIT_OK, EXIT_FAILED, EXIT_USAGE, EXIT_REFUSED, EXIT_DECLINED, EXIT_HUMAN_PENDING = 0, 1, 2, 3, 4, 10
+
+class InstallerError(Exception):
+    code: int = 1                     # class default, overridden per subclass or per instance
+    key: str = "core.failed"          # text key of 16.4.7 / the package catalogs
+    def __init__(self, key: str | None = None, code: int | None = None, **fmt: object) -> None: ...
+    fmt: dict[str, object]            # format values; never a secret, an email, a Zalo id or a message
+class Exit(InstallerError):
+    def __init__(self, code: int, key: str | None = None, **fmt: object) -> None: ...
+                                      # stop the command with that code; key None prints nothing
+```
+
+| Raised by | Class | `code` | `key` |
+|---|---|---|---|
+| WP1 `state` | `Locked(pid: int \| None)` | 3 | `core.locked` |
+| WP1 `pins` | `PinError(name: str)` | 2 | `core.pin_missing` |
+| WP1 `download` | `DownloadError(kind, name, *, host="")`, kind `not_https`, `network`, `http`, `size`, `checksum`, and `disk` (curl exit 23, a write error, or ENOSPC when the finished file is renamed; also raised for the Claude Code installer download in `runtimes`, rev review) | 1 | `core.download_<kind>` |
+| WP2 `release` | `ReleaseError(kind, **fmt)`, kind `damaged`, `signature`, `not_release`, `older`, `same`, `denylisted` | 3 | `release.<kind>` |
+| WP2 `release` | `InstallerError("release.menu_damaged", 1)` from `install_menu`, because a menu archive problem gives only a warning in step 11 and U5 (rev review) | 1 | `release.menu_damaged` |
+| WP2 `runtimes` | `RuntimeInstallError(name, kind, *, version="")`, kind `unpack`, `version`, `installer`, `checksum`; `{name}` is the runtime's label and version (rev review) | 1 | `release.runtime_<kind>` |
+| WP2 `deps` | `DepsError(which)`, which `workspace`, `engine` | 1 | `release.deps_<which>` |
+| WP5 `backup` | `BackupError(kind)`, kind `space`, `verify`, `copy` (code 1), `refused`, `locked` (code 3). `copy` covers a file that cannot be copied and a `BOT_HOME/backups` that cannot be opened. SQLite error 13 (`SQLITE_FULL`) or "disk is full" while copying gives `space`, not `verify` (rev review) | 1 or 3 | `ops.backup_<kind>` |
+| dispatcher | `KeyboardInterrupt` | 1 | `core.interrupted` |
+| dispatcher | any other exception | 2 | `core.internal_error` with the type name only; the traceback goes to `logs/install.log` through `proc.redact` |
+
+CLI and dispatch (WP1, `thomhouse.py`). `main(argv: list[str] | None = None) -> int`: parse (bad arguments: exit 2),
+`paths.resolve(os.environ, code_root=Path(os.path.abspath(__file__)).parent.parent)` (logical path, symlinks kept),
+refuse a command not allowed in checkout mode (`Exit(3, "core.checkout_only")`), `context.make_ctx`, then call the
+handler, inside `state.InstallLock` when the table says so and `--dry-run` is not given. Right after the lock is
+taken, the dispatcher removes `APP_HOME/.bootstrap.lock.d` when its `pid` file holds `os.getpid()` (rev F6).
+`python3 -I install/thomhouse.py --version` prints the `VERSION.json` version (or `checkout`) and exits 0, with no
+other module imported (rev F2). Every handler is `cmd_<name>(ctx: Ctx, args: argparse.Namespace) -> int`.
+
+Two more refusals come before the lock and the handler (rev check). While `state.moved_out()` is not None, every
+command except `doctor`, `backup`, `backups`, `stop`, `move-back` and `uninstall` exits 3 with `core.moved_out`:
+the refused commands could start the stack or a Zalo listener for an account that now runs on another Mac (for
+example `login-zalo`, `restore`, `update`). Otherwise, while `state.update_open()` is not None, every command except
+`update`, `rollback`, `doctor`, `backup`, `backups`, `stop` and `uninstall` exits 3 with `core.update_open`: the
+live release and the database may not match, and `repair` would relink `app` to the old release over a migrated
+database. `stack.start`, `steps.cmd_install` and `steps.cmd_continue` keep their own refusals below.
+
+Every Namespace has `command: str`, `yes: bool`, `dry_run: bool`, `quiet: bool`, `offline: bool`, `json: bool`, all
+`False` unless the command defines the option. Command-specific attributes:
+
+| Command | Handler | InstallLock | Checkout mode | Attributes |
+|---|---|---|---|---|
+| `install` | `steps.cmd_install` | yes | no | `only: str \| None`, `menu: Path \| None`, `move_in: Path \| None`, `skip_human: bool`, `from_bootstrap: bool`, `consented: list[str]` (subset of `python`, `node`, `pnpm`, `claude_code`), `release_file: Path \| None` (the `.command` the header ran), `trust_channel: bool` |
+| `continue` | `steps.cmd_continue` | yes | no | `skip_human: bool` |
+| `start`, `stop`, `restart` | `service.cmd_start`, `cmd_stop`, `cmd_restart` | yes | no | — |
+| `doctor` | `doctor.cmd_doctor` | no | yes | `strict: bool`, `only: set[str] \| None` |
+| `update` | `update.cmd_update` | yes | no | `file: Path`, `menu: Path \| None` |
+| `rollback` | `update.cmd_rollback` | yes | no | — |
+| `backup` | `backup.cmd_backup` | no (takes `backups/.lock`) | yes | `mode: "online" \| "stopped" \| None`, `reason: "manual" \| "before-migration"`, `if_pending_migrations: bool` |
+| `backups` | `backup.cmd_backups` | no | yes | — |
+| `restore` | `backup.cmd_restore` | yes | yes | `id: str` |
+| `move-out` | `move.cmd_move_out` | yes | yes (rev F12) | `to: Path` |
+| `move-in` | `move.cmd_move_in` | yes | no | `file: Path` |
+| `move-back` | `move.cmd_move_back` | yes | yes (rev F12) | — |
+| `uninstall` | `uninstall.cmd_uninstall` | yes | no | `data: bool` |
+| `login-claude` | `human.cmd_login_claude` | yes | no | `label: str \| None` (None: `main` when it exists, else the first account by priority that step 14 would ask for; after a move-in there is no `main`, rev check) |
+| `add-claude` | `human.cmd_add_claude` | yes | no | `label: str`, `priority: int` (default 100) |
+| `login-zalo` | `human.cmd_login_zalo` | yes | no | — |
+| `sync-history` | `human.cmd_sync_history` | yes | no | `force: bool` |
+| `analyze` | `human.cmd_analyze` | yes | no | `contacts: bool`, `visits: bool` (neither given: both) |
+| `labels` | `human.cmd_labels` | yes | no | `sync: bool` |
+| `staff-token` | `human.cmd_staff_token` | no | no | — |
+| `autostart`, `shortcuts` | `autostart.cmd_autostart`, `cmd_shortcuts` | yes | no | `state: "on" \| "off"` |
+| `repair` | `repair.cmd_repair` | yes | no | `paths: bool`, `env: bool` |
+
+`doctor`, `backups`, `staff-token` and every `--dry-run` take no lock (rev F3). Human commands return 0 when done, 1
+on a failure and 4 when the person answered `s` or stdin was not interactive.
+
+```python
+# ---------------------------------------------------------------- WP1 core
+# context.py
+@dataclass
+class Ctx:
+    paths: Paths
+    env: Mapping[str, str]           # copy of os.environ at start (tests pass their own)
+    args: argparse.Namespace
+    yes: bool; dry_run: bool; quiet: bool; offline: bool
+    interactive: bool                # sys.stdin.isatty()
+    platform: Platform               # property: platforms.detect() on first use
+    pins: Pins                       # property: pins.load(paths.code_root, platform.key) on first use; raises PinError
+    def log(self, event: str, **fields: object) -> None   # one JSON line {"at", "event", ...} to logs/install.log
+                                                           # through proc.redact; never printed; with dry_run it
+                                                           # writes nothing (rev review)
+make_ctx(args: argparse.Namespace, env: Mapping[str, str] | None = None, *, paths: Paths | None = None) -> Ctx
+    # paths None = paths.resolve(env); the dispatcher passes the Paths it resolved from the logical location of
+    # thomhouse.py, because the package itself is imported from the real (resolved) folder (rev wp1)
+
+# paths.py
+@dataclass(frozen=True)
+class Paths:
+    home: Path; app_home: Path; bot_home: Path; code_root: Path   # code_root: folder holding install/ (logical)
+    mode: str                        # "installed" when code_root/VERSION.json exists, else "checkout"
+    app: Path                        # APP_HOME/app (installed) or code_root (checkout)
+    releases: Path; runtime: Path; runtime_bin: Path; shared: Path; cache: Path; downloads: Path
+    cache_releases: Path
+    trust: Path                      # APP_HOME/trust/allowed_signers
+    launcher: Path                   # APP_HOME/bin/thomhouse
+    installed_json: Path; steps_json: Path; history: Path; logs: Path
+                                     # history and logs: under APP_HOME (installed) or BOT_HOME (checkout), so a
+                                     # checkout-mode command never creates ~/ThomHouse on the build Mac (rev wp1)
+    lock_file: Path                  # APP_HOME/.install.lock (installed) or BOT_HOME/.install.lock (checkout)
+    bootstrap_lock_dir: Path         # APP_HOME/.bootstrap.lock.d
+    run_dir: Path; bot_logs: Path; d1_dir: Path                   # BOT_HOME/run, BOT_HOME/logs, BOT_HOME/d1
+    accounts_json: Path; account_state_json: Path
+    backups: Path; backups_lock: Path                             # BOT_HOME/backups, BOT_HOME/backups/.lock
+    moved_out: Path                  # BOT_HOME/moved-out.json
+    zalo_config: Path                # ZALO_CONFIG_DIR or ~/.zalo-agent-cli (only checked for accounts/*/zalo.db)
+    def release_dir(self, ver: str) -> Path
+    def env_file(self, name: str) -> Path   # "server" apps/server/.dev.vars, "runner" apps/runner/.env,
+                                            # "bridge" apps/zalo-bridge/.env, "console_local" apps/console/.env.local,
+                                            # all under `app`
+resolve(env: Mapping[str, str] | None = None, code_root: Path | None = None) -> Paths
+    # raises Exit(3, "core.whitespace_path") when app_home or bot_home contains whitespace
+
+# platforms.py
+@dataclass(frozen=True)
+class Platform:
+    os: str                          # "darwin" | "linux" | "wsl" | "windows" | "other" (from uname -s, /proc/version)
+    uname: str; macos: tuple[int, ...] | None
+    cpu: str                         # "arm64" | "x64" | "other"
+    key: str | None                  # "darwin-arm64" | "darwin-x64" | None
+detect(run=subprocess.run) -> Platform ; free_gb(path: Path) -> float
+
+# pins.py
+@dataclass(frozen=True)
+class RuntimePin: version: str; url: str | None; sha256: str | None; bytes: int | None
+@dataclass(frozen=True)
+class Pins:
+    macos_min: tuple[int, ...]; disk_min_gb: int
+    python: RuntimePin; python_min: str
+    node: RuntimePin; node_min_stack: str; node_min_rooms_major: int
+    pnpm_version: str; pnpm_bytes: int | None
+    claude: RuntimePin               # url = installer_url; sha256/bytes of the binary for this platform (may be None)
+    claude_min: str; claude_approx_mb: int
+    engine_version: str; openmausbot_version: str | None
+load(code_root: Path, platform_key: str | None = "darwin-arm64") -> Pins     # raises PinError(name)
+agreement(code_root: Path) -> list[str]   # names of the pins of 16.2.2 step 3 that disagree; [] when all agree
+
+# consent.py
+ask(ctx, key: str, choices: str = "ck", *, allow_yes: bool = True, **fmt) -> str
+    # prints t(key); accepts a letter of `choices` (case and diacritics ignored, "có" = "c"), asks again otherwise;
+    # non-interactive stdin: "k" when "k" in choices else "s"; --yes and allow_yes: prints the question and "c"
+typed(ctx, key: str, words: tuple[str, ...], **fmt) -> bool
+    # NFC and lower case; never answered by --yes; non-interactive stdin: False
+
+# proc.py
+@dataclass
+class Result: returncode: int; stdout: str = ""; stderr: str = ""   # filled only with capture=True
+child_env(paths: Paths, extra: Mapping[str, str] | None = None, *, claude_install: bool = False) -> dict[str, str]
+    # 16.4.2. claude_install=True drops DISABLE_UPDATES and DISABLE_AUTOUPDATER (rev F1)
+run(ctx, cmd: list[str], *, cwd: Path | None = None, env: Mapping[str, str] | None = None, log: Path | None = None,
+    timeout: float | None = None, stdin: str | None = None, capture: bool = False, interactive: bool = False) -> Result
+    # env None = child_env(ctx.paths); stdin None = /dev/null unless interactive; log: stdout and stderr appended to
+    # that file through redact, never shown; capture: kept in memory only, never logged; neither: discarded;
+    # interactive: inherits the terminal, nothing logged; non-interactive children get their own session, and a
+    # timeout sends SIGTERM to the group, SIGKILL after 5 s, returncode 124; a missing executable gives 127
+secret_values(paths: Paths) -> set[str]   # values of 16+ characters of the five keys of invariant 4 in the env files
+redact(text: str, secrets: set[str]) -> str
+
+# state.py
+load_installed(paths) -> dict | None ; save_installed(paths, data: dict) -> None   # 0600, temp file + os.replace
+step_get(paths, step_id: str) -> dict | None      # {"status", "at", "reason", …}
+step_set(paths, step_id: str, status: str, reason: str | None = None, **extra) -> None
+steps_all(paths) -> dict[str, dict]
+update_get(paths) -> dict | None ; update_set(paths, data: dict | None) -> None
+    # the update journal, key "update" of install-steps.json (16.8.1): {"from", "to", "file", "from_runtimes",
+    # "to_runtimes", "backup", "phases": {"U1": "done", …}, "state": "running" | "done" | "rolled_back" | "failed"}
+    # As built, WP5 adds "new_runtimes" (the runtimes U3 installed; U9 switches exactly these and a rollback switches
+    # them back, never Claude Code), "d1_failed", "started_at" and "finished_at" (rev review)
+update_open(paths) -> dict | None                 # the journal when "state" is "running" and phase U7 or a later
+                                                  # one has started (rev F14). Before U7 nothing live was touched
+                                                  # and the old stack still runs, so refusing then would only keep
+                                                  # the bot down after a reboot; the next `update FILE` starts
+                                                  # again at U1 (rev check)
+history_append(paths, event: dict) -> None
+class Locked(InstallerError): pid: int | None
+class InstallLock:                                # context manager on paths.lock_file, fcntl.flock LOCK_EX|LOCK_NB;
+    def __init__(self, paths: Paths) -> None      # re-entrant within one process (a counter); the first entry writes
+                                                  # "<pid>\n" and sets os.environ["THOMHOUSE_LOCK_OWNER"]; the last exit
+                                                  # unlocks and removes the variable; raises Locked (rev F3)
+lock_holder(paths) -> int | None    # None when free (probed with a non-blocking flock on a new descriptor, released
+                                    # at once); else the PID in the file (0 when unreadable)
+held_by_us(paths) -> bool           # lock_holder() is os.getpid() or int(os.environ["THOMHOUSE_LOCK_OWNER"])
+moved_out(paths) -> dict | None ; set_moved_out(paths, info: dict) -> None ; clear_moved_out(paths) -> None
+    # BOT_HOME/moved-out.json {"schema": 1, "at", "image_name", "image_sha256"} (rev F12)
+@dataclass
+class BackupInfo:
+    id: str; path: Path; created_at: str; reason: str; mode: str; app_version: str
+    device_id: str | None; migrations_applied: list[str]; bytes: int
+list_backups(paths) -> list[BackupInfo]   # newest first; folders with backup.json and no .partial- prefix; no hashing
+
+# download.py
+fetch(ctx, url: str, sha256: str, size: int | None, *, name: str) -> Path
+    # returns cache/downloads/<sha256>.<ext>. Reuses that file, or any other regular file in cache/downloads whose
+    # SHA-256 matches (renamed to the cache name), with no curl call (rev F11). Otherwise
+    # curl --proto =https --tlsv1.2 -fL --retry 3 -C - -o <sha256>.part, size and hash check, rename.
+    # Raises DownloadError: not_https (before any call), network (curl 6, 7, 28, 35), http (curl 22),
+    # size, checksum (the .part file is deleted for size and checksum). Before any call it raises PinError(name)
+    # when url is None or sha256 is not 64 hex characters (the null placeholder of versions.json), so nothing is
+    # downloaded before refresh_pins.py has filled the pin (rev wp1). DownloadError(kind, name, *, host="")
+    # curl exit 23 (a write error, for example a full disk) and ENOSPC on the rename raise DownloadError("disk"),
+    # key core.download_disk; any other curl failure is "network" (rev review)
+
+# stack.py
+@dataclass
+class Service: name: str; pattern: str; pid: int | None; alive: bool; cwd: Path | None
+SERVICES: tuple[tuple[str, str], ...]     # (name, pattern) as start_local.sh: server "<app>/apps/server/", cron
+                                          # "__scheduled", runner "runner.main", bridge "bridge.main",
+                                          # console "<app>/apps/console/", openmausbot "<app>/tools/openmausbot/"
+services(paths) -> list[Service]          # alive = the is_running rule of start_local.sh:83-93
+is_running(paths, name: str) -> bool
+other_stacks(paths) -> list[Service]
+    # alive services of BOT_HOME/run that belong to another installation (rev F20). A service belongs to this one
+    # when its command line contains "<paths.app>/" (the logical path that start_local.sh passes, as in SERVICES)
+    # or "<realpath(paths.app)>/", or when its working folder (lsof -a -d cwd -p PID -Fn, a real path) lies under
+    # realpath(paths.app); the cron ticker, whose command line holds no path and whose working folder is wherever
+    # start_local.sh was run, belongs where the server belongs. A command line is never compared with the real
+    # path alone, because the installation's own server, console and OpenMausBot carry the logical `app` path,
+    # and OpenMausBot's working folder is BOT_HOME/openmausbot (start_local.sh:310-314) (rev check)
+    # "Alive" here: the PID lives, its start time equals <name>.start when that file exists, and its command line
+    # contains the path-free part of the pattern ("/apps/server/", "runner.main", ...), so a server or console
+    # started by another installation from its own folder is reported too (rev wp1)
+start(ctx, *, quiet: bool = False, during_update: bool = False) -> int
+    # prints the one line core.starting unless quiet or ctx.quiet (rev wp1)
+    # raises Exit(3, "core.moved_out") when state.moved_out(); Exit(3, "core.update_open") when state.update_open()
+    # and not during_update (rev F14); runs <app>/scripts/start_local.sh with cwd <app> and child_env; its stdout
+    # and stderr go only to logs/start.log (rev F18); returns its exit code
+stop(ctx) -> bool                         # records PIDs and start times, runs <app>/scripts/stop_local.sh (log
+                                          # logs/start.log); True when none of those processes is alive afterwards
+health_gate(ctx) -> list[str]             # after THOMHOUSE_HEALTH_WAIT_S: ids among "processes", "server_health",
+                                          # "console" that fail (same rules as doctor checks 31, 32, 35)
+http_json(ctx, method: str, path: str, *, token: str | None = None, body: object | None = None,
+          timeout: float = 3.0) -> tuple[int, object | None]
+    # base THOMHOUSE_SERVER_URL for a path starting with "/", or a full loopback URL; opener with ProxyHandler({});
+    # (0, None) when no connection; the body parsed as JSON, else None; ValueError for a non-loopback host
+    # The opener follows no redirect: a 30x answer is returned as its status, so a Bearer token never reaches
+    # another host (rev review)
+LOOPBACK_HOSTS = ("127.0.0.1", "localhost", "::1")   # also used by `staff-token` (16.6.5, rev review)
+
+# migrations.py
+find_db(bot_home: Path) -> Path | None
+    # the newest (mtime) *.sqlite in bot_home/d1/v3/d1/miniflare-D1DatabaseObject/ that has a table d1_migrations;
+    # metadata.sqlite and files without that table are ignored (rev F13)
+applied(bot_home: Path) -> list[str] | None
+    # [] when that folder holds no *.sqlite other than metadata.sqlite; None when files exist but find_db() is None
+    # or the file cannot be read; else the names. Every open is read-only: sqlite3.connect("file:<quoted>?mode=ro",
+    # uri=True)
+pending(code_root: Path, bot_home: Path) -> list[str] | None   # sorted names of apps/server/migrations/*.sql
+                                                               # not applied; None when applied() is None
+apply(ctx, code_root: Path) -> int        # output in logs/migrations.log (rev wp1); wrangler d1 migrations apply thomhouse-main --local --persist-to
+                                          # <bot_home>/d1 </dev/null in <code_root>/apps/server; wrangler's exit code
+active_catalog(bot_home: Path) -> str | None   # SELECT id FROM catalog_versions WHERE status = 'active' (rev F7)
+
+# accounts.py (rev F8, F23)
+@dataclass
+class Account:
+    label: str; config_dir: Path | None; priority: int; enabled: bool; pool_status: str; usable_now: bool
+@dataclass
+class AuthStatus:
+    logged_in: bool; auth_method: str | None; subscription: str | None
+    @property
+    def ok(self) -> bool             # logged_in and auth_method == "claude.ai" and bool(subscription)
+load(ctx) -> list[Account]
+    # sets os.environ["THOMHOUSE_BOT_HOME"] = str(paths.bot_home), then loads <code_root>/scripts/runner/claude_pool.py
+    # with importlib.util.spec_from_file_location into a new module object per call, never stored in sys.modules;
+    # uses its accounts(), state() and healthy(label); [] when accounts.json is missing
+auth_status(ctx, account: Account) -> AuthStatus
+    # `claude auth status` with CLAUDE_CONFIG_DIR = config_dir (unset when None), capture; reads only loggedIn,
+    # authMethod, subscriptionType; output that is not JSON gives AuthStatus(False, None, None)
+pool(ctx, *args: str) -> int              # python3 -I <code_root>/scripts/runner/claude_pool.py <args>; output
+                                          # discarded (claude_pool.py status prints emails)
+
+# bridgecli.py (all calls: python3 -m bridge.main … in <app>/apps/zalo-bridge with child_env, capture)
+doctor(ctx) -> dict[str, str] | None      # {name: "ok" | "warn" | "fail"} from {"checks": [...]}; details never
+                                          # read; None with --offline, without apps/zalo-bridge/.env, or no JSON
+listener(ctx, action: str, *, only_ours: bool = False) -> tuple[int, dict]
+    # action "start" | "status" | "stop"; exit code and parsed JSON ({} when none): 0 ok, 1 error, 2 config,
+    # 3 not logged in, 4 foreign daemon (apps/zalo-bridge/bridge/listener.py:25-29)
+sync_labels(ctx, *, dry_run: bool) -> tuple[int, dict | None]
+init_env(ctx, code_root: Path, engine_bin: Path) -> int   # init-env --mode personal --engine-bin … --repo-root
+                                                          # <code_root> (rev wp1); output discarded
+
+# envs.py
+read(path: Path) -> dict[str, str]        # KEY=value lines; blank and "#" lines skipped; quotes removed; {} when
+                                          # missing; values never logged
+value(paths: Paths, name: str, key: str) -> str | None   # name as Paths.env_file
+
+# text_vi/__init__.py
+t(key: str, **fmt) -> str                 # KeyError for an unknown key
+say(key: str, **fmt) -> None              # print(t(key, **fmt))
+KEYS: frozenset[str]
+# Each catalog module text_vi/{core,release,setup,doctor,ops}.py defines TEXTS: dict[str, str] whose keys start with
+# "<module>."; __init__ merges the modules that exist and raises ValueError on a duplicate key.
+
+# ---------------------------------------------------------------- WP2 release
+# release.py
+@dataclass
+class ReleaseInfo:
+    version: str; path: Path; payload_offset: int; payload_bytes: int; payload_sha256: str
+    release_id: str                  # first 16 hex of the SHA-256 of the whole file, upper case (rev F5)
+    signature: bytes; menu_id: str
+read_header(path: Path) -> ReleaseInfo    # header variables parsed as data; never executes the file; ReleaseError
+                                          # ("not_release") without exactly one __PAYLOAD__ line
+verify_file(ctx, path: Path, *, first_install: bool) -> ReleaseInfo
+    # payload SHA-256 ("damaged"); signature with ssh-keygen -Y verify against the payload's own
+    # install/trust/allowed_signers (first_install) or paths.trust ("signature"); no MANIFEST path denylisted by the
+    # installed release's install/denylist.txt ("denylisted"). The caller compares versions ("older", "same").
+unpack(ctx, info: ReleaseInfo) -> Path    # releases/.staging-<ver>, shasum check of MANIFEST.sha256, rename to
+                                          # releases/<ver>; a verified existing folder is returned as is; the live
+                                          # folder (`app` points at it) that fails verification is never replaced:
+                                          # ReleaseError("damaged"), left to `thomhouse repair` (rev review)
+copy_to_cache(ctx, info: ReleaseInfo) -> Path   # cache/releases/thomhouse-<ver>.command, 0600
+switch_app(ctx, version: str) -> None     # relative link app -> releases/<version>, temp link + os.replace
+write_launcher(ctx, code_root: Path) -> bool
+    # renders code_root/install/thomhouse.sh.in with APP_HOME and BOT_HOME only (nothing version-specific) into
+    # bin/thomhouse (temp file, os.replace, 0700); False when the content was already equal (rev F10)
+launcher_current(ctx, code_root: Path) -> bool
+verify_manifest(code_root: Path) -> list[str]   # changed or missing paths; runtime_written skipped
+denylist(code_root: Path) -> list[str] ; denylisted(rel_path: str, patterns: list[str]) -> bool
+prune(ctx, keep_previous: int = 1) -> None
+install_menu(ctx, menu_tar: Path) -> str  # the menu_id
+link_menu(ctx, code_root: Path, menu_id: str) -> bool
+menu_slides_ok(ctx, code_root: Path) -> bool   # link valid and every file of MENU.json verifies
+
+# runtimes.py
+@dataclass
+class RuntimeItem:
+    name: str                        # "python" | "node" | "pnpm" | "claude_code"
+    wanted: str; found: str | None; action: str        # "keep" | "install"
+    source: str                      # host shown to the person
+    size_mb: int; target: Path; url: str | None; sha256: str | None
+found(ctx, name: str) -> str | None
+    # the first x.y.z of --version at the launcher's locations only: runtime/python/bin/python3, runtime/node/bin/node,
+    # runtime/bin/pnpm, $HOME/.local/bin/claude; None when missing or not runnable (rev F11)
+plan(ctx) -> list[RuntimeItem]            # "keep" when found equals the pin (claude_code: found >= min)
+install(ctx, item: RuntimeItem, *, node_bin: Path | None = None) -> None
+    # python, node: download.fetch, unpack into runtime/.tmp-<name>-<v>, --version check, rename;
+    # pnpm: npm ci of install/lock/pnpm with node_bin (default runtime/node/bin) first on PATH;
+    # claude_code: step 5 of 16.4.3 (installer with child_env(claude_install=True), version, binary SHA-256).
+    # Raises DownloadError or RuntimeInstallError; a half-made folder is removed
+switch(ctx, name: str, version: str) -> None
+    # python, node: the runtime/<name> link; pnpm: runtime/bin/pnpm; claude_code: runtime/bin/claude ->
+    # $HOME/.local/bin/claude (rev F15)
+
+# deps.py
+stamp_ok(ctx, code_root: Path) -> dict[str, bool]     # keys "workspace", "engine", "rooms"
+    # as built: the stamp records `uname -s` and `uname -m` and the Node.js major version; "engine" also requires
+    # that the installed engine version equals the pin; deps.install writes a "not installed" stamp before it
+    # starts (rev review)
+install(ctx, code_root: Path, node_bin: Path, *, pnpm_bin: Path | None = None) -> dict[str, bool]
+    # step 7 of 16.4.3; pnpm_bin None = runtime/bin/pnpm; U4 passes the new pnpm before U9 switches the link
+    # (rev check); returns {"rooms": ok}; raises DepsError for workspace or engine
+
+# repair.py
+cmd_repair(ctx, args) -> int              # 0 done, 1 failed, 4 declined; without options it also rewrites the
+                                          # launcher when it differs; --paths drops the path lines from the bridge,
+                                          # runner and server env files (rev review)
+# WP2 helpers outside this list (glob_match, glob_regex, versions_env, menu_id_of, group_id, version_tuple,
+# compare_versions, MARKER) stay private; WP5's update.py compares versions with its own code (rev review)
+
+# ---------------------------------------------------------------- WP3 setup
+@dataclass
+class StepResult:
+    status: str                      # "done" | "pending" | "skipped" | "failed" | "declined"
+    reason: str | None = None        # 16.4.4 codes
+    exit: int | None = None          # not None: stop the run with this exit code
+    extra: dict = field(default_factory=dict)   # journal fields later runs need: the engine notice accepted_at,
+                                     # the preflight answers, the move-in image_sha256, the release file of step 11;
+                                     # kept when the runner rewrites the step (rev review)
+@dataclass
+class Step:
+    n: int; id: str; title_key: str; optional: bool; human: bool; network: bool
+    check: Callable[[Ctx], bool]; run: Callable[[Ctx], StepResult]
+steps.STEPS: list[Step]                   # the 25 steps of 16.4.3, in order
+steps.cmd_install(ctx, args) -> int ; steps.cmd_continue(ctx, args) -> int        # 0, 1, 2, 3, 4 or 10
+    # both raise Exit(3, "core.update_open") when state.update_open() (rev F14) and Exit(3, "core.moved_out") when
+    # state.moved_out() (rev F12)
+    # install --only STEP takes a step id or a number; exit 0 for done, skipped or declined, 4 for a postponed human
+    # step or a pending "declined", 1 otherwise, 2 for an unknown step (rev review)
+steps.RESTORE_MARK = "d1.restore-needed.json"
+steps.restore_needed(paths) -> dict | None
+    # the mark of 16.4.3 step 12 in BOT_HOME: {"backup", "backup_path", "failed", "at"}, None when absent, {} when
+    # unreadable (still counts as present). service.cmd_start, step 15, `backup --if-pending-migrations` and
+    # move-out refuse while it exists; backup.py, service.py and move.py import it inside the function (rev review)
+human.cmd_login_claude / cmd_add_claude / cmd_login_zalo / cmd_sync_history / cmd_analyze / cmd_labels /
+      cmd_staff_token (ctx, args) -> int  # 0 done, 1 failed, 4 postponed
+
+# ---------------------------------------------------------------- WP4 doctor
+@dataclass
+class CheckResult:
+    n: int; id: str; group: str
+    status: str                      # "pass" | "fail" | "warn" | "todo" | "skip"
+    label: str; detail: str; fix: str | None
+    crashed: bool = False            # a check that raised: a `fail` line with doctor.crashed; not part of as_dict()
+                                     # (rev wp4)
+    def as_dict(self) -> dict        # {"n", "id", "group", "status", "label", "detail", "fix"}
+@dataclass
+class CheckDef: n: int; id: str; group: str; net: bool; run: bool; fn: Callable[[Ctx, dict], CheckResult]
+doctor.CHECKS: list[CheckDef]             # the 48 checks of 16.7
+doctor.run_checks(ctx, *, only: set[str] | None = None) -> list[CheckResult]
+    # in order; the bridge doctor, the pool and the login status are read at most once per call; ValueError for an
+    # unknown id, and so does passes() (rev wp4)
+doctor.BY_ID, doctor.BY_N                 # {id: CheckDef}, {"<n>": CheckDef} (rev wp4)
+doctor.line(result: CheckResult) -> str   # one rendered doctor line, for WP3 and WP5 when they print failing checks
+                                          # (rev wp4)
+doctor.passes(ctx, ids: set[str]) -> bool # no listed check is "fail" or "todo" (the check() of a step); "warn"
+                                          # and "skip" pass, so a step whose check can only warn (11, 24) has
+                                          # its own rule in 16.4.3 (rev check)
+doctor.exit_code(results: list[CheckResult], strict: bool) -> int   # 2 when any result has crashed (rev wp4)
+doctor.cmd_doctor(ctx, args) -> int       # 0, 1, 2; --only accepts check numbers as well as ids, and an unknown one
+                                          # gives doctor.unknown_check and exit 2 (rev wp4)
+safety.group_pids(pgids: list[int]) -> list[int]               # from ps -ax -o pid=,pgid=
+safety.pgid_table() -> dict[int, int]     # the ps -ax -o pid=,pgid= table that group_pids filters (rev wp4)
+safety.listen_sockets(pids: list[int]) -> list[tuple[int, str, int]]   # (pid, address, port) from
+                                          # lsof -nP -a -p <pids> -iTCP -sTCP:LISTEN
+safety.process_argv(pid: int) -> list[str]   # ps -ww -o args= -p PID, split on whitespace (no path here holds
+                                             # whitespace, 16.2.7)
+safety.FORBIDDEN_PLATFORM_ARGS: tuple[str, ...] = ("--tunnel", "--lan", "--relay", "--domain", "--public-url",
+                                                   "--tailscale", "login")
+safety.forbidden_platform_args(argv: list[str]) -> list[str]
+    # whole elements only: an element equal to "login", equal to an option, or starting with "<option>=" (rev F16)
+    # returns the option names found, never a value (for --domain=x it returns --domain), so a URL or token passed
+    # to an option never reaches the screen (rev wp4)
+
+# ---------------------------------------------------------------- WP5 ops
+backup.make(ctx, *, mode: str, reason: str) -> state.BackupInfo
+    # mode "stopped" | "online"; takes BOT_HOME/backups/.lock (waits up to 300 s, else BackupError("locked")); never
+    # InstallLock (rev F3); BackupError("refused") for "stopped" while the server runs
+backup.verify(backup_dir: Path) -> bool
+backup.restore_into(ctx, source_dir: Path, *, same_device: bool) -> None
+backup.cmd_backup / cmd_backups / cmd_restore (ctx, args) -> int
+update.cmd_update(ctx, args) -> int ; update.cmd_rollback(ctx, args) -> int
+move.cmd_move_out / cmd_move_in / cmd_move_back (ctx, args) -> int
+move.place_moved_data(ctx, image: Path) -> int   # 0 done; 1 failed (set-aside data moved back); 3 newer app_version;
+                                                 # 4 no passphrase given
+uninstall.cmd_uninstall(ctx, args) -> int
+autostart.enable(ctx) -> None ; autostart.disable(ctx) -> None ; autostart.shortcuts(ctx, on: bool) -> None
+autostart.remove_all(ctx) -> list[str]    # removed paths
+autostart.cmd_autostart(ctx, args) -> int ; autostart.cmd_shortcuts(ctx, args) -> int
+service.cmd_start(ctx, args) -> int       # stack.start, stack.health_gate, then doctor.run_checks(only=
+                                          # {"listen_local_only", "openmausbot_options"}); 0 ok, 1 failed, 3 refused
+service.cmd_stop(ctx, args) -> int        # 0, or 1 when a process survives
+service.cmd_restart(ctx, args) -> int
+```
+
+Calls that cross packages, by caller (anything not listed is not called across packages):
+
+| Caller | Calls |
+|---|---|
+| WP2 | WP1 only: `paths`, `platforms`, `pins`, `consent`, `proc`, `state`, `download`, `stack.stop`/`start` (repair), `text_vi` |
+| WP4 | WP1: `state.lock_holder`, `held_by_us`, `moved_out`, `steps_all`, `list_backups`; `pins.agreement`; `stack.services`, `other_stacks`, `http_json`; `migrations.find_db`, `pending`, `active_catalog`; `accounts.load`, `auth_status`; `bridgecli.doctor`, `listener`; `envs.value`. WP2: `release.verify_manifest`, `denylist`, `denylisted`, `menu_slides_ok`; `deps.stamp_ok`; `runtimes.found` |
+| WP5 | WP1 (all of the above as needed); WP2: `release.verify_file`, `read_header`, `unpack`, `copy_to_cache`, `switch_app`, `write_launcher`, `prune`, `install_menu`, `link_menu`, `denylist`, `denylisted`; `runtimes.plan`, `install`, `switch`; `deps.install`; WP4: `doctor.run_checks` |
+| WP3 | WP1; WP2: `release.*` as WP5, `runtimes.*`, `deps.*`; WP4: `doctor.run_checks`, `passes`, `exit_code`; WP5: `backup.make`, `move.place_moved_data`, `autostart.enable`, `autostart.shortcuts` |
+
+`CheckResult.status` is one of `pass`, `fail`, `warn`, `todo`, `skip`. Each install step's `check()` is
+`doctor.passes(ctx, ids)` with the check ids named in the "Skipped when" column of 16.4.3, so a step and the doctor check of the same subject run
+the same function; a check never trusts the journal alone when the machine can be inspected. (rev iface) Doctor
+checks 19 (`menu_slides`) and 40 (`menu_images`) report a missing item as `warn`, which `passes` accepts, so steps 11
+and 24 name their own function instead of a check id; otherwise both steps would be marked done without running.
+(rev check)
+
+### 16.4 The install command
+
+#### 16.4.1 Command lines
+
+```
+bash thomhouse-<ver>.command [--dry-run] [--yes] [--doctor] [--trust-channel] [--skip-human] [--menu FILE] [--move-in FILE]
+~/ThomHouse/bin/thomhouse install [--yes] [--dry-run] [--skip-human] [--only STEP] [--menu FILE] [--move-in FILE]
+~/ThomHouse/bin/thomhouse continue [--yes] [--dry-run] [--skip-human]
+~/ThomHouse/bin/thomhouse start [--quiet] | stop | restart
+~/ThomHouse/bin/thomhouse doctor [--json] [--offline] [--strict] [--only CHECK[,CHECK…]]
+~/ThomHouse/bin/thomhouse update FILE [--menu FILE] [--dry-run] [--yes]
+~/ThomHouse/bin/thomhouse rollback [--dry-run]
+~/ThomHouse/bin/thomhouse backup [--online | --stopped] [--reason manual|before-migration] [--if-pending-migrations] [--quiet]
+~/ThomHouse/bin/thomhouse backups
+~/ThomHouse/bin/thomhouse restore ID [--dry-run]
+~/ThomHouse/bin/thomhouse move-out --to DIR | move-in FILE | move-back
+~/ThomHouse/bin/thomhouse uninstall [--data] [--dry-run]
+~/ThomHouse/bin/thomhouse login-claude [LABEL] | add-claude LABEL [--priority N]
+~/ThomHouse/bin/thomhouse login-zalo | sync-history [--force] | analyze [--contacts] [--visits] | labels [--sync]
+~/ThomHouse/bin/thomhouse staff-token
+~/ThomHouse/bin/thomhouse autostart on|off | shortcuts on|off
+~/ThomHouse/bin/thomhouse repair [--paths] [--env]
+~/ThomHouse/bin/thomhouse --version
+```
+
+`bootstrap.sh` alone adds the options `--from-bootstrap --consented python,node,pnpm,claude_code --release-file FILE`
+to `install` (only the consented names are listed); they are not documented for people (rev iface).
+
+`install` without a file on an installed device is the same as `continue`. The `.command` file is never the way to
+continue or update an installed device: on a device with `installed.json`, the header runs only `--doctor` and
+otherwise prints the "already installed" screen of 16.4.7 and exits 3 (rev F5, rev check). Before step 8 there
+is no launcher and no `installed.json`, so running the same `.command` again resumes the install. `update FILE`
+refuses an older version (exit 3) and names `thomhouse rollback`; for the same version it prints the line
+`ops.update_same` of 16.8.1, which names `continue`, and exits 0, so WP5 never calls WP3 (rev check). In
+checkout mode (`python3 -I install/thomhouse.py …` in the project) only `doctor`, `backup`, `backups`, `restore`,
+`move-out` and `move-back` run; every other command exits 3 (rev F12).
+
+Changing commands take `InstallLock` (16.3.3 table): `install`, `continue`, `start`, `stop`, `restart`, `update`,
+`rollback`, `restore`, `move-out`, `move-in`, `move-back`, `uninstall`, `login-claude`, `add-claude`, `login-zalo`,
+`sync-history`, `analyze`, `labels`, `autostart`, `shortcuts`, `repair`. `doctor`, `backups`, `staff-token` and every
+`--dry-run` take no lock; `backup` takes only `BOT_HOME/backups/.lock` (16.8.2), so the `start_local.sh` hook can run
+while another command holds `InstallLock`. Inside a command that holds the lock, its own children see it as held by
+them (`state.held_by_us()`), so step 2 and doctor check 6 pass there. (rev F3)
+
+Exit codes of every command: 0 done; 1 a step failed; 2 bad arguments or an internal error; 3 refused (verification
+failed, unsupported system, checkout mode, another installer or another stack running, device moved out, an update
+not finished); 4 the person declined something required; 10 (`install`, `continue` only) no doctor check is `LỖI`
+but a required human step (`claude_login`, `zalo_login`, `staff_token`) is still pending (rev F9, F14). Where the
+contract fixes no code, WP5 chose exit 2 for an unknown restore ID and for a missing `move-out --to` folder
+(rev review).
+
+#### 16.4.2 Launcher and child environment
+
+`~/ThomHouse/bin/thomhouse` (bash 3.2) runs:
+
+```
+exec env -i HOME="$HOME" USER="$u" LOGNAME="$u" LANG=en_US.UTF-8 TERM="${TERM:-xterm-256color}" TMPDIR="${TMPDIR:-/tmp}" \
+  PATH="$APP_HOME/runtime/node/bin:$APP_HOME/runtime/python/bin:$APP_HOME/runtime/bin:/usr/bin:/bin:/usr/sbin:/sbin" \
+  THOMHOUSE_APP_HOME="$APP_HOME" THOMHOUSE_BOT_HOME="$BOT_HOME" \
+  DISABLE_UPDATES=1 ZALO_AGENT_NO_UPDATE_CHECK=1 WRANGLER_SEND_METRICS=false PROFILE_LLM_ENABLED=false \
+  [http_proxy https_proxy all_proxy HTTP_PROXY HTTPS_PROXY ALL_PROXY ZALO_CONFIG_DIR, each only when set] \
+  no_proxy="$np" NO_PROXY="$np" \
+  "$APP_HOME/runtime/python/bin/python3" -I "$APP_HOME/app/install/thomhouse.py" "$@"
+```
+
+with `u="${USER:-$(id -un)}"` and `np` = the caller's `no_proxy` (or `NO_PROXY`) followed by
+`127.0.0.1,localhost,::1`, set always (rev F4). As built, the launcher, and the exec of the CLI by the header and by
+`bootstrap.sh`, also pass every other `THOMHOUSE_*` variable of the caller through `env -i` (`THOMHOUSE_APP_HOME`
+and `THOMHOUSE_BOT_HOME` excepted), as `proc.child_env` does; so `THOMHOUSE_SERVER_URL`, `THOMHOUSE_HEALTH_WAIT_S`
+and the test settings keep working under the launcher (rev review). `APP_HOME` and `BOT_HOME` are the only values written into the
+launcher when it is rendered from `install/thomhouse.sh.in`; the launcher ignores `THOMHOUSE_APP_HOME` and
+`THOMHOUSE_BOT_HOME` from the caller's environment. Nothing version-specific is written into it: at every run it reads
+`PY_VERSION` from `$APP_HOME/app/install/versions.env` (read as text, never sourced). When
+`runtime/python/bin/python3` is missing, does not run, or is older than 3.11, the launcher runs the bash doctor
+(checks `macos`, `cpu`, `disk`, `system_tools`, `python` of 16.7, the same lines) and exits 1. When it runs and is
+3.11 or newer but prints a version other than `PY_VERSION`, the launcher still starts the CLI, and doctor check 5
+reports the difference: U9 switches `runtime/python` and `app` one after the other, so a power cut between the two
+leaves them apart, and a strict launcher would then refuse the very `update FILE` that finishes the update
+(rev check). Step 8, update phase U9 and every rollback rewrite the launcher from the release
+that becomes live, through `release.write_launcher()` (rev F10). `~/.local/bin` is not on the PATH: Claude Code is
+reached through `runtime/bin/claude`, a link to `$HOME/.local/bin/claude` (rev F15).
+
+`proc.child_env(paths, extra=None, *, claude_install=False)` gives every child the launcher's variables, built the
+same way when the installer runs in checkout mode without the launcher (there `PATH` is the caller's `PATH`), and
+also: `npm_config_cache=$APP_HOME/cache/npm` (rev F21); `THOMHOUSE_LOCK_OWNER` and `ZALO_CONFIG_DIR` when set; never
+`ANTHROPIC_API_KEY`, `ANTHROPIC_AUTH_TOKEN`, `CLAUDE_CODE_OAUTH_TOKEN`, `CLAUDECODE`, `CLAUDE_CODE_*`,
+`CLAUDE_EFFORT`, nor `CLAUDE_CONFIG_DIR` unless `extra` gives it for a pool account. `no_proxy` and `NO_PROXY` always
+contain `127.0.0.1,localhost,::1` (invariant 11); proxy variables are kept, so Claude Code, npm, pnpm and curl can
+use a proxy the Mac needs, while every loopback call of the runner, the bridge, `seed_dev.py`, the analyzers and curl
+in `start_local.sh` goes direct (rev F4). `claude_install=True` also removes `DISABLE_UPDATES` and
+`DISABLE_AUTOUPDATER`; it is used only for Anthropic's installer in step 5 and update phase U3, because Claude Code
+2.1.319's `install` command exits 0 without installing when `DISABLE_UPDATES` is set (rev F1). Every other child keeps
+`DISABLE_UPDATES=1`. The installer's own loopback HTTP calls use
+`urllib.request.build_opener(urllib.request.ProxyHandler({}))` and refuse a host other than `127.0.0.1`,
+`localhost` or `::1` (exit 2).
+
+| Variable | Default | Meaning |
+|---|---|---|
+| `THOMHOUSE_APP_HOME` | `~/ThomHouse` | program, runtimes, caches, install state |
+| `THOMHOUSE_BOT_HOME` | `~/.thomhouse-bot` | data, as today |
+| `THOMHOUSE_SERVER_URL` | `http://127.0.0.1:8787` | base of the doctor's server calls; loopback only (tests point it at a stub) |
+| `THOMHOUSE_CONSOLE_URL` | `http://127.0.0.1:5173` | console check; loopback only. `staff-token` refuses a value whose scheme is not `http` or `https` or whose host is not in `stack.LOOPBACK_HOSTS` (16.6.5, rev review) |
+| `THOMHOUSE_CLIPBOARD_CLEAR_S` | `120` | longest time `STAFF_TOKEN` stays on the clipboard; a value outside 1 to 300 is replaced by 120 (rev F16) |
+| `THOMHOUSE_HEALTH_WAIT_S` | `20` | seconds after `start_local.sh` before the health gate |
+| `THOMHOUSE_SYNC_TIMEOUT_S` | `600` | limit of one `zalo-agent sync` run |
+| `ZALO_CONFIG_DIR` | `~/.zalo-agent-cli` | the engine's own folder; the installer only checks whether `accounts/*/zalo.db` exists |
+| `THOMHOUSE_RELEASE_KEY` | `~/.ssh/thomhouse-release` | build Mac only: signing key |
+| `THOMHOUSE_RELEASE_TEST_PINS` | unset | build Mac and tests only: a `versions.json` with `"hash_source": "test"` for a test build (16.2.2, rev review) |
+| `THOMHOUSE_TOOL_PATH` | unset | test seam, never set on a device: replaces `/usr/bin:/bin:/usr/sbin:/sbin` as the header's and `bootstrap.sh`'s own PATH and as the end of the PATH that the launcher and `bootstrap.sh` give the CLI, so the shell files can use the fake `curl`, `uname`, `sw_vers` (rev review) |
+| `THOMHOUSE_PROC_VERSION` | `/proc/version` | test seam, never set on a device: the file the header reads for its WSL check (rev review) |
+
+#### 16.4.3 Steps in order
+
+Every step first runs its `check()` on the real machine; a step whose check passes is marked `done` and skipped.
+The "Skipped when" column is that `check()`; where it names doctor check ids, `check()` is `doctor.passes(ctx, ids)`
+(16.3.3, rev iface). Titles are printed as `Bước <n>/25: <title>`. "Human" steps can be postponed with `s`; with
+`--skip-human` or a non-interactive stdin they are marked `pending` without a question. `continue` reruns every step
+whose journal status is not `done` or `declined`, so `pending`, `failed` and `skipped` steps are tried again
+(rev visits). `declined` is written only for the optional consent steps 22 and 23. A `k` (or a bare Enter) at a
+required question, that is the shared-data question of step 2, the runtime consent of step 5 and the licence notice
+of step 6, exits 4 and leaves its step `pending` with reason `declined`, so the next run asks again and no later
+step runs without that answer; otherwise `continue` would skip step 6 and install the engine in step 7 without the
+owner's `dong y`. Step 4's consent is asked by `bootstrap.sh` at every run. (rev check)
+
+How the steps were built, where the table below says less or otherwise (rev review):
+
+- Step 1 without `--from-bootstrap` and without `installed.json` verifies `--release-file` with
+  `release.verify_file` when given, otherwise checks `release.verify_manifest` of the code root.
+- Step 2 looks up the stock tools in `/usr/bin`, `/usr/sbin`, `/bin` and `/sbin` (16.5), and does not ask the Intel
+  question again after `--from-bootstrap` (the header already asked) or after an acceptance recorded in the journal.
+- Step 3 uses `--release-file` or the cached copy in `cache/releases`.
+- Step 4, when `runtime/python` is not the pinned version: Python cannot install itself, so the step prints the
+  `bootstrap.sh --python-only` repair command, is marked `failed` and the run goes on.
+- Step 7 first checks that the engine notice was accepted; `install --only deps` (or `--only 7`) before `dong y`
+  prints `setup.engine_declined`, leaves the step `pending` with reason `declined` and exits 4 without any `npm`
+  call (review finding).
+- Step 8 creates `APP_HOME` and `BOT_HOME` when needed and sets both to 0700 (16.2.7, doctor check 23); it switches
+  `app` and writes the launcher first and writes `installed.json` last, because once that file exists the header
+  refuses to run again, so the launcher must already exist for `thomhouse continue`. It stores the payload's
+  `install/trust/allowed_signers` itself (0600, folder 0700; a missing file is only logged as `trust_missing`).
+  `signer` is `SHA256:<base64>`, the form `ssh-keygen -l` prints; `payload_sha256` and `release_id` come from
+  `release.read_header` of `--release-file` or of `cache/releases/thomhouse-<ver>.command`, otherwise they are null.
+- Step 11 remembers the `--release-file` path in its journal entry, so a later `continue` finds
+  `thomhouse-menu-<menu_id>.tar` beside it without `--menu`.
+- Step 12 stops the stack before the stopped backup when the server runs, because `backup.make` refuses a stopped
+  backup while the server runs. When `migrations.apply` fails, the step writes the mark
+  `BOT_HOME/d1.restore-needed.json` (`{"backup", "backup_path", "failed", "at"}`, 0600) before anything moves, renames
+  `BOT_HOME/d1` to `d1.failed-<stamp>`, copies `<backup>/d1` back, and removes the mark only after that copy
+  succeeded. The journal reason stays `restore_failed` when the copy fails. While the mark exists, the next step 12
+  (`continue`) first copies `d1` again from the backup the mark names, keeping the half-made copy as another
+  `d1.failed-*` folder; when that backup is gone it refuses with `setup.migrations_restore_missing`. While the mark
+  exists, `thomhouse start` exits 3, step 15 exits 1, the `start_local.sh` hook `backup --if-pending-migrations`
+  exits 1 (so the script stops before `wrangler d1 migrations apply`), and move-out refuses, all with
+  `setup.restore_needed`; a successful `restore` removes the mark (review finding). Not covered: when writing the
+  mark itself fails (ENOSPC on a tiny file), step 12 reports the failure, `d1` stays half-migrated in place and no
+  mark exists; doctor does not report the mark.
+- Step 17 needs the Zalo login: a `zalo_login` journal entry `done`, or the bridge doctor's `zalo_login` `ok`.
+- Steps 18 and 19 give the analyzers `SERVER_URL` equal to `THOMHOUSE_SERVER_URL` when that variable is set and add
+  nothing otherwise; `STAFF_TOKEN` is not passed, because the analyzers read `.dev.vars` themselves.
+- Steps 22 and 23 with nobody at the keyboard and no `--yes` are `pending` with reason `later`, not `declined`, so a
+  later interactive run asks again. A `declined` answer stays declined, and the step prints
+  `Bước n/25: <title> (anh đã chọn không)`.
+- `StepResult.extra` (16.3.3) keeps journal fields between runs: the licence acceptance time that step 8 copies into
+  `installed.json`, `shared_data_accepted` and `intel_accepted` of step 2, the move-in `image_sha256`, the release
+  file of step 11.
+- When stdin is not interactive, `staff-token` copies nothing and returns 4. A listener exit code other than 0, 3
+  or 4 leaves `zalo_login` `pending` with reason null. Human commands record the journal entry of their own step.
+
+| # | id | Title on screen | What it does | Skipped when | Human / network | On failure |
+|---|---|---|---|---|---|---|
+| 1 | `verify` | Kiểm tra file cài đặt | header only (bash): payload SHA-256; release id of the whole file and the comparison question; signature against the payload's own `allowed_signers`. On an installed device the header does not reach this step (16.4.1) (rev F5) | `--from-bootstrap` was given, or `installed.json` exists | owner compares id / no | exit 3, nothing written; `k` at the id question: exit 4 |
+| 2 | `preflight` | Kiểm tra máy | macOS ≥ `macos_min`; CPU arm64 (x64: warning and `c/k`); `id -u` not 0; `disk_min_gb` free in HOME; stock tools of 16.5 present; `InstallLock` free or held by this command (rev F3); no `BOT_HOME/moved-out.json` (rev F12); no other stack, judged by command line and working folder (rev F20). Then, when `BOT_HOME/d1` holds a database and `installed.json` does not exist, the shared-data question of 16.4.7 (not answered by `--yes`; `c` is journaled as `shared_data_accepted`) (rev F20) | never | owner answers when data exists / no | exit 3 with the check's line; `k` at the shared-data question: exit 4 |
+| 3 | `unpack` | Giải nén chương trình | header (bash): unpack to `releases/.staging-<ver>`, `shasum -a 256 -c MANIFEST.sha256`, rename to `releases/<ver>`; copy the `.command` to `cache/releases/` (0600) | `releases/<ver>` exists and verifies | no | staging deleted, exit 3 |
+| 4 | `python` | Cài Python | `bootstrap.sh` detects the four runtimes at the launcher's fixed locations only, never by a PATH lookup (16.4.6, rev F11, rev check), shows one plan for the missing ones (16.4.7) and asks once; on `c` installs Python (a file in `cache/downloads` whose SHA-256 matches is used without a download, rev F11), switches `runtime/python`, checks `--version`; execs the Python CLI with `--consented` | `runtime/python` runs the pinned version | consent / github.com | mismatch: file deleted, exit 1; download failure: the text of its kind (16.4.7), exit 1 (rev F18); `k`: the per-item instructions, exit 4 |
+| 5 | `runtimes` | Cài Node.js, pnpm và Claude Code | an item to install that is missing from `--consented` is shown and asked again, never failed (rev F11). Node: `download.fetch`, unpack to `runtime/node-v<v>-darwin-<arch>`, switch `runtime/node`. pnpm: `npm ci --prefix runtime/pnpm-<v> --no-fund --no-audit` from `install/lock/pnpm` (cache from `npm_config_cache`), link `runtime/bin/pnpm`. Claude Code: download `installer_url` to `cache/downloads/claude-install.sh`, log its SHA-256, run `bash <file> <version>` with `proc.child_env(claude_install=True)` (rev F1); then `$HOME/.local/bin/claude --version` must print the pinned version, else `release.runtime_installer`; then, when the pin has a SHA-256, the file `~/.local/share/claude/versions/<version>` must match it, else this run removes that file when this run created it, points `~/.local/bin/claude` back at the target it had before the installer ran (or removes the link when there was none), and fails with `release.runtime_checksum` (rev F22, rev check); finally `runtimes.switch("claude_code")` links `runtime/bin/claude` (rev F15) | check ids `node`, `pnpm`, `claude_cli` | consent from step 4 / nodejs.org, registry.npmjs.org, claude.ai and the host its installer downloads from (not checked) | half-made folder deleted; the text of the error (16.4.7), exit 1 |
+| 6 | `engine_notice` | Điều khoản bộ công cụ Zalo | shows the licence notice of 16.4.7; owner types `dong y`; the engine itself is installed from the npm registry on each device in step 7, never shipped (rev owner) | `installed.json` has `engine_notice_accepted_at` (before step 8: the journal records the acceptance and step 8 copies it) | owner types / no | not accepted: exit 4, nothing of the engine installed |
+| 7 | `deps` | Cài thư viện của chương trình | in the release: write `.npmrc` with the single line `store-dir=<APP_HOME>/cache/pnpm-store` (so `start_local.sh`'s own `pnpm install` uses the same store, rev F21); `pnpm install --frozen-lockfile`; `npm ci --prefix tools/zalo-agent --no-fund --no-audit`; the same for `tools/openmausbot`; writes `.thomhouse-deps.json` | check ids `deps_workspace`, `deps_engine` (stamp matches `uname -sm`, node major and the SHA-256 of the three lockfiles, and `wrangler`, `vite`, `zalo-agent` exist) | no / registry.npmjs.org | log `logs/deps.log`, the registry text of 16.4.7, exit 1 (rev F18); an OpenMausBot failure is a warning only (rooms are optional, 14.10) |
+| 8 | `activate` | Kích hoạt bản cài | first install: create `device_id`, store trust, write `installed.json` (with `release_id` and `engine_notice_accepted_at`); switch `app` with `os.replace`; `release.write_launcher` (0700, rev F10) | `app` points at this release and `release.launcher_current()` | no / no | exit 1 |
+| 9 | `config` | Tạo file cấu hình và mã bí mật | `bridgecli.init_env(ctx, app, APP_HOME/app/tools/zalo-agent/node_modules/.bin/zalo-agent)`; checks the three files are 0600 | never (init-env keeps existing values, `envfiles.py:117-156`) | no / no | exit 1 |
+| 10 | `move_in` | Chuyển dữ liệu từ máy cũ | only with `--move-in FILE`: `move.place_moved_data` (16.8.5) | journal done for the same image SHA-256 | passphrase typed into hdiutil / no | exit 1, data set aside is moved back |
+| 11 | `menu_slides` | Chép ảnh menu gốc | finds `thomhouse-menu-<menu_id>.tar` given by `--menu` or beside `--release-file`; verifies `MENU.json`; unpacks to `shared/menu-slides/<menu_id>/`; links `sources/drive-resources/thomhouse-menu` of the release to it | `release.menu_slides_ok(ctx, app)` (check 19 only warns, so `doctor.passes` would always pass, rev check) | no / no | warning, step `pending`; the bot runs without menu images |
+| 12 | `migrations` | Cập nhật cơ sở dữ liệu | when `migrations.find_db()` finds a database and `migrations.pending` is not empty (or unknown): `backup.make(mode="stopped", reason="before-migration")`; then `migrations.apply` (no database yet: apply only) | `migrations.pending()` is `[]` | no / not checked for wrangler | the D1 folder is restored from the backup just taken, exit 1 |
+| 13 | `pool` | Đăng ký tài khoản Claude cho chatbot | when `BOT_HOME/accounts.json` is missing: `accounts.pool(ctx, "add", "main", "--priority", "1")`, then `accounts.pool(ctx, "disable", "main")` | `accounts.json` exists | no / no | exit 1 |
+| 14 | `claude_login` | Đăng nhập Claude | for each account of `accounts.json`, in priority order, that is disabled or not logged in with `authMethod` `claude.ai`: 16.6.1 with its label; `s` postpones the remaining ones. After a move-in there are several such accounts and no `main` (rev check) | every account of `accounts.json` is enabled and logged in with `authMethod` `claude.ai`; an account the owner enabled by hand while `subscriptionType` is null counts (16.6.1) (rev F8, rev check) | owner, browser / claude.ai | `s`: pending; the account stays disabled |
+| 15 | `start` | Bật chatbot | `stack.start` (output only in `logs/start.log`, rev F18): `app/scripts/start_local.sh` with the child environment (catalog seed, `rooms-setup`, menu images, runner, bridge, listener attempt, console), then `stack.health_gate` and doctor checks 41 and 42 | never (idempotent, `start_local.sh:16`) | no / registry on a first run, Claude, Zalo | the failing doctor lines, exit 1 |
+| 16 | `zalo_login` | Đăng nhập Zalo | 16.6.2, then `bridgecli.listener(ctx, "start")` | check ids `zalo_login`, `listener` | phone holder / Zalo | `s`: pending; the bot receives nothing |
+| 17 | `history_sync` | Lấy tin nhắn cũ từ điện thoại | 16.6.3 (optional) | journal `done` | phone holder / Zalo | `s` or failure: pending |
+| 18 | `analyze_contacts` | Phân tích danh bạ khách | `cd app && python3 -I scripts/analyze_contacts.py --push` with `PROFILE_LLM_ENABLED=false`; output read in memory and discarded (optional) | journal `done` | no / local server only | skipped (`no_cache`) when no `ZALO_CONFIG_DIR/accounts/*/zalo.db`; failure: pending |
+| 19 | `analyze_visits` | Phân tích các buổi làm trong tin nhắn | runs by default (rev visits). Skipped (`no_cache`) like step 18. First `stack.http_json(ctx, "GET", "/staff/chat-facts/eligible", token=STAFF_TOKEN)`: 404 means the server of this release has no chat-facts endpoints, so the step prints the single line `setup.visits_server_404` (16.4.7) and is marked `pending` with reason `server_404`, which a later `thomhouse continue` reruns. Otherwise `cd app && python3 -I scripts/analyze_visits.py --push` with `PROFILE_LLM_ENABLED=false`; output read in memory and discarded; exit 1 whose stderr contains `(HTTP 404)` is handled like the 404 above (optional) | journal `done` | no / local server only | failure: pending (`exit_1`) |
+| 20 | `labels` | Gắn nhãn khách trong Zalo | 16.6.4 (optional) | journal `done`, or `GET /staff/roles` returns at least one role | staff, Zalo app / Zalo | `s`: pending; the bridge also syncs every 900 s |
+| 21 | `staff_token` | Đưa mã nhân viên vào console | 16.6.5 | journal `done` | staff / no | `s`: pending |
+| 22 | `autostart` | Tự bật chatbot khi đăng nhập máy | `c/k`; on `c`: `autostart.enable` (LaunchAgent) (optional) | journal answered | consent / no | warning |
+| 23 | `shortcuts` | Tạo nút bấm trên màn hình | `c/k`; on `c`: the line `ops.desktop_prompt` of 16.4.7, then `autostart.shortcuts(ctx, True)` (rev F18) (optional) | journal answered | consent / no | warning |
+| 24 | `menu_check` | Kiểm tra ảnh menu | `python3 -I app/scripts/build_menu_images.py --home BOT_HOME --check`; on exit 1 a build without `--check` | that `--check` run exits 0 (check 40 only warns, so `doctor.passes` would always pass, rev check) | no / no | warning |
+| 25 | `final_check` | Kiểm tra lần cuối | `doctor.run_checks`; sets `install_completed_at` when no check is `fail`; prints the summary of 16.4.7 | never | no / Claude, Zalo | exit 1 when a check is `LỖI`; else exit 10 when `claude_login`, `zalo_login` or `staff_token` is pending; else exit 0 (rev F9) |
+
+R4 order. Config and secrets (9), D1 migrations (12), catalog seed (inside 15), Claude pool (13), OpenMausBot config
+(`rooms-setup` inside 15), history sync (17), contact analyzer (18), visit analyzer (19), label sync (20), menu
+images (24). Two deviations, both necessary: the pool (13) comes before the catalog seed, because
+`start_local.sh:237-243` registers `~/.claude` as `default` whenever `accounts.json` is missing; and `start_local.sh`
+builds the menu images on every start (`:334-338`), so step 24 only verifies or repairs them at the end.
+
+The pool account `main` gets its own Claude config folder `BOT_HOME/accounts/main` (created by `claude_pool.py add`,
+`claude_pool.py:217-233`), so the bot's login and session files never mix with the person's own `~/.claude`. It
+stays disabled until its login is verified, so a first job cannot mark it `login_expired`, a state only a human
+reset clears (`claude_pool.py:139-147`; lifecycle 2.1 step 3).
+
+#### 16.4.4 Progress record
+
+`APP_HOME/install-steps.json` (0600, atomic write by temp file and `os.replace`):
+
+```json
+{ "schema": 1, "release": "1.4.0",
+  "steps": { "claude_login": { "status": "pending", "at": "2026-11-20T09:31:12+07:00", "reason": "later" } },
+  "update": null }
+```
+
+`status` is one of `done`, `pending`, `skipped`, `failed`, `declined`. `reason` is a short code (`later`, `no_cache`,
+`server_404`, `exit_1`, `timeout`, `declined`, `console_login`, `no_subscription`); `not_in_release` is gone with the
+feature flag (rev visits, F8). The status `declined` belongs to steps 22 and 23 only; a required step that the
+person refused is `pending` with reason `declined` (16.4.3, rev check). The journal is a cache: a re-run runs `check()` for every step and redoes a `done` step
+whose check fails. Steps 17 to 23, which cannot be seen on the machine, rely on the journal. `update` holds the update
+journal of 16.8.1 (`state.update_get`), `null` when no update ever ran (rev F14).
+
+`APP_HOME/installed.json` (0600), the version stamp of R6:
+
+```json
+{ "schema": 1, "device_id": "<32 hex>", "version": "1.4.0", "previous_version": null,
+  "installed_at": "2026-11-20T09:12:03+07:00", "install_completed_at": null,
+  "payload_sha256": "…", "release_id": "3F9A-21C7-0B44-D1E8", "signer": "SHA256:…", "menu_id": "…",
+  "runtimes": { "python": "3.14.6", "node": "24.19.0", "pnpm": "10.32.1", "claude_code": "2.1.319" },
+  "previous_runtimes": null, "engine_notice_accepted_at": "…",
+  "migrations_applied": ["0001_init.sql", "…"], "backup_before_update": null,
+  "autostart": false }
+```
+
+`moved_out_at` left this file: the mark of a move is `BOT_HOME/moved-out.json`, so that it also exists on the build
+Mac in checkout mode and `start_local.sh` can see it (rev F12). `release_id` is the whole-file id of 16.2.1 (rev F5).
+As built, `release_id` is stored grouped (`3F9A-21C7-0B44-D1E8`), and WP5 adds `previous_release_id`,
+`previous_payload_sha256`, `previous_menu_id`, `updated_at` and `rolled_back_at`, so that `rollback` can restore
+`release_id`, `payload_sha256` and `menu_id` (rev review).
+
+`APP_HOME/history.jsonl` (0600): one object per line, `{"at", "event", "from", "to", "result", "backup"}` with
+`event` in `install`, `update`, `rollback`, `restore`, `move_out`, `move_in`, `move_back`, `uninstall` and `result` in
+`ok`, `failed`, `rolled_back`.
+
+#### 16.4.5 `--dry-run`
+
+Changes nothing, downloads nothing, asks nothing, and prints:
+
+```
+Kế hoạch cài chatbot thom house bản 1.4.0 (chạy thử, máy không thay đổi gì):
+  1. [đã xong] Kiểm tra file cài đặt
+  4. [sẽ làm] Cài Python: Python 3.14.6 từ github.com, 41 MB, vào ~/ThomHouse/runtime
+  …
+ 25. [sẽ làm] Kiểm tra lần cuối
+```
+
+Markers: `[đã xong]` (check passes), `[sẽ làm]`, `[bỏ qua]` (not applicable, for example `move_in` without the
+flag). Sizes come from `versions.json`. The header's `--dry-run` unpacks the payload to a new folder under `$TMPDIR`,
+prints steps 1 to 4, then runs that payload's `install/thomhouse.py install --dry-run` with the private Python or,
+before it exists, with a `python3.14` to `python3.11` or `python3` on PATH that is 3.11 or newer and is not
+`/usr/bin/python3`; without one it prints the titles of steps 5 to 25 with `[sẽ làm]`. The temporary folder is
+removed. Exit 0. As built, the header runs the payload CLI as
+`install --dry-run --from-bootstrap --release-file FILE [options]`, and with `--from-bootstrap` the CLI prints only
+steps 5 to 25, so the plan appears once; `install --dry-run` and `continue --dry-run` without it print the heading
+and all 25 steps. `Ctx.log` writes nothing with `--dry-run`, so a dry run does not create `logs/install.log`
+(rev review).
+
+#### 16.4.6 What the header and the bootstrap do before Python exists
+
+`install/selfextract.sh.in` (bash 3.2, stock tools only), in this order:
+
+1. Parse options.
+2. Refuse an unsupported system with the sentence of 16.5 for its `uname -s` and exit 3 (rev F19).
+3. `--doctor` runs the bash doctor and exits, on any Mac. When `APP_HOME/installed.json` exists, anything else,
+   `--dry-run` included, prints the "already installed" screen of 16.4.7 and exits 3 (rev F5, rev check).
+4. Check the payload hash. With `--dry-run` the header then continues as in 16.4.5 and skips steps 5 to 9, so it
+   takes no lock and writes nothing outside its folder under `$TMPDIR` (rev check).
+5. Take `APP_HOME/.bootstrap.lock.d` with `mkdir` and write `$$` into `.bootstrap.lock.d/pid`; `$$` stays the same
+   through the `exec` of `bootstrap.sh` and of Python, so the file names the whole chain. An existing folder is stale,
+   and is replaced, when that PID is not alive or `ps -o command= -p PID` contains none of `bootstrap.sh`,
+   `thomhouse.py` and `.command` (the header itself, which runs steps 6 to 8 before its `exec`; without it a second
+   header started meanwhile would take over the lock, rev check); otherwise exit 3 with `core.locked`. The 2-hour rule and the `trap` are gone: bash runs no `EXIT`
+   trap on `exec`. The Python CLI removes the folder right after it takes `InstallLock` (16.3.3). The header also exits
+   3 with `core.locked` when `APP_HOME/.install.lock` names a live PID whose command line contains `thomhouse.py`.
+   (rev F6)
+6. Preflight, the bash part of step 2. As built, this bash preflight (macOS version, uid 0, the Intel question,
+   disk, stock tools, a live `.install.lock` holder, `moved-out.json`) runs before the lock of step 5 is taken, so
+   these refusals write nothing (a test of 16.10 requires this); detecting another running stack is left to the
+   Python step 2. The header's moved-out refusal prints the first line of `core.moved_out`, then a header-only
+   sentence: once the other Mac has stopped the bot, delete `BOT_HOME/moved-out.json` and run the file again
+   (rev review).
+7. Release id and signature (step 1).
+8. Unpack and copy the file to `cache/releases` (step 3).
+9. `exec bash releases/<ver>/install/bootstrap.sh <options> --release-file "<this file>"`.
+
+`install/bootstrap.sh`: read `install/versions.env`; detect the four runtimes by running exactly the four files that
+`runtimes.found()` checks (`$APP_HOME/runtime/python/bin/python3`, `$APP_HOME/runtime/node/bin/node`,
+`$APP_HOME/runtime/bin/pnpm`, `$HOME/.local/bin/claude`) with `--version`, the same places as the launcher. It never
+looks a runtime up on PATH: on a Mac without the developer tools `python3` on PATH is `/usr/bin/python3`, whose
+first run opens the developer-tools dialog (general knowledge, not run) (rev check). Its own commands run with `PATH=/usr/bin:/bin:/usr/sbin:/sbin`.
+A `claude` that `command -v claude` finds on the caller's PATH outside `~/.local/bin` (Homebrew, npm under nvm) is
+only looked up, never run or used, and the plan line says so (rev F11). Print the plan of
+16.4.7 and ask once; on `c` install Python (step 4): first look in `cache/downloads` for `<sha256>.tar.gz` or any
+other file whose `shasum -a 256` equals the pin (rev F11), else
+`curl --proto =https --tlsv1.2 -fL --retry 3 -C - -o <cache>/<sha256>.part <url>`; then `shasum -a 256`, `tar -xzf`
+into `runtime/.tmp-python-<ver>`, `mv` to `runtime/python-<ver>-<triple>`, `ln -sfh` `runtime/python`; then
+`exec runtime/python/bin/python3 -I releases/<ver>/install/thomhouse.py install --from-bootstrap --consented <list>
+--release-file <file> <options>`. Neither file ever calls `/usr/bin/python3`. A curl failure prints the download text
+of its kind (16.4.7) and exits 1 (rev F18); curl exit 23 (a write error such as a full disk) prints the disk text of
+`core.download_disk` (rev review). `bash ~/ThomHouse/app/install/bootstrap.sh --python-only` is the repair
+path on an installed device whose private Python is missing or wrong (doctor check 5): it runs the installed, already
+trusted copy, shows the plan line for Python only, asks `c/k`, installs the pinned Python as above and exits 0
+without starting the Python CLI (rev F5).
+
+#### 16.4.7 Screens (exact text; `{…}` are filled in)
+
+Release id (step 1, first install; `{release_id}` is computed from the whole file, rev F5):
+
+```
+Cài chatbot thom house bản {version} lên máy này.
+Mã bản cài: {release_id}. Anh so mã này với mã hiện trên máy đã tạo file cài.
+Khớp thì gõ c rồi Enter. Không khớp thì gõ k rồi Enter và báo người gửi file.
+```
+
+Already installed (`release.already_installed`, header on a device with `installed.json`, exit 3, rev F5):
+
+```
+Máy này đã cài chatbot thom house, nên file cài không chạy lại từ đầu.
+Cập nhật bằng file này: ~/ThomHouse/bin/thomhouse update {file}
+Các bước còn lại: ~/ThomHouse/bin/thomhouse continue
+```
+
+Damaged file: `File cài đặt bị hỏng hoặc đã bị sửa nên chương trình chưa cài gì. Anh chép lại file rồi chạy lại.`
+
+Runtime plan (step 4; one line per missing item):
+
+```
+Máy cần thêm các phần mềm dưới đây. Chương trình cài chúng cho riêng chatbot,
+không cần mật khẩu máy và không sửa cài đặt của Terminal:
+  - Python {v}: tải từ github.com, {n} MB, đặt vào ~/ThomHouse/runtime
+  - Node.js {v}: tải từ nodejs.org, {n} MB, đặt vào ~/ThomHouse/runtime
+  - pnpm {v}: tải từ registry.npmjs.org, {n} MB, đặt vào ~/ThomHouse/runtime
+  - Claude Code {v}: chương trình cài của Anthropic (claude.ai), khoảng {n} MB, vào ~/.local
+Anh gõ c rồi Enter để cài, hoặc gõ k rồi Enter để dừng.
+```
+
+When a `claude` exists only outside `~/.local/bin`, the Claude Code line is followed by
+`    Máy đã có một bản Claude Code khác; chatbot dùng bản riêng này, bản kia giữ nguyên.` (rev F11)
+
+Declined (`k`; only the lines of the items in the plan, rev F11):
+
+```
+Chương trình chưa cài phần mềm nào; mã chương trình đã chép vào ~/ThomHouse.
+Chatbot chỉ chạy với đúng các bản dưới đây:
+  - Python {v}: {url}
+    SHA-256 {sha256}
+  - Node.js {v}: {url}
+    SHA-256 {sha256}
+  - pnpm {v}: cần mạng tới registry.npmjs.org; không cài tay được.
+  - Claude Code {v}: anh tự cài bằng lệnh dưới đây rồi chạy lại lệnh cài:
+    curl -fsSL https://claude.ai/install.sh | bash -s {v}
+Với Python và Node.js, anh có thể tải file ở máy khác và chép vào ~/ThomHouse/cache/downloads/,
+rồi chạy lại lệnh cài; chương trình kiểm mã từng file trước khi dùng.
+```
+
+Failures (rev F18, F22; `{lệnh}` is `bash <file .command>` before step 8 and `~/ThomHouse/bin/thomhouse continue`
+after it):
+
+| Key | Text |
+|---|---|
+| `core.download_network` | `Chưa tải được {tên} từ {máy chủ} vì máy không kết nối được mạng.` / `Anh kiểm tra mạng rồi chạy lại: {lệnh}` |
+| `core.download_http` | `Máy chủ {máy chủ} chưa trả file {tên}. Anh chờ một lúc rồi chạy lại: {lệnh}` |
+| `core.download_size`, `core.download_checksum` | `File {tên} tải về không đúng mã kiểm tra nên chương trình đã xóa file đó. Anh chạy lại: {lệnh}` |
+| `core.download_not_https` | `Địa chỉ tải {tên} không dùng https nên chương trình không tải. Anh báo người gửi file.` |
+| `core.download_disk` | `Ổ đĩa của máy không đủ chỗ trống để tải {tên}.` / `Anh xóa bớt tệp rồi chạy lại: {lệnh}` (curl exit 23 or ENOSPC; also printed by `bootstrap.sh` for Python, rev review) |
+| `release.deps_workspace`, `release.deps_engine` | `Chưa cài được thư viện từ registry.npmjs.org; chi tiết ở ~/ThomHouse/logs/deps.log.` / `Anh kiểm tra mạng rồi chạy lại: {lệnh}` |
+| `release.runtime_installer` | `Chưa cài được Claude Code; chi tiết ở ~/ThomHouse/logs/runtimes.log.` |
+| `release.runtime_checksum` | `Bản Claude Code vừa tải không khớp bản đã thử trên máy tạo file cài,` / `nên chương trình đã gỡ bản đó. Anh báo người gửi file.` |
+| `core.locked` | `Một lệnh cài hoặc cập nhật khác đang chạy trên máy này. Anh chờ lệnh đó xong rồi chạy lại.` |
+| `core.update_open` | `Lần cập nhật trước chưa xong, nên chương trình chưa làm lệnh này.` / `Anh chạy lại: ~/ThomHouse/bin/thomhouse update {file}` / `Hoặc quay về bản cũ: ~/ThomHouse/bin/thomhouse rollback` (rev F14, rollback line added after the recovery review; worded for every refused command, rev check) |
+| `core.moved_out` | `Dữ liệu chatbot của máy này đã chuyển sang máy khác, nên chương trình không bật chatbot ở đây.` / `Muốn chạy lại ở máy này: {tb} move-back` (rev F12) |
+
+Texts added by the review repair (rev review; catalog keys, `{tb}` is the launcher path):
+
+| Key | Text |
+|---|---|
+| `setup.engine_declined` | `Chương trình chưa cài bộ công cụ Zalo và dừng ở đây.` / `Khi anh đồng ý, anh chạy lại: {cmd}` (step 7 before the licence notice was accepted) |
+| `setup.restore_needed` | `Lần cập nhật cơ sở dữ liệu trước bị lỗi, và dữ liệu chatbot chưa được chép lại` / `từ bản sao lưu {folder}, nên chương trình chưa làm lệnh này và chưa bật chatbot.` / `Anh chạy: {tb} continue` |
+| `setup.migrations_restore_missing` | `Chương trình không tìm thấy bản sao lưu {folder} để trả dữ liệu về,` / `nên chưa cập nhật cơ sở dữ liệu và chưa bật chatbot. Anh báo người phụ trách.` |
+| `setup.token_console_not_local` | `Địa chỉ trang quản lý trong THOMHOUSE_CONSOLE_URL ({url}) không nằm trên máy này,` / `nên chương trình không chép mã nhân viên.` / `Anh bỏ biến THOMHOUSE_CONSOLE_URL rồi chạy lại: {tb} staff-token` |
+| `ops.update_declined_unfinished` | `Anh chọn không cập nhật.` |
+| `ops.update_unfinished_closed` | `Lần cập nhật dở dang trước đó đã được hủy; chatbot bản {old} đã chạy lại.` |
+| `ops.update_unfinished_start_failed` | `Lần cập nhật dở dang trước đó đã được hủy, nhưng chatbot bản {old} chưa chạy lại được;` / `chi tiết ở {log}. Anh chạy: {tb} start` |
+
+`core.update_open` and `ops.update_same` keep the literal `~/ThomHouse/bin/thomhouse`, because `test_core_text`
+compares them with the wording of this subsection; both lines are wrong when `THOMHOUSE_APP_HOME` names another
+folder (rev review, open).
+
+Shared data (`setup.shared_data`, step 2, rev F20):
+
+```
+Máy này đã có dữ liệu chatbot ở {thư mục}, của một bản cài khác hoặc của bản đã gỡ.
+Bản cài mới sẽ dùng dữ liệu đó; nếu bản kia vẫn còn trên máy, anh không chạy bản kia nữa.
+Dùng dữ liệu đó? [c = có / k = không]
+```
+
+Before macOS asks in English (rev F18): `ops.desktop_prompt` `macOS có thể hỏi bằng tiếng Anh cho Terminal ghi vào
+Desktop; anh bấm Allow.` (before the shortcuts); `ops.hdiutil_create` `Ngay sau đây hdiutil hỏi mật khẩu bằng tiếng
+Anh. Anh đặt mật khẩu và ghi lại để mở ở máy mới.` (move-out); `ops.hdiutil_attach` `Ngay sau đây macOS hỏi mật khẩu
+của file chuyển máy; anh nhập mật khẩu đã đặt ở máy cũ.` (move-in). The removable-volume prompt appears before the
+header runs, so only the note below and the guide explain it.
+
+Visit analyzer without the server endpoint (`setup.visits_server_404`, one line, rev visits):
+`Máy chủ chưa nhận được kết quả phân tích buổi làm; lần chạy thomhouse continue sau sẽ thử lại.`
+
+Note beside the file (`scripts/release/DOC-TRUOC.txt.in`, plain text, rev F5, F18, F19):
+
+```
+Chatbot thom house bản {version}: file cài cho máy Mac
+File cài chỉ chạy trên máy Mac có macOS 13.5 trở lên; máy Windows và Linux chưa được hỗ trợ.
+
+Trước khi cài lần đầu, anh mở Terminal và chạy lệnh dưới đây (thay đường dẫn cho đúng):
+  shasum -a 256 /Volumes/USB/thomhouse-{version}.command
+16 ký tự đầu mà lệnh in ra phải giống mã bản cài người tạo file gửi riêng cho anh
+(không kể dấu gạch, chữ hoa hay chữ thường). Không giống thì anh đừng chạy file.
+
+Cài lần đầu:
+  bash /Volumes/USB/thomhouse-{version}.command
+Máy đã cài rồi thì cập nhật bằng:
+  ~/ThomHouse/bin/thomhouse update /Volumes/USB/thomhouse-{version}.command
+
+macOS có thể hỏi bằng tiếng Anh cho Terminal đọc ổ USB, ghi vào Desktop hoặc mở trình duyệt;
+anh bấm Allow. Hướng dẫn đầy đủ nằm trong docs/cai-dat-may-moi.md của bản cài.
+```
+
+Licence notice (step 6):
+
+```
+Chatbot nhận và gửi tin Zalo qua bộ công cụ @ardennguyen/zalo-agent-cli {v}.
+Giấy phép của bộ công cụ này là CC BY-NC-SA 4.0. Tệp NOTICE của tác giả ghi rằng
+giấy phép không cho dùng trong hoạt động kinh doanh của một công ty.
+Bộ công cụ dùng cách kết nối Zalo không chính thức, nên tài khoản Zalo có thể bị khóa.
+Anh đã đọc và vẫn muốn cài thì gõ dong y rồi Enter. Chỉ Enter để dừng.
+```
+
+`dong y` and `đồng ý` are both accepted (compared after NFC normalisation and lower case). The owner was told about
+the licence on 2026-11-12 and chose this notice: it is shown once per device, and the engine is installed from the
+npm registry on each device in step 7, never shipped in a release (16.2.3 ships only its `package.json` and lock).
+(rev owner)
+
+Summary (step 25):
+
+```
+Chatbot thom house bản {version} đang chạy trên máy này.
+Console cho nhân viên: http://127.0.0.1:5173
+Còn {n} việc anh cần làm: {danh sách tên bước}.
+Khi sẵn sàng, anh chạy: ~/ThomHouse/bin/thomhouse continue
+```
+
+With nothing left, the third and fourth lines become `Đã cài xong, không còn việc nào.`
+
+Other texts are written by each package in its own catalog, follow the same rules (Vietnamese with diacritics, the
+reader is "anh", short sentences, no emoji, at most 100 characters per line), and are checked by
+`test_core_text.py`, which also holds the step titles of 16.4.3, the doctor labels of 16.7 and every text with a key
+in this subsection as constants copied from this section and compares them with the catalogs; it also checks
+`scripts/release/DOC-TRUOC.txt.in` (rev iface). A ` / ` inside a table cell above separates two screen lines.
+Several texts of 16.6 to 16.8 (for example the postponed-login line of 16.6.1, the screens of 16.6.3 and 16.8.3,
+the uninstall confirmation) are longer than 100 characters as written here; the builder prints each as several
+lines, broken after a sentence or a clause, and `test_core_text` compares the words with line breaks ignored, so the
+100-character rule and the copied constants never contradict each other (rev check).
+
+`test_core_text` requires a Vietnamese diacritic in every catalog value, but the doctor labels of 16.7 ("Chip",
+"Python", "Node.js", "pnpm", "Claude Code", "OpenMausBot", "Runner", "Console", "Bridge") hold none. The WP4 build
+found that both rules could not pass (rev wp4); the integration step exempts the `doctor.label_*` values listed in
+`DOCTOR_LABELS` from the diacritics rule (rev review). For the same reason a text that holds no Vietnamese word is
+built in code instead of the catalog: the doctor's pass details and bare-command fixes (16.7, rev wp4) and the
+make_release output, which is English (16.2.2).
+
+### 16.5 Prerequisites
+
+| Runtime | Minimum the code needs | Installed version | Detection on a device | Detection in checkout mode | Source | Folder |
+|---|---|---|---|---|---|---|
+| Python | 3.11 (`start_local.sh:157-158`); `/usr/bin/python3` is Xcode's 3.9.6 (inventory 1) | 3.14.6 (python-build-standalone `install_only`) | `runtime/python/bin/python3 --version` equals the pin | first of `python3.14` … `python3.11`, `python3` on PATH that is ≥ 3.11 and not `/usr/bin/python3` | github.com (astral-sh/python-build-standalone) | `runtime/python-3.14.6-<triple>` |
+| Node.js and npm | 22.19.0 for the stack (undici in the engine lock), 24 for OpenMausBot (inventory 1) | 24.19.0 (official tarball) | `runtime/node/bin/node --version` equals `v24.19.0` | `node` on PATH: below 22 fail; 22.0-22.18 warn; below 24 warn (rooms off) | nodejs.org/dist | `runtime/node-v24.19.0-darwin-<arch>` |
+| pnpm | exactly `packageManager` (`package.json:4`) | 10.32.1 | `runtime/bin/pnpm --version` equals it | `pnpm --version` equals it; same major warns | registry.npmjs.org (`npm ci` of `install/lock/pnpm`) | `runtime/pnpm-10.32.1` |
+| Claude Code | 2.1.319, the version tested (`docs/run-local.md:30`) | 2.1.319 (`installer_url` with the version argument) | `$HOME/.local/bin/claude --version` ≥ `min`, the first `x.y.z` of the output; a `claude` elsewhere is not used (rev F11) | `claude` on PATH ≥ `min` | claude.ai | `~/.local/bin/claude`, `~/.local/share/claude`; linked as `runtime/bin/claude` |
+| Stock macOS tools | present on macOS 13.5 or newer (inventory 2) | not installed | `curl`, `shasum`, `tar`, `lsof`, `ssh-keygen`, `pbcopy`, `pbpaste`, `open`, `sips`, `hdiutil`, `launchctl`, `sw_vers`, `sysctl` in `/usr/bin`, `/usr/sbin`, `/bin` or `/sbin` (`launchctl` is `/bin/launchctl` on macOS; checked with `ls` on the build Mac, Darwin 27.2.0; doctor, the bash doctor and step 2 all look in the four folders, rev wp4) | same | — | — |
+
+Claude Code is reused when `~/.local/bin/claude` is present and new enough, because Anthropic's installer owns that
+folder; a Claude Code installed with Homebrew or npm is ignored, and the plan installs the native one beside it
+(rev F11). The other three runtimes are always the installer's own copies, so every device runs the versions that
+were tested and the launcher PATH does not depend on what else the machine has (launchd starts with a minimal PATH,
+inventory gap 7).
+
+Only Macs are targets (owner decision 2026-11-12). The header decides by `uname -s` before it reads the payload,
+takes a lock or writes anything; every refusal is one sentence plus
+`Anh báo người gửi file; chương trình chưa thay đổi gì trên máy này.` and exit 3, except the refusals of a macOS older
+than 13.5 and of a run as root, whose own sentences say what the person does (rev check). No sentence points at a file
+inside the payload, which is not unpacked at that moment (rev owner, F19):
+
+- `Darwin`, macOS 13.5 or newer on Apple Silicon: the plan and consent of 16.4.7; `k` exits 4 with the instructions.
+- `Darwin` on Intel: line `Máy Intel chưa được chạy thử. Anh vẫn cài? [c = có / k = không]`; with `c`, the
+  `darwin-x64` pins are used; when those pins are null: `File cài này chưa có bản cho máy Intel.` and exit 3.
+- `Darwin` older than 13.5: `Máy đang chạy macOS {v}; chatbot cần macOS 13.5 trở lên. Anh cập nhật macOS rồi chạy
+  lại.` and exit 3.
+- `Darwin` with `id -u` equal to 0 (run as root, for example with `sudo`; preflight, step 2):
+  `Anh chạy lại lệnh cài bằng tài khoản thường của máy, không dùng sudo.` and exit 3, the sentence that
+  `test_release_selfextract` expects for uid 0 (rev check).
+- `Linux` without `microsoft` in `/proc/version`:
+  `Bản cài này chỉ chạy trên máy Mac có macOS 13.5 trở lên; máy Linux chưa được hỗ trợ.`
+- `Linux` with `microsoft` in `/proc/version` (WSL):
+  `Bản cài này chỉ chạy trên máy Mac có macOS 13.5 trở lên; Windows và WSL chưa được hỗ trợ.`
+- `MINGW*`, `MSYS*`, `CYGWIN*` (Git Bash and similar):
+  `Bản cài này chỉ chạy trên máy Mac có macOS 13.5 trở lên; máy Windows chưa được hỗ trợ.`
+- anything else: `Bản cài này chỉ chạy trên máy Mac có macOS 13.5 trở lên; hệ điều hành {tên} chưa được hỗ trợ.`
+
+A double-click on Windows opens Windows' own "open with" dialog, which no file content can change; the note beside
+the file (16.2.1) says the file is for Macs only.
+
+### 16.6 Human steps, how the installer waits for and verifies each
+
+#### 16.6.1 Claude login (`thomhouse login-claude [LABEL]`, default `main`, or after a move-in the first account step 14 would ask for, rev check; install step 14)
+
+Screen:
+
+```
+Chatbot cần đăng nhập một tài khoản Claude để soạn tin trả lời.
+Trình duyệt sẽ mở trang đăng nhập Claude. Nếu Claude hỏi cách đăng nhập, anh chọn tài khoản Claude
+có gói trả phí, không chọn Anthropic Console. Đăng nhập xong, anh quay lại cửa sổ này.
+Mở trang đăng nhập ngay? [c = có / s = để sau]
+```
+
+Runs `CLAUDE_CONFIG_DIR=BOT_HOME/accounts/<label> claude auth login` in the foreground (interactive, not logged).
+Then `accounts.auth_status()` with the same `CLAUDE_CONFIG_DIR`; only `loggedIn`, `authMethod` and `subscriptionType`
+are read from its JSON (rev F8):
+
+| Result | What the installer does |
+|---|---|
+| `loggedIn` true, `authMethod` `claude.ai`, `subscriptionType` not empty | `accounts.pool(ctx, "enable", label)` and `accounts.pool(ctx, "reset", label)`, journal `done`, line `Đã đăng nhập Claude cho chatbot.`, then the browser line below (rev F17) |
+| `loggedIn` true, `authMethod` other than `claude.ai` (a Console login gives `api_key`) | the account stays disabled; `CLAUDE_CONFIG_DIR=<dir> claude auth logout` (output discarded); `Tài khoản vừa đăng nhập không có gói Claude trả phí (có thể anh đã chọn Anthropic Console).` / `Anh đăng nhập lại bằng tài khoản có gói. [c = thử lại / s = để sau]`; `s` gives `pending` with reason `console_login` |
+| `loggedIn` true, `authMethod` `claude.ai`, `subscriptionType` empty or null | the account stays disabled, no logout (the field can be null for a valid login, binary read); `Claude chưa cho biết gói của tài khoản này nên chatbot chưa dùng tài khoản đó.` / `Anh thử lại? [c = thử lại / s = để sau]`; `c` reads the status again; `s` gives `pending` with reason `no_subscription`. When Claude keeps the field null although the owner has checked the paid plan on claude.ai, the guide gives the way out by hand: `~/ThomHouse/runtime/python/bin/python3 -I ~/ThomHouse/app/scripts/runner/claude_pool.py enable <label>`, then the same with `reset <label>`; step 14 and check 29 then count the account, and check 30 stays CHÚ Ý (rev check) |
+| `loggedIn` false | `Máy chưa thấy tài khoản Claude đăng nhập. Anh thử lại? [c = thử lại / s = để sau]` |
+
+Browser line after a successful login (rev F17): `Anh đăng xuất claude.ai trên trình duyệt của máy này,` /
+`để nhân viên không mở được tài khoản Claude của anh.`
+
+`s` leaves the account disabled: the runner then claims no job (`poller.py:253-256`), customer messages are stored
+and wait in the console, and the line is `Anh chọn đăng nhập sau. Chatbot vẫn nhận tin nhưng chưa soạn trả lời; nhân
+viên trả lời tay trên console. Khi sẵn sàng, anh chạy: ~/ThomHouse/bin/thomhouse login-claude`. After a move-in no
+account has `config_dir: null` (16.8.5); an account that still has one is logged in with plain `claude auth login`.
+
+`thomhouse add-claude LABEL [--priority N]` (default priority 100): `claude_pool.py add LABEL --priority N`, then
+`claude_pool.py disable LABEL`, then the login above. When OpenMausBot is running it ends with
+`Anh chạy ~/ThomHouse/bin/thomhouse restart để phòng chat hai bot dùng tài khoản mới.`, because `rooms-setup` runs only
+while the platform is stopped (`start_local.sh:268-272`).
+
+#### 16.6.2 Zalo QR login (`thomhouse login-zalo`; install step 16)
+
+Screen:
+
+```
+Bước này đăng nhập tài khoản Zalo của studio vào máy này. Mỗi tài khoản Zalo chỉ chạy chatbot trên
+một máy: nếu tài khoản này đang chạy ở máy khác, máy kia sẽ mất kết nối.
+Trình duyệt sẽ hiện mã QR. Anh mở app Zalo trên điện thoại của studio,
+chọn Quét mã QR ngay trong app (không dùng camera thường), quét mã rồi xác nhận trên điện thoại.
+Bắt đầu? [c = có / s = để sau]
+```
+
+Before the call, the installer notes whether 127.0.0.1:18927 is free. It runs
+`APP_HOME/app/tools/zalo-agent/node_modules/.bin/zalo-agent --json login` (never `--qr-url`, never `--credentials`,
+with `ZALO_AGENT_NO_UPDATE_CHECK=1`) and reads stdout line by line; nothing of it is printed or logged. Events:
+
+| Event | What the installer does |
+|---|---|
+| first `qr` | `open http://127.0.0.1:18927/qr` when the port was free, else `open <file>` from the event; prints `Mã QR đã mở trong trình duyệt. Mã hết hạn sau khoảng 60 giây;` / `khi đó chương trình tự tạo mã mới, anh tải lại trang nếu trang chưa đổi.` (two lines of at most 100 characters, rev check) |
+| `qr_scanned` | prints `Điện thoại đã quét mã. Anh xác nhận đăng nhập trên điện thoại.`; `name` and `avatar` are dropped |
+| `qr_expired` | nothing (the engine retries) |
+| `qr_declined`, `login_error`, exit not 0, or 300 s without `login_success` | process stopped; `Chưa đăng nhập được Zalo. Anh thử lại? [c = thử lại / s = để sau]` |
+| `login_success` | `ownId` and `name` dropped; then `bridgecli.listener(ctx, "start")` (`python3 -m bridge.main listener start` in `app/apps/zalo-bridge`) |
+
+`listener start` exit 0: `Đã đăng nhập Zalo. Chatbot bắt đầu nhận tin.`, journal `done`. Exit 3: back to the
+question. Exit 4: `Một chương trình zalo-agent khác đang giữ kết nối của tài khoản này. Anh cho dừng chương trình đó?
+[c = có / s = để sau]`; `c` runs `zalo-agent listen --stop` and `listener start` again. Other codes: pending with
+`Chưa bật được phần nhận tin Zalo. Anh chạy ~/ThomHouse/bin/thomhouse doctor để xem chi tiết.` Verification at any
+later time: the bridge doctor's `zalo_login` and `listener` statuses (16.7).
+
+#### 16.6.3 History sync (`thomhouse sync-history [--force]`; install step 17, optional)
+
+Screen: `Bước này lấy tin nhắn của 365 ngày trước về máy để phân tích khách (không bắt buộc). Điện thoại của studio
+sẽ hiện thông báo có nút ĐỒNG BỘ NGAY. Anh bấm nút đó trong vòng 3 phút. Bắt đầu? [c = có / s = để sau]`. Requires
+`zalo_login` done. Runs `zalo-agent --json sync --days 365 --no-media --no-cloud` (with `-F` on `--force` and on a
+retry), output discarded, limit `THOMHOUSE_SYNC_TIMEOUT_S`; every 30 s for the first 180 s it prints
+`Còn {n} giây để bấm ĐỒNG BỘ NGAY trên điện thoại.` Exit 0: `Đã lấy xong tin nhắn cũ.`, journal `done`. Otherwise
+`Chưa lấy được tin nhắn cũ, có thể vì chưa bấm kịp trên điện thoại. Anh thử lại? [c = thử lại / s = để sau]`. The
+sync uses the listener's connection when the listener runs (`docs/chay-local-zalo-ca-nhan.md`, section "Lấy lại
+tin nhắn cũ"); the engine's exit codes were not checked, so exit 0 is the only proof. As built, "`zalo_login`
+done" means a `zalo_login` journal entry `done` or the bridge doctor's `zalo_login` reporting `ok` (rev review).
+
+#### 16.6.4 Labels (`thomhouse labels [--sync]`; install step 20, optional)
+
+Screen:
+
+```
+Chatbot phân biệt khách với người trong studio bằng nhãn trong app Zalo.
+Trên điện thoại của studio, anh gắn nhãn cho từng cuộc trò chuyện:
+  - Khách hàng: người đến làm dịch vụ
+  - Quản lý: chủ và người quản lý studio
+  - Nhân viên: nhân viên của studio
+Gắn xong thì gõ c rồi Enter để kiểm tra, hoặc gõ s để làm sau.
+```
+
+`c` runs `python3 -m bridge.main sync-labels --dry-run` and reads `contacts.customer`, `contacts.manager` and
+`contacts.staff` from its JSON (`labels.py:99-108`, `:163`). All zero: `Chưa thấy cuộc trò chuyện nào được gắn nhãn.
+[c = kiểm tra lại / s = để sau]`. Otherwise `Đã thấy {k} khách hàng, {q} quản lý, {n} nhân viên được gắn nhãn. Chép
+vào chatbot? [c = có / s = để sau]`; `c` runs `sync-labels`, exit 0 → `Đã chép nhãn vào chatbot. Chatbot tự chép lại
+mỗi 15 phút.` and journal `done`; exit 1 → pending. `--sync` skips the questions.
+
+#### 16.6.5 Staff token into the console (`thomhouse staff-token`; install step 21)
+
+Reads `STAFF_TOKEN` from `app/apps/server/.dev.vars` into memory, puts it on the clipboard with `pbcopy` (stdin),
+runs `open http://127.0.0.1:5173`, and prints:
+
+```
+Chương trình đã chép mã nhân viên vào bộ nhớ tạm; mã không hiện trên màn hình.
+Trình duyệt vừa mở console. Anh vào Cài đặt, bấm vào ô Staff token, nhấn Cmd+V rồi bấm Lưu.
+Dán xong thì gõ c rồi Enter. Chương trình xóa mã khỏi bộ nhớ tạm sau {phút} phút.
+Nếu máy có ứng dụng lưu lịch sử bộ nhớ tạm, anh xóa mục này trong ứng dụng đó.
+```
+
+`{phút}` is `THOMHOUSE_CLIPBOARD_CLEAR_S` (1 to 300, default 120) rounded up to whole minutes (rev F16). The last line
+is new (rev F17): `pbcopy </dev/null` does not clear a clipboard manager's history, and Universal Clipboard can carry
+the token to the owner's other Apple devices (16.13 item 10).
+
+On `c`, `s` or after `THOMHOUSE_CLIPBOARD_CLEAR_S`, when `pbpaste` still returns a value whose SHA-256 equals the
+token's, the clipboard is emptied with `pbcopy </dev/null`. `c` sets the journal `done`; the browser cannot be
+inspected, so this is the only record. The paste is needed once per browser profile and again after a move (new
+secrets).
+
+As built (rev review): the page opened is `THOMHOUSE_CONSOLE_URL` (default `http://127.0.0.1:5173`). Before
+`pbcopy`, `staff-token` checks that URL: the scheme must be `http` or `https` and the host must be in
+`stack.LOOPBACK_HOSTS`. Otherwise it prints `setup.token_console_not_local`, copies nothing, opens nothing and
+returns `failed`; it does not fall back to the default URL. Without an interactive stdin it copies nothing and the
+step stays `pending` with reason `later` (exit 4).
+
+### 16.7 Doctor
+
+`thomhouse doctor [--json] [--offline] [--strict] [--only CHECK[,CHECK…]]` works before install (through the bash
+doctor of the launcher and of `bash thomhouse-<ver>.command --doctor`, checks 1 to 5), after a partial install and on
+a running stack. One line per check:
+
+```
+[ĐẠT] Hệ điều hành: macOS 15.1
+[LỖI] Node.js: chưa có bản 24.19.0. Cách sửa: ~/ThomHouse/bin/thomhouse install --only runtimes
+```
+
+Status words: `[ĐẠT]` (`pass`), `[LỖI]` (`fail`), `[CHÚ Ý]` (`warn`), `[CHƯA LÀM]` (`todo`), `[BỎ QUA]` (`skip`).
+A line that is not `ĐẠT` ends with ` Cách sửa: <fix>` when a fix exists. Exit code: 0 when no line is `LỖI`; 1 when
+at least one is (with `--strict`, also when one is `CHÚ Ý` or `CHƯA LÀM`); 2 on bad arguments or a crash of the
+doctor. `--json` prints `{"schema": 1, "checks": [CheckResult…], "exit": n}`. `--offline` skips the checks marked
+"net" (status `BỎ QUA`, detail `chạy với --offline`). When the stack is stopped, the checks marked "run" are
+`BỎ QUA` with detail `chatbot đang tắt`, except `processes`, which is `LỖI`. Before install, `release` is `LỖI` and
+checks 10 to 48 are `CHƯA LÀM` with fix `anh chạy file thomhouse-<bản>.command`. In checkout mode, checks 9 to 11,
+16 to 19 and 22, and the journal checks 44 to 46 and 48 (the build Mac has no install journal), are `BỎ QUA`
+(`máy phát triển`); checks 5 and 12 to 14 use the checkout rules of 16.5; check 8 compares with the checkout root
+instead of `APP_HOME/app`; check 23 looks at the `BOT_HOME` folders only (rev check).
+
+The bridge doctor is run once per doctor run through `bridgecli.doctor()` (`python3 -m bridge.main doctor --json` in
+`app/apps/zalo-bridge`, only when `apps/zalo-bridge/.env` exists and not `--offline`); only its `name` and `status`
+fields are used. The pool is read through `accounts.load()`, which sets `THOMHOUSE_BOT_HOME` first and loads
+`claude_pool.py` into a new module object per run, never kept in `sys.modules`, because that file binds its paths when
+it is imported (`scripts/runner/claude_pool.py:37-41`) (rev F23). The login is read with `accounts.auth_status()` per
+account (`loggedIn`, `authMethod`, `subscriptionType` only, rev F8). The doctor never calls `/runner/*` and never
+sends `RUNNER_TOKEN` (rev F7). `{fix: install}` below stands for `~/ThomHouse/bin/thomhouse install --only <step>` and
+`{tb}` for `~/ThomHouse/bin/thomhouse`. In checkout mode `{tb}` is `python3 -I install/thomhouse.py`, `{tb} restart`
+is `scripts/stop_local.sh; scripts/start_local.sh`, `{tb} start` is `scripts/start_local.sh` and `{tb} stop` is
+`scripts/stop_local.sh` (rev F20); a fix that names a command checkout mode refuses (16.4.1, for example
+`login-claude`, `login-zalo`, `labels`, `repair`) becomes `xem docs/run-local.md` (rev check), printed as
+`xem hướng dẫn trong docs/run-local.md`, because `test_core_text` requires a Vietnamese diacritic in every catalog
+string (rev wp4).
+
+How the doctor was built, where the text above says less or otherwise (rev wp4):
+
+- The before-install rule (`release` `LỖI`, checks 10 to 48 `CHƯA LÀM`) applies to a full run only. `passes()` and
+  `--only` inspect the machine, because install steps 5 and 7 call `passes()` before step 8 writes
+  `installed.json`; with the rule applied there, those steps could never be seen as done before step 8.
+- Checks 10, 15 to 19, 34 and 40 read the release through `paths.code_root`, which equals `APP_HOME/app` once the
+  launcher runs the program, and is the release being installed before step 8, which is what steps 5 and 7 check.
+  Check 22 still compares with `APP_HOME/app` literally.
+- A check that raises becomes a `LỖI` line with `doctor.crashed`, and the doctor then exits 2 (16.3.3
+  `CheckResult.crashed`). `--only` accepts check numbers as well as ids; an unknown one gives `doctor.unknown_check`
+  and exit 2.
+- Pass details and fixes that hold no Vietnamese word (`macOS 15.1`, `Apple Silicon`, `120 GB`, versions, the
+  catalog id, the backup date, a fix that is only a command such as `~/ThomHouse/bin/thomhouse repair`) are built
+  in `doctor.py`, not in the catalog.
+- Texts the table does not define, added to the catalog: OS names, an unreadable macOS version, the checkout-mode
+  Node.js, pnpm and Python lines, a missing Claude Code link, the server answering in another mode, the staff API not
+  answering, `STAFF_TOKEN` missing, unreadable bridge doctor output, `OpenMausBot không chạy.` as the pass detail of
+  check 42, and the rooms-not-running warning of check 31.
+- The in-process doctor tests replace the WP2 modules `release`, `deps` and `runtimes` with stand-ins, so the
+  doctor's unit tests do not depend on WP2's stamp and manifest formats; `test_subprocess_json_from_root` and
+  `test_doctor_bash` use the real WP2 code.
+
+The doctor does not report `BOT_HOME/d1.restore-needed.json` (16.4.3 step 12); a check with the fix
+`thomhouse continue` is not built (rev review, open).
+
+| # | id | Label on screen | Passes when (pass detail) | On failure: status, detail, fix |
+|---|---|---|---|---|
+| 1 | `macos` | Hệ điều hành | macOS ≥ 13.5 (`macOS {v}`) | LỖI `macOS {v}, chatbot cần 13.5 trở lên.` fix `anh cập nhật macOS trong Cài đặt hệ thống rồi chạy lại.`; another OS: LỖI `{tên} chưa được hỗ trợ.` fix `chatbot chỉ chạy trên máy Mac.` (rev owner) |
+| 2 | `cpu` | Chip | `hw.optional.arm64` = 1 (`Apple Silicon`) | CHÚ Ý `máy Intel chưa được chạy thử.` fix `nếu gặp lỗi, anh gửi kết quả lệnh này cho người phụ trách.` |
+| 3 | `disk` | Dung lượng trống | ≥ `disk_min_gb` in HOME (`{n} GB`) | LỖI `chỉ còn {n} GB, cần ít nhất {m} GB.` fix `anh xóa bớt tệp rồi chạy lại.` |
+| 4 | `system_tools` | Công cụ của macOS | every tool of 16.5 present in `/usr/bin`, `/usr/sbin`, `/bin` or `/sbin` (`đủ`) (rev wp4) | LỖI `thiếu {tên}.` fix `đây là lỗi lạ trên macOS; anh báo người phụ trách.` |
+| 5 | `python` | Python | the pinned version runs (`{v}`) | LỖI `chưa có Python {v}.` fix, without `installed.json`: `anh chạy lại file thomhouse-<bản>.command.`; with it: `bash ~/ThomHouse/app/install/bootstrap.sh --python-only` (the header refuses an installed device, rev F5) |
+| 6 | `install_lock` | Lệnh cài khác | `state.lock_holder()` is None or `state.held_by_us()` (`không có`) (rev F3) | LỖI `một lệnh cài hoặc cập nhật khác đang chạy.` fix `anh chờ lệnh đó xong rồi chạy lại.` |
+| 7 | `moved_out` | Máy đã chuyển đi | `state.moved_out()` is None, that is no `BOT_HOME/moved-out.json` (`không`) (rev F12) | LỖI `dữ liệu của máy này đã chuyển sang máy khác ngày {ngày}.` fix `đừng bật chatbot ở đây; muốn chạy lại trên máy này: {tb} move-back` |
+| 8 | `other_stack` | Bản chatbot khác | `stack.other_stacks()` is empty: no live service of `BOT_HOME/run` that belongs to another installation by the rule of 16.3.3 (logical or real `app` path in the command line, else the working folder; the cron ticker follows the server) (`không có`) (rev F20, rev check) | LỖI `một bản chatbot khác ({thư mục}) đang chạy với cùng dữ liệu.` fix `anh tắt bản đó bằng scripts/stop_local.sh trong thư mục đó.` |
+| 9 | `release` | Bản cài | `installed.json` exists, `app` → `releases/<v>`, `VERSION.json` agrees (`bản {v}, cài ngày {ngày}`) | without `installed.json`: LỖI `chưa cài chương trình.` fix `anh chạy file thomhouse-<bản>.command.`; with an update journal still `running` (`state.update_open()`): LỖI `lần cập nhật trước chưa xong.` fix `{tb} update {file}` with the journal's file (rev check); otherwise: LỖI `bản cài không khớp với ghi chép cài đặt.` fix `{tb} repair` (rev F5) |
+| 10 | `release_files` | Tệp chương trình | `release.verify_manifest` is empty (`{n} tệp đúng`) | LỖI `{n} tệp bị sửa hoặc bị mất.` fix `{tb} repair` |
+| 11 | `release_clean` | Tệp không được mang theo | no path of any `releases/*/MANIFEST.json` is `release.denylisted()` by the live release's `install/denylist.txt` (`không có`) | LỖI `bản cài có tệp không được mang theo: {đường dẫn}.` fix `anh tắt chatbot và báo người làm file cài.` |
+| 12 | `node` | Node.js | pinned version (`{v}`) | LỖI `chưa có bản {v}.` fix `{fix: runtimes}` |
+| 13 | `pnpm` | pnpm | equals `packageManager` (`{v}`) | LỖI `chưa có bản {v}.` fix `{fix: runtimes}` |
+| 14 | `claude_cli` | Claude Code | `runtimes.found(ctx, "claude_code")` ≥ `min` and `runtime/bin/claude` links to `~/.local/bin/claude` (`{v}`); newer than the pin: CHÚ Ý `bản {v} mới hơn bản đã thử {pin}.` (rev F11, F15) | LỖI `chưa có Claude Code {min} trở lên.` fix `{fix: runtimes}` |
+| 15 | `pins` | Phiên bản ghi trong mã | `pins.agreement(app)` is empty (`khớp`) | LỖI `các phiên bản ghi trong mã không khớp nhau: {tên}.` fix `anh báo người làm file cài.` |
+| 16 | `deps_workspace` | Thư viện JavaScript | `deps.stamp_ok()["workspace"]` (`đúng cho máy này`) | LỖI `chưa cài cho máy này hoặc đã cũ.` fix `{fix: deps}` |
+| 17 | `deps_engine` | Bộ công cụ Zalo | `deps.stamp_ok()["engine"]` and the installed version equals the pin (`{v}`) | LỖI `chưa đúng bản {v}.` fix `{fix: deps}` |
+| 18 | `deps_rooms` | OpenMausBot | `deps.stamp_ok()["rooms"]` (`{v}`) | CHÚ Ý `chưa cài; phòng chat hai bot sẽ tắt, chatbot vẫn trả lời bình thường.` fix `{fix: deps}` |
+| 19 | `menu_slides` | Ảnh menu gốc | link valid and files verified (`bộ {menu_id}`) | CHÚ Ý `chưa có bộ ảnh menu gốc {menu_id}.` fix `anh chép file thomhouse-menu-{menu_id}.tar vào máy rồi chạy: {tb} install --only menu_slides --menu <file>` |
+| 20 | `env_files` | File cấu hình | the three env files exist, mode 0600, with their required key names (`đủ 3 file`) | LỖI `{tệp} thiếu, sai quyền hoặc thiếu {tên biến}.` fix `{fix: config}` |
+| 21 | `tokens_agree` | Mã bí mật khớp nhau | `RUNNER_TOKEN` equal in the three files, `ZALO_PERSONAL_WEBHOOK_SECRET` equal in `.dev.vars` and the bridge `.env` (digests) (`khớp`) | LỖI `mã bí mật giữa các file cấu hình không khớp.` fix `{tb} repair --env` |
+| 22 | `paths_current` | Đường dẫn trong file cấu hình | `ZALO_AGENT_BIN` exists under `APP_HOME/app`, `OPENMAUSBOT_NODE_DIR` (when set) exists under `APP_HOME/runtime` (`đúng`) | LỖI `{tên biến} trỏ tới một thư mục không còn dùng.` fix `{tb} repair --paths` |
+| 23 | `permissions` | Quyền thư mục | `APP_HOME`, `BOT_HOME` and, when present, `BOT_HOME/backups` and `BOT_HOME/profiles` are 0700 (`đúng`); a fresh install has made no backup yet, so a missing `backups` folder is not a failure (rev check) | LỖI `{thư mục} cho người khác đọc được.` fix `{tb} repair` |
+| 24 | `no_api_key` | Khóa API Anthropic | `ANTHROPIC_API_KEY`, `ANTHROPIC_AUTH_TOKEN` absent from the environment and every env file (`không có`); `CLAUDE_CODE_OAUTH_TOKEN` present: CHÚ Ý `{nơi} đặt CLAUDE_CODE_OAUTH_TOKEN; biến này đè lên đăng nhập của các tài khoản Claude.` | LỖI `{nơi} đặt {tên biến}; chatbot chỉ dùng gói Claude.` fix `anh xóa dòng đó rồi chạy: {tb} restart` |
+| 25 | `profile_llm_off` | Phân tích bằng model | `PROFILE_LLM_ENABLED` not truthy anywhere (`tắt`) | LỖI `{nơi} bật PROFILE_LLM_ENABLED.` fix `anh xóa dòng đó rồi chạy: {tb} restart` |
+| 26 | `database` | Cơ sở dữ liệu | `migrations.find_db()` finds the D1 file (`có`) | CHƯA LÀM `chưa tạo.` fix `{fix: migrations}` |
+| 27 | `migrations` | Bản cập nhật cơ sở dữ liệu | `pending` is `[]` (`đủ {n} bản`); `None`: CHÚ Ý `không đọc được danh sách đã áp.` | LỖI `còn {n} bản chưa áp.` fix `{tb} restart (máy tự sao lưu trước)`; with no database at all: CHƯA LÀM `chưa có cơ sở dữ liệu.` with the fix of check 26, instead of a LỖI that would only repeat check 26 before the first start (rev wp4) |
+| 28 | `last_backup` | Sao lưu | the newest verified backup is at most 7 days old (`{ngày}`) | CHÚ Ý `bản sao lưu mới nhất đã {n} ngày.` or `chưa có bản sao lưu.` fix `{tb} backup` |
+| 29 | `claude_pool` | Tài khoản Claude của chatbot | at least one account enabled and `healthy` (`{n} tài khoản dùng được`); each account in `limited`, `login_expired` or `blocked`: CHÚ Ý `tài khoản {nhãn} đang tạm ngừng.` | every account disabled (the state the installer leaves until a login is verified): CHƯA LÀM `chưa đăng nhập tài khoản Claude nào; chatbot chưa soạn trả lời.` fix `{tb} login-claude` (rev F9); otherwise LỖI `chưa có tài khoản Claude nào dùng được.` fix `{tb} login-claude` |
+| 30 | `claude_login` (net) | Đăng nhập Claude | every account `loggedIn` with `authMethod` `claude.ai` (`đã đăng nhập`); `subscriptionType` empty: CHÚ Ý `tài khoản {nhãn} có thể không có gói Claude.` | `authMethod` other than `claude.ai`: LỖI `tài khoản {nhãn} đăng nhập bằng khóa API, không phải gói Claude.` fix `{tb} login-claude {nhãn}` (rev F8); not logged in: CHƯA LÀM `tài khoản {nhãn} chưa đăng nhập; chatbot chưa soạn trả lời.` fix `{tb} login-claude {nhãn}` |
+| 31 | `processes` (run) | Các phần của chatbot | server, cron, runner, bridge and console alive by the PID rule of `start_local.sh:83-93` (`đang chạy`); OpenMausBot installed with Node 24 and not running: CHÚ Ý | LỖI `{tên} chưa chạy.` fix `{tb} start` |
+| 32 | `server_health` (run) | Máy chủ local | `/health` answers with `zalo_mode` `personal` (`đang chạy`) | LỖI `máy chủ chưa trả lời.` fix `{tb} restart; nếu vẫn lỗi, xem ~/.thomhouse-bot/logs/server.log` |
+| 33 | `runner_online` (run) | Runner | in `GET /staff/runner`, the row whose `runner_id` equals `RUNNER_ID` of `apps/runner/.env` (`init-env` writes `mac-local-1`; `mac-runner-1` when the key is missing, `apps/runner/runner/config.py:138`, rev check) is `online` (`đang báo về máy chủ`); another row never counts (rev F7). The runner reports status even when every pool account is disabled, so a postponed Claude login does not fail this check | LỖI `runner không báo về máy chủ.` fix `xem ~/.thomhouse-bot/logs/runner.log rồi chạy: {tb} restart` |
+| 34 | `catalog` (run) | Danh mục dịch vụ | `migrations.active_catalog(BOT_HOME)` (read-only `SELECT id FROM catalog_versions WHERE status = 'active'` on the D1 file) equals `cv_local_` + the first 12 hex of the SHA-256 of `data/services.json`, `data/business-facts.json`, `design/system-prompt-draft.md`, `design/tools-schema.json` concatenated (`start_local.sh:220-221`) (`{phiên bản}`); `None`: CHÚ Ý `không đọc được danh mục trong cơ sở dữ liệu.` (rev F7) | LỖI `danh mục trên máy chủ chưa phải bản mới.` fix `{tb} restart` |
+| 35 | `console` (run) | Console | `GET /` on the console URL answers (`đang mở`) | LỖI `console chưa mở.` fix `{tb} start` |
+| 36 | `zalo_login` (net) | Đăng nhập Zalo | bridge doctor `zalo_login` ok (`đã đăng nhập`) | CHƯA LÀM `chưa đăng nhập Zalo; chatbot chưa nhận tin.` fix `{tb} login-zalo` |
+| 37 | `listener` (net, run) | Nhận tin Zalo | bridge doctor `listener` ok (`đang nhận tin`) | when check 36 is CHƯA LÀM: CHƯA LÀM `chưa nhận tin vì chưa đăng nhập Zalo.` fix `{tb} login-zalo` (rev F9); otherwise LỖI `phần nhận tin Zalo chưa chạy.` fix `{tb} restart`; bridge doctor `listener` `warn` (the daemon runs with socket or webhook problems, `apps/zalo-bridge/bridge/doctor.py:138`): CHÚ Ý `doctor.listener_warn`, because the LỖI text would be false there (rev wp4) |
+| 38 | `bridge_token` (run) | Bridge | bridge doctor `bridge_token` ok (`kết nối được`) | LỖI `bridge chưa kết nối được máy chủ.` fix `{tb} restart`; bridge doctor `warn` (the token is accepted but some sends have an unknown outcome, `doctor.py:169`): CHÚ Ý `doctor.bridge_token_unknown` (rev wp4) |
+| 39 | `room_platform` (net, run) | Phòng chat hai bot | bridge doctor `room_platform` ok (`sẵn sàng`) | CHÚ Ý `chưa sẵn sàng; chatbot vẫn trả lời bình thường.` |
+| 40 | `menu_images` | Ảnh menu cho Zalo | `build_menu_images.py --home BOT_HOME --check` exits 0 (`đủ`) | CHÚ Ý `chưa đủ; bot chưa gửi được ảnh menu.` fix `{tb} restart` |
+| 41 | `listen_local_only` (run) | Chỉ mở trên máy này | every LISTEN socket (`safety.listen_sockets`) of the process groups (`safety.group_pids`) of check 31, of OpenMausBot (`run/openmausbot.pid`, today ports 8799 and 8800) and of the listener daemon (PID from `bridgecli.listener(ctx, "status")`) is on `127.0.0.1` or `[::1]` (`đúng`) (rev F16) | LỖI `{tên} đang mở cổng {cổng} ra ngoài máy.` fix `anh tắt chatbot ngay bằng {tb} stop và báo người phụ trách.` |
+| 42 | `openmausbot_options` (run) | Tùy chọn của OpenMausBot | `safety.forbidden_platform_args(safety.process_argv(pid))` is empty for the platform's PID: no argument equals `login`, `--tunnel`, `--lan`, `--relay`, `--domain`, `--public-url` or `--tailscale`, or starts with one of those options and `=`; a path that merely contains those letters never matches (`đúng`) (rev F16) | LỖI `OpenMausBot đang chạy với {tùy chọn}.` fix `anh tắt chatbot ngay bằng {tb} stop và báo người phụ trách.` |
+| 43 | `reply_flags` (run) | Chế độ trả lời | `GET /staff/flags`: `ai_engine` is `subscription` (`duyệt từng tin` for `approve_each`, or the mode name) | LỖI `ai_engine đang là {giá trị}.` fix `anh báo người phụ trách.`; CHÚ Ý `chatbot đang tự gửi trả lời không chờ duyệt.` when `auto_reply_mode` is `auto_allowed` (fix `nếu anh không chủ ý bật, tắt trong màn hình Cài đặt của console.`); CHÚ Ý `mọi tin gửi ra Zalo đang tắt.` when `outbound_enabled` is false (fix `bật lại trong màn hình Cài đặt sau khi anh xem hàng chờ gửi.`) |
+| 44 | `history_sync` | Tin nhắn cũ | journal `done` (`đã lấy`) | CHƯA LÀM `chưa lấy tin nhắn cũ (không bắt buộc).` fix `{tb} sync-history` |
+| 45 | `contacts_analyzed` | Phân tích danh bạ | journal `done` (`ngày {ngày}`); BỎ QUA `máy chưa có tin nhắn Zalo đã lấy về.` when step 18 is `skipped` (`no_cache`), like check 46 (rev wp4) | CHƯA LÀM `chưa phân tích danh bạ (không bắt buộc).` fix `{tb} analyze --contacts` |
+| 46 | `visits_analyzed` | Phân tích buổi làm | journal `done`; BỎ QUA `máy chưa có tin nhắn Zalo đã lấy về.` when step 19 is `skipped` (`no_cache`) | CHƯA LÀM `chưa phân tích buổi làm (không bắt buộc).` fix `{tb} analyze --visits`; with reason `server_404`: CHƯA LÀM `máy chủ chưa nhận kết quả phân tích buổi làm.` fix `{tb} continue` (rev visits) |
+| 47 | `labels` (run) | Nhãn khách trong Zalo | `GET /staff/roles` returns at least one role (array under `roles`, or a top-level array) (`{n} người có nhãn`) | CHƯA LÀM `chưa có ai được gắn nhãn Khách hàng, Quản lý hoặc Nhân viên.` fix `anh gắn nhãn trong app Zalo rồi chạy: {tb} labels` |
+| 48 | `staff_token_step` | Mã nhân viên trong console | journal `done` (`đã đưa vào console`) | CHƯA LÀM `chưa đưa mã nhân viên vào console.` fix `{tb} staff-token` |
+
+Staff calls (checks 33, 43, 47) read `STAFF_TOKEN` from `app/apps/server/.dev.vars` and send it to the loopback
+server only. No check calls `/runner/*`: such a call needs `X-Runner-Id`, and `requireRunner` would then mark that id
+as a live runner for `RUNNER_OFFLINE_MS` (`apps/server/src/lib/auth.ts:28-37`, `apps/server/wrangler.toml:13`), which
+hides a dead runner from `sweepRunnerHealth` (`apps/server/src/jobs/draft-jobs.ts:533-556`) (rev F7). No detail ever
+contains a token, an email, a Zalo id, a name or a message.
+
+### 16.8 Update, backup, restore, move, uninstall
+
+#### 16.8.1 Update (`thomhouse update FILE [--menu FILE] [--dry-run] [--yes]`)
+
+First line: `Cập nhật chatbot từ bản {cũ} lên bản {mới}. Chatbot sẽ tạm tắt vài phút. Tiếp tục? [c = có / k = không]`.
+`update FILE` is the only way to update; the file is read as data and never executed (16.2.6, rev F5). The update
+journal (`state.update_get`/`update_set`, key `update` of `install-steps.json`) is written before each phase starts
+and when it ends: `{"from", "to", "file", "from_runtimes", "to_runtimes", "backup", "phases", "state"}` with `state`
+`running` until the end, then `done` or `rolled_back` (rev F14).
+
+| # | Phase | Stack | On failure |
+|---|---|---|---|
+| U1 | `release.verify_file(first_install=False)`: payload hash, signature against the stored trust, no MANIFEST path denylisted by the live release's `install/denylist.txt`; the version must be higher than installed (`older`: refuse and name `{tb} rollback`; `same`: print `ops.update_same` below and exit 0, without calling WP3, rev check) | old, running | refuse, exit 3, nothing changed |
+| U2 | `release.unpack` to `releases/<new>`, `release.copy_to_cache` | running | staging deleted, exit 1 |
+| U3 | new runtime versions (pins differ): `runtimes.plan`, consent, `runtimes.install` into versioned folders, symlinks not switched; a new Claude Code goes through Anthropic's installer with `child_env(claude_install=True)` (rev F1). That installer points `~/.local/bin/claude` at the new version at once (general knowledge, not checked), so the running old stack drafts with the new Claude Code from U3 on, and no rollback undoes it; check 14 then shows CHÚ Ý (16.13 item 24, rev check) | running | new folders deleted, exit 1 or 4; a Claude Code binary that fails its hash is handled as in step 5 |
+| U4 | `deps.install(ctx, releases/<new>, <new node>/bin, pnpm_bin=<new pnpm>)` when U3 installed them, else the current ones (writes that release's `.npmrc`, rev F21, rev check) | running | the new `node_modules` deleted, exit 1 |
+| U5 | menu: same `menu_id` → `release.link_menu` to the existing slides; else `--menu FILE` or `thomhouse-menu-<id>.tar` beside FILE; else a warning | running | warning only |
+| U6 | copy `apps/server/.dev.vars`, `apps/runner/.env`, `apps/zalo-bridge/.env` and, when present, `apps/console/.env.local` from `app/` into the new release, mode 0600 (copied, never linked: `EnvFile.save` replaces a symlink, `envfiles.py:90-97`) | running | exit 1 |
+| U7 | `stack.stop`: record PIDs and start times, run the old `stop_local.sh`, verify none of them is alive | stopped | `stack.start(during_update=True)` of the old release, exit 1 |
+| U8 | `backup.make(mode="stopped", reason="before-update-<new>")`, verified; its id goes into the journal | stopped | old started, exit 1, nothing lost |
+| U9 | the journal records `from_runtimes` and `to_runtimes` first; then switch runtime symlinks (when U3 ran) and `app` with `os.replace`, and `release.write_launcher(ctx, releases/<new>)` (rev F10, F14) | stopped | — |
+| U10 | `migrations.apply` with the new wrangler | stopped | first the journal records `phases.U10 = "rollback"`; then rename `BOT_HOME/d1` to `BOT_HOME/d1.failed-<stamp>` (kept, 0700) and copy `d1` back from the U8 backup. When that copy fails (a full disk, for example), nothing is started: the screen names the backup folder and `d1.failed-<stamp>`, the journal stays `running` with that mark, exit 1 (rev F14). A later `update FILE` or `rollback` finishes this rollback (copy `d1` from the journal's backup again, then switch back and start the old release); it never applies migrations to a `d1` that was not restored, which would start the bot on an empty database (rev check). When the copy succeeds: switch `app`, runtimes and launcher back, `stack.start(during_update=True)` of the old release, journal `rolled_back`, exit 1 |
+| U11 | `stack.start(during_update=True)` of the new release; its backup hook works under the update's `InstallLock` (16.8.2, rev F3) | starting | `start_local.sh` exits non-zero only in its steps 1 to 5 (`:148-243`), before runner, bridge, listener and console start, so no customer message or staff action can have been stored: `stack.stop`, then the rollback of U10, exit 1 |
+| U12 | health gate: `stack.health_gate` and doctor checks 41 and 42 | new, running | no automatic rollback (data may have been written): U13 still runs, so that `rollback` knows the previous version; then the failed lines, `{tb} rollback`, history result `failed`, exit 1 |
+| U13 | stamp: `installed.json` (`version`, `previous_version`, `previous_runtimes`, `backup_before_update`, `migrations_applied`, `release_id`); `history.jsonl`; `release.prune(keep_previous=1)`; old runtime folders kept until the next update; journal `done` | new, running | — |
+
+Rollback messages: `Bản mới gặp lỗi ở bước {tên bước}, nên chương trình đã trả máy về bản {cũ}. Dữ liệu không mất.
+Chi tiết ở ~/ThomHouse/logs/update.log.` Downtime is U7 to U11 only.
+
+Same version (`ops.update_same`, U1, rev check): `Máy đã chạy bản {v}, nên không cần cập nhật.` /
+`Các bước còn lại: ~/ThomHouse/bin/thomhouse continue`
+
+Interrupted update (power cut, closed window, crash; journal `running` while no process holds `InstallLock`)
+(rev F14): from U7 on (`state.update_open()`), `start` (so also the LaunchAgent, which runs `start --quiet`) and
+`continue` refuse with exit 3 and `core.update_open`, because the release and the database may not match; so do
+the other commands named in the dispatcher rule of 16.3.3 (rev check). `update FILE` with the same file resumes:
+before U9 it starts again at U1 (nothing live was switched yet); from U9 on it continues at the first phase not done
+(U10 applies only the migrations still pending), except that a U10 marked `rollback` is finished as a rollback
+(U10 row, rev check). From U7 on, `update` with another file exits 3 with `core.update_open`, which names the
+journal's file (also kept in `cache/releases/`); before U7 any `update FILE` starts over at U1 (rev check).
+`rollback` with an open journal uses the journal's `from`, `from_runtimes` and `backup` instead of `installed.json`.
+
+As built (rev review):
+
+- An update interrupted before U9 (the stack may be down since U7, while `app` still points at the old release):
+  `update FILE` asks again and starts at U1. Every other outcome, that is the answer `k`, a file that does not
+  verify, or the same or an older version, closes the old journal as `rolled_back`, writes it to `history.jsonl` and
+  starts the old release with `stack.start(during_update=True)` without stopping first, because nothing was
+  switched before U9 and `start_local.sh` starts only the missing services. The screen prints
+  `ops.update_declined_unfinished` (on `k`), then `ops.update_unfinished_closed` or
+  `ops.update_unfinished_start_failed` (16.4.7), instead of a sentence saying the old release still runs. A dry run
+  changes nothing (review finding).
+- In the rollback of U10 and U11 the journal is set to `rolled_back` before the old release starts, not after:
+  with the contract's order, a power cut after the old stack started would make the next resume set aside data
+  that the old stack had already written.
+- `rollback` while an update journal is still open (after a power cut) asks for the typed `khoi phuc` only when U11
+  had started, because the new release may have stored messages; before U11 it restores `d1` without asking.
+- U5 judges "same `menu_id`" by whether `shared/menu-slides/<menu_id>` exists; otherwise it uses `--menu FILE` or
+  `thomhouse-menu-<id>.tar` beside FILE. Any problem in U5 is a warning only.
+- U9 rewrites the launcher only when its content differs; in the integration run of an update to a new Python the
+  launcher stayed the same, because it reads `PY_VERSION` from `versions.env` at run time (rev F10).
+
+`thomhouse rollback [--dry-run]`: switch `app` (and runtimes, from `previous_runtimes`) back to `previous_version` and
+write the launcher from that release (`release.write_launcher`, rev F10). When `migrations_applied` contains a file
+that the previous release's `apps/server/migrations` lacks, the pre-update backup must be restored too: the screen
+shows its time and the restore warning of 16.8.3, the person types `khoi phuc`, then stop, restore, switch, start.
+Without that difference: stop, switch, start. Exit 0, 1, 3 (no previous release) or 4 (declined).
+
+#### 16.8.2 Backup (`thomhouse backup`)
+
+- Locks (rev F3): `backup` never takes `InstallLock`. `backup.make()` takes `BOT_HOME/backups/.lock` (`fcntl.flock`,
+  waiting up to 300 s, else exit 3 with `ops.backup_locked`) for the copy and the retention pass, so two backups
+  never overlap, and a backup started by the `start_local.sh` hook works while install, update, restore or move-in
+  hold `InstallLock`.
+- Mode: `--stopped` refuses (exit 3) when the server runs; `--online` copies while it runs; with neither, `stopped`
+  when the server is not running, else `online`. Update, restore, move and the `start_local.sh` hook always use
+  `stopped`. In `online` mode each SQLite file is consistent by itself, but D1 and the Durable Objects may be a few
+  seconds apart.
+- `--if-pending-migrations`: decided before any lock is taken; exit 0 without a backup when there is no D1 database
+  yet or `pending` is `[]`; an unknown `pending` takes the backup. While `BOT_HOME/d1.restore-needed.json` exists
+  (16.4.3 step 12) it prints `setup.restore_needed` and exits 1 before looking at the migrations, so the
+  `start_local.sh` hook stops the start (rev review).
+- Folder `BOT_HOME/backups/<YYYYMMDD-HHMMSS>-<reason>/` (0700, files 0600), written as `.partial-<…>` and renamed when
+  verified. Free space needed: twice the size of what is copied, else exit 1. Each `backup.make`, once it holds
+  `backups/.lock`, deletes the `.partial-*` folders an interrupted backup left and logs their ids; a symlink is
+  neither deleted nor followed. SQLite error 13 (`SQLITE_FULL`) or "disk is full" while copying is reported as
+  `space`; a copy that fails its check stays `verify`; a file that cannot be copied, or a `backups` folder that
+  cannot be opened, is `copy` (`ops.backup_copy`, exit 1) (rev review).
+- Copied: `d1/**` (every file that starts with `SQLite format 3\0` through
+  `sqlite3.connect("file:<path>?mode=ro", uri=True).backup(dest)`, then `PRAGMA integrity_check` must return `ok`;
+  files ending in `-wal`, `-shm`, `-journal` are skipped; other files copied as they are); `bridge/journal.jsonl`;
+  `accounts.json`; `account-state.json`; `profiles/**`; `sessions/**`; `state/**`; `conversations/**`;
+  `env/server.dev.vars`, `env/runner.env`, `env/bridge.env` (from `app/`, 0600).
+- Not copied: `run/`, `logs/`, `menu-images/`, `prompt/`, `probe/`, `accounts/` (Claude logins sit in the Keychain),
+  `rooms/` and `openmausbot/` (rebuilt by `rooms-setup` and room seeding, 14.8 step 2; the platform log holds
+  pairing codes), `backups/`, `d1.failed-*`, `moved-out.json` (rev F12).
+- `backup.json`: `{"schema": 1, "id", "created_at", "reason", "mode", "app_version"` (or `"checkout"`)`, "device_id",
+  "bot_home", "migrations_applied", "files": [{"path", "sha256", "bytes"}], "sqlite_checked"}`.
+- Retention after each successful backup: keep the newest 5 of reasons `manual` and `before-migration`; keep
+  `before-update-*` for 30 days and always the newest one; never delete `move-*` or `before-restore-*`. As built,
+  the newest 5 are kept per reason, separately; the reasons in use are `manual`, `before-migration`,
+  `before-update-<ver>` (U8), `move` and `before-uninstall`, and a reason the code does not know is never pruned
+  (rev review).
+- `thomhouse backups` prints one line per backup: `{id}  {thời gian}  {lý do}  bản {v}  {MB} MB  {đã kiểm | lỗi}`.
+- `--quiet` prints only errors. Exit 0 done or not needed, 1 failed, 3 refused.
+
+#### 16.8.3 Restore (`thomhouse restore ID [--dry-run]`)
+
+1. Verify `backup.json` hashes (exit 1 on a mismatch). Refuse (exit 3) a backup that is newer than this code: its
+   `migrations_applied` names a file that this release's (or the checkout's) `apps/server/migrations` lacks, or its
+   `app_version` is a higher `X.Y.Z` than the installed version. A backup made in checkout mode has `app_version`
+   `checkout`, which no version comparison can order, so it is judged by the migrations alone; this is how the
+   build Mac's image of 16.8.5 reaches a device (rev check).
+2. Show: `Bản sao lưu lúc {thời gian} ({lý do}). Mọi tin nhắn và thay đổi sau thời điểm đó sẽ không còn trong dữ liệu
+   đang dùng; dữ liệu hiện tại được giữ trong {thư mục}. Gõ khoi phuc rồi Enter để khôi phục, hoặc chỉ Enter để
+   thôi.` (`khoi phuc` or `khôi phục`).
+3. `stack.stop`.
+4. Move every item that the backup replaces into `BOT_HOME/backups/<stamp>-before-restore/` (rename on the same
+   disk; nothing is deleted).
+5. Copy the backup items in. `bridge/journal.jsonl`: on the same device (`device_id` equal) the current journal is
+   kept, because it records what was really sent and keeps entries 7 days (`journal.py:1-17`, `KEEP_MS`); on another
+   device the backup's journal is used.
+6. Env files: same device → restored into `app/` (the consoles keep their token); another device → this device's
+   files stay.
+7. When `bot_home` differs: rewrite the `config_dir` prefix in `accounts.json`, recreate each
+   `accounts/<label>/projects` link to `sessions/`; an account whose config folder does not exist is set
+   `enabled: false` (its login is redone).
+8. `stack.start` (it applies newer migrations, with the backup hook, and reruns `rooms-setup`), then the doctor.
+
+A failure in steps 3 to 7 moves the set-aside items back, starts the stack and exits 1. The installer never writes
+`flags` during a restore (invariant 3); the restore screen ends with `Anh mở console và xem hàng chờ gửi trước khi
+nhân viên làm việc tiếp.`
+
+As built (rev review): step 4 sets aside every item of the backup format that exists now, not only the items the
+backup contains, so the result equals the backup's state; on the same device the bridge journal is left out of
+both. An unknown ID exits 2. After a successful copy, `restore` removes `BOT_HOME/d1.restore-needed.json`, because
+`d1` now comes from a verified backup; otherwise the `start_local.sh` hook would refuse the start of step 8.
+
+#### 16.8.4 What a backup is for
+
+Daily safety (`backup`), the step before every migration (automatic), and the base of `move-out`. Backups stay on
+the same disk as the data under the same 0700 protection; an off-site copy is an owner decision (16.12).
+
+#### 16.8.5 Move to another device
+
+`thomhouse move-out --to DIR` (old device, installed or checkout mode; in checkout mode it is run as
+`python3 -I install/thomhouse.py move-out --to DIR`, which is how the live data of the build Mac reaches its first
+device, rev F12): asks `Chuyển dữ liệu chatbot sang máy khác? Sau bước này chatbot không chạy trên máy này nữa.
+[c = có / k = không]`; `stack.stop` (in checkout mode this runs the checkout's `scripts/stop_local.sh`);
+`bridgecli.listener(ctx, "stop")` without `only_ours`, so the Zalo web session is free (one session per account,
+distribution 6); `autostart.disable` (installed mode only); `backup.make(mode="stopped", reason="move")`; build a
+staging copy of that backup without `env/` and with `env-settings.json` holding only these keys from the env files
+when present: `ROOM_TURN_TIMEOUT_S`, `ROOM_OBSERVE_EVERY_S`, `ROOM_FALLBACK`, `ROOM_REQUIRE_PROFILE_READ`,
+`ROOM_CUSTOMER_MODEL`, `ZALO_PERSONAL_IGNORE_THREADS`, `ZALO_ACCOUNT`, `SEND_MIN_INTERVAL_S`, `LABEL_SYNC_EVERY_S`,
+`THOMHOUSE_CLAUDE_MODEL`, `THOMHOUSE_CLAUDE_EFFORT`. `THOMHOUSE_DRAFT_ENGINE` no longer travels, so the installer
+never writes it (invariant 3): the new device starts with the `claude` engine that `init-env` writes, and the guide
+tells the owner to set `rooms` again by hand if the old device used it (rev F16). Then the line `ops.hdiutil_create`
+(rev F18) and `hdiutil create -encryption AES-256 -srcfolder <staging> -volname thomhouse-chuyen-may -format UDZO
+DIR/thomhouse-chuyen-may-<YYYYMMDD-HHMM>.dmg` (hdiutil asks for the passphrase itself; mode 0600); then
+`state.set_moved_out()` writes `BOT_HOME/moved-out.json` with the image name and its SHA-256, so neither the installer
+nor a hand-run `start_local.sh` starts this Mac again (16.3.2, rev F12). Last line: `Đừng bật lại chatbot trên máy
+này. Mỗi tài khoản Zalo chỉ chạy trên một máy.`
+
+`move.place_moved_data(ctx, image)` (used by `thomhouse move-in FILE` and by install step 10): the line
+`ops.hdiutil_attach` (rev F18); `hdiutil attach -readonly -nobrowse -mountpoint <tmp> FILE` (passphrase asked by
+hdiutil); verify `backup.json`; refuse a newer backup by the rule of 16.8.3 step 1 (exit 3; an image from the build
+Mac has `app_version` `checkout` and is judged by its migrations, rev check); `move-in` alone first runs `stack.stop`; set the
+current items aside into `backups/<stamp>-before-move-in/`; copy the items in, journal included; merge
+`env-settings.json` into this device's env files with `bridge.envfiles.EnvFile` (secrets are this device's own);
+rewrite `accounts.json` so that every account gets `BOT_HOME/accounts/<label>` (created, `projects` link to
+`sessions/`) and `enabled: false`, including an account with `config_dir: null`, such as the build Mac's `default`,
+which would otherwise use whatever `~/.claude` login the new Mac has (rev F12); write `account-state.json` as `{}`;
+`hdiutil detach`; `move-in` alone then runs `stack.start` and prints `Anh chạy ~/ThomHouse/bin/thomhouse continue để
+đăng nhập Claude và Zalo cho máy này.` (it does not run the human steps itself, so that WP5 does not call WP3, rev
+iface).
+
+| Travels | Redone on the new device |
+|---|---|
+| D1 data (conversations, consents, outbox, profiles, visits, roles, Durable Object state) | runtimes and dependencies (each device installs its own, portability 1) |
+| bridge journal, account labels and priorities, sessions, analyzer files in `profiles/` | new secrets and tokens; the staff token pasted again in each browser |
+| the non-secret settings listed above | Claude login per pool account (Keychain-bound, `claude_pool.py:3-4`) |
+| | Zalo QR login; history sync only when the analyzers must run again (`~/.zalo-agent-cli` is not moved) |
+| | autostart and shortcuts; room platform data (rebuilt) |
+
+As built (rev review): `move-out` exits 2 when the `--to` folder does not exist, and exits 1 with
+`setup.restore_needed` while `BOT_HOME/d1.restore-needed.json` exists, so an empty or partial `d1` never reaches
+another Mac. `env-settings.json` has the shape `{"schema": 1, "files": {"server" | "runner" | "bridge": {KEY: value}}}`,
+and the image's `backup.json` lists it, so the verification covers it. `move-in` sets aside every item of the backup
+format that exists now, as restore does. The integration run moved a test installation to a second HOME:
+`ROOM_FALLBACK` travelled, `THOMHOUSE_DRAFT_ENGINE` did not, `STAFF_TOKEN` was new, and the accounts were rehomed and
+disabled.
+
+`thomhouse move-back` (installed or checkout mode): asks `Bật lại chatbot trên máy này? Chỉ làm khi máy mới đã tắt
+chatbot. [c = có / k = không]`, `state.clear_moved_out()` removes `BOT_HOME/moved-out.json`, exit 0 (rev F12).
+`uninstall` keeps `BOT_HOME`, so the mark survives it; a new install on that Mac then stops at step 2 with
+`core.moved_out` before any launcher exists. For that case the guide says to delete
+`~/.thomhouse-bot/moved-out.json` by hand once the other Mac no longer runs the bot, and to run the file again
+(rev check).
+
+#### 16.8.6 Uninstall (`thomhouse uninstall [--data] [--dry-run]`)
+
+`--dry-run` lists what would be removed and exits 0. Default (keeps data): offer a backup (`c/k`; a non-interactive
+stdin answers `k` like every `c/k` question, invariant 10, rev check);
+`stack.stop`; `autostart.remove_all` (removes the LaunchAgent and the Desktop files only when their content equals
+the template output); delete `APP_HOME` (program, runtimes, caches; all rebuildable); print what stays: `BOT_HOME`,
+`~/.zalo-agent-cli`, Claude Code in `~/.local`, the browser's staff token. `--data` also, after the person types
+`xoa du lieu` (or `xóa dữ liệu`) at `Toàn bộ hội thoại của khách trên máy này sẽ chuyển vào Thùng rác. Gõ xoa du lieu
+rồi Enter để tiếp tục, hoặc chỉ Enter để thôi.`, in this order (rev F24):
+
+1. A final verified backup (inside `BOT_HOME`, so it moves with it).
+2. Choose where `BOT_HOME` goes before anything irreversible: create an empty folder `BOT_HOME/.trash-probe-<stamp>`
+   and rename it to `~/.Trash/thomhouse-probe-<stamp>`, then remove it. When that works the target is
+   `~/.Trash/thomhouse-bot-<stamp>`; when macOS refuses (`EPERM`, `EACCES`; whether Terminal may write into `~/.Trash`
+   without Full Disk Access was not checked) the target is `~/thomhouse-bot-da-xoa-<stamp>`, a rename inside the home
+   folder. When neither probe works, stop here: nothing was logged out or stopped, exit 1 with the folder named.
+3. With `BOT_HOME` still in place: `bridgecli.listener(ctx, "stop")`, then
+   `CLAUDE_CONFIG_DIR=<dir> claude auth logout` for every pool account with a config folder (command not verified,
+   lifecycle 6). They run before the move because Claude Code may key its Keychain item by the config path (not
+   checked).
+4. Rename `BOT_HOME` to the target. For the home-folder target, print `Anh kéo thư mục này vào Thùng rác: {thư mục}`.
+   When this last rename fails although its probe worked, exit 1 naming both folders; the data stays in place.
+5. Delete `APP_HOME` as in the default.
+
+As built (rev review): in the default mode the offered backup is taken before `stack.stop` (`online` when the stack
+runs), so a failed backup leaves everything as it was. With `--data` the final backup of item 1 is taken before the
+Trash probe without stopping anything, so "nothing was logged out or stopped" holds when both probes fail.
+
+`~/.zalo-agent-cli` and `~/.claude` are never touched; the guide tells the owner to remove the device from the Zalo
+app's list of logged-in devices.
+
+#### 16.8.7 Repair (`thomhouse repair [--paths] [--env]`)
+
+Without options: `app` is linked again to `releases/<version of installed.json>` when it points elsewhere and that
+folder verifies (rev F5); files reported by `release.verify_manifest` are restored from `cache/releases/thomhouse-<ver>.command`
+(verified, extracted to a staging folder, only the changed files copied), and folder modes of check 23 are fixed.
+`--paths`: after `c`, removes the `ZALO_AGENT_BIN` and `OPENMAUSBOT_NODE_DIR` lines (also commented ones) and runs
+`stack.stop` and `stack.start`; `init-env` writes this installation's paths (`envfiles.py:139-140`, `:153-154`).
+`--env`: after `c`, copies `RUNNER_TOKEN` and `ZALO_PERSONAL_WEBHOOK_SECRET` from `.dev.vars` into the runner and
+bridge env files (the server's file is the source), then restarts. Values are never printed. As built, `repair`
+without options also rewrites the launcher when it differs, and `--paths` removes those lines from the bridge,
+runner and server env files (rev review).
+
+#### 16.8.8 Autostart and shortcuts
+
+LaunchAgent `~/Library/LaunchAgents/vn.thomhouse.bot.plist` (0644) from `install/templates/vn.thomhouse.bot.plist.in`:
+`Label` `vn.thomhouse.bot`, `ProgramArguments` `/bin/bash`, `<APP_HOME>/bin/thomhouse`, `start`, `--quiet`,
+`RunAtLoad` true, `AbandonProcessGroup` true, `StandardOutPath` and `StandardErrorPath`
+`<APP_HOME>/logs/autostart.log`. Loaded with `launchctl bootstrap gui/<uid> <plist>`, removed with
+`launchctl bootout gui/<uid>/vn.thomhouse.bot` (launchd behaviour not checked). When an update is unfinished, the
+LaunchAgent's `start --quiet` exits 3 and leaves the stack stopped (16.8.1, rev F14). Desktop files (0755, first line
+`#!/bin/bash`, second line `# thomhouse-shortcut v1`): `~/Desktop/Bat-chatbot.command` (`exec "<APP_HOME>/bin/thomhouse"
+start`), `Kiem-tra-chatbot.command` (`… doctor`), `Tat-chatbot.command` (`… stop`); every template fills in the
+installation's `<APP_HOME>`, so a non-default `THOMHOUSE_APP_HOME` works (rev F15). The line `ops.desktop_prompt` is
+shown before the files are written (rev F18). The Mac must stay awake for the bot to work; autostart does not change
+sleep settings.
+
+### 16.9 Operating systems
+
+The owner decided on 2026-11-12 that devices are Macs only. Apple Silicon is the supported target; Intel Macs stay
+untested; Linux and Windows stay not supported, and the header refuses them with one Vietnamese sentence before it
+writes anything (16.5). The facts about the other systems are kept so that the decision can be revisited. (rev owner)
+
+| System | Level now | Why | Next step |
+|---|---|---|---|
+| macOS 13.5 or newer, Apple Silicon | Supported. The installer is written and passes 497 tests and eight end-to-end flows, all against fakes, a temporary HOME and dead proxies; it has not run a real install (rev review) | The stack runs as is on the build Mac (portability 1); workerd and Node 24.19.0 need macOS 13.5 (inventory 1). | Before devices rely on it, one real install on a Mac, or a macOS virtual machine, without the Xcode command line tools and without Homebrew; a spare user account on the build Mac cannot show that case, because the developer tools and `/opt/homebrew` are system-wide there (rev F19). That run also checks the items no fake can: Anthropic's installer and the binary hash, the English macOS prompts, `claude auth login` and `claude auth status` with a Pro or Max and with a Console account, whether `claude -p` runs `/usr/bin/git` and opens the developer-tools dialog (the 2.1.319 binary has code for "a non-functional macOS xcrun shim"), the Zalo QR login, `hdiutil` and `launchctl`. |
+| macOS 13.5 or newer, Intel | Untested; the installer warns and asks | Every native package has a darwin-x64 build in the lockfiles; installed `node_modules` hold darwin-arm64 only and are never copied (portability 5). Minimum macOS of the x64 binaries not checked. `claude_code.platforms.darwin-x64.sha256` stays null, so the Claude Code binary is not hash-checked there. | `refresh_pins.py --platforms darwin-arm64,darwin-x64`, one install on an Intel Mac, then "Supported". |
+| macOS older than 13.5 | Not supported; the header exits 3 | workerd and Node 24 need 13.5. | None planned. |
+| Ubuntu 22.04 or 24.04 and other Linux | Not supported; the header exits 3 with the Linux sentence | The services should run (portability 5); menu images need `sips` (`build_menu_images.py:1-15`); `shasum` may be missing (`start_local.sh:221`); the installer uses `pbcopy`, `hdiutil`, `launchctl`, `sw_vers`. Nothing was run on Linux. | None planned (owner decision). If revisited: linux-x64 pins, a Linux branch in the header and `platforms.py`, a `sha256sum` fallback, prebuilt menu JPEGs, a systemd user unit, an encrypted tar instead of `hdiutil`, a test on an Ubuntu VM (portability L1, L2). |
+| Windows 11 with WSL2 | Not supported; the header exits 3 with the WSL sentence | Like Ubuntu inside WSL2; installing WSL needs an administrator and a restart (distribution 4); keeping WSL running and reaching the console, QR page and Claude login from Windows are open (portability U1, U2). | None planned (owner decision). |
+| Windows 11 native (x64 and ARM64) | Not supported; Git Bash, MSYS and Cygwin get the Windows sentence; a double-click opens Windows' own "open with" dialog, and the note beside the file says the file is for Macs (rev F19) | The bridge stops at `import fcntl` (`apps/zalo-bridge/bridge/journal.py:23`); the system prompt (about 70,000 characters, estimate) exceeds the 32,767-character command line (`apps/runner/runner/claude_runner.py:204-206`); `os.killpg`; no time zone database; ANSI code page (portability 4.2). On Windows ARM64 there is also no workerd build: the only Windows entry is `@cloudflare/workerd-windows-64` with `cpu: [x64]` (`pnpm-lock.yaml:132-136`, read 2026-11-12), so even a port would leave out those laptops (rev F19). | None planned (owner decision). If revisited: the port of portability 6 (W1 to W15). |
+
+### 16.10 Tests
+
+All tests are standard-library `unittest`, need no network, never touch the real home folder, never run the real
+stack, `claude`, `zalo-agent`, `openmausbot`, npm or pnpm. Run all:
+
+```
+cd /Users/luuphuc/Projects/lulu-thomhouse && PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s install/tests -t install
+```
+
+One package: add `-p 'test_<prefix>_*.py'` with prefix `core`, `release`, `setup`, `doctor` or `ops`. The tests live
+outside `scripts/tests`, so the other builds' discovery never picks them up.
+
+Results after the review repair (rev review): the command above ran twice with `Ran 497 tests` and `OK`, no skips;
+`cd apps/zalo-bridge && PYTHONDONTWRITEBYTECODE=1 python3 -m unittest tests.test_local_scripts` ran twice with
+`Ran 14 tests` and `OK`; `/bin/bash -n` (GNU bash 3.2.57) passed on the 12 shell files of the installer, its fakes
+and `scripts/`. The integration step also ran eight end-to-end flows against the fakes: a release built with
+`make_release.py` and test pins from a fresh copy of the checkout (no forbidden path, no `.secrets`, no `.dev.vars`,
+no secret value of the build Mac in the payload; the only private digit runs also found in the payload were an
+alphabet constant and two example numbers whose hashes are listed in `placeholders.txt`), a first install with
+`--skip-human` then `continue`, the same `.command` run again (exit 3), an update to a release with a new Python and
+one migration, `rollback` with the typed `khoi phuc`, a declined runtime plan, a download failure followed by a
+rerun, backup, restore, uninstall, move-out, and `install --move-in` on a second HOME. Not verified, because no fake
+can show them: real downloads and checksums, Anthropic's real installer, real `hdiutil` encryption and passphrase
+prompts, `launchctl bootstrap` and `bootout`, moving files to the Trash, a real `claude auth logout`, a real full
+disk or power cut, the real `wrangler`, a full real install on a second Mac, and pnpm reading `store-dir` from
+`.npmrc`.
+
+As built (rev review): `support.py` sets `THOMHOUSE_TOOL_PATH` (16.4.2), so the shell files run the fakes, and
+`run_cli` gives the CLI `/dev/null` as stdin by default. The `THOMHOUSE_SETUP_REAL_MODULES` skip is gone, so every
+test runs. The stand-in modules of WP3, WP4 and WP5 (`tests/fakes_setup/wp_stubs`, `tests/fakes_ops/stub_modules`,
+WP4's `stub_wp2`) are kept on purpose to inject faults in unit tests; `test_integration_stubs.py` checks that they
+keep the real modules' signatures, and `test_integration_flows.py` runs the real five-package chain through the
+header. `test_hardening.py` holds the tests of the review repairs (redirects, the loopback console URL, the phone
+scan forms, the restore mark, the unfinished update, leftover partial backups, `SQLITE_FULL`, curl exit 23); each new
+test failed while its repair was reverted.
+
+`install/tests/support.py` (WP1) gives `InstallerTestCase`: a temporary folder with `HOME`, `THOMHOUSE_APP_HOME`,
+`THOMHOUSE_BOT_HOME`, `ZALO_CONFIG_DIR` and a copy of `install/tests/fake_tree` as a release (or a checkout), into
+which the real `install/` (without `install/tests/`) is copied at test time, so every subprocess runs the real
+`install/thomhouse.py` (rev F2); it fails the test when any of these resolves under the real `Path.home()`. `PATH` is
+`<extra fake dirs>:install/tests/fake_bin:<tmp>/pybin:/usr/bin:/bin:/usr/sbin:/sbin`, where `<tmp>/pybin/python3`
+links to `sys.executable`. `http_proxy`, `https_proxy`, `HTTP_PROXY`, `HTTPS_PROXY`, `ALL_PROXY` are
+`http://127.0.0.1:9` and `no_proxy` is `127.0.0.1,localhost`; `self.env_without_no_proxy()` gives the same
+environment without `no_proxy` and `NO_PROXY` for the proxy tests (rev F4). A stdlib `http.server` on 127.0.0.1 port 0
+serves `/health`, `/staff/flags`, `/staff/runner`, `/staff/roles` and `/staff/chat-facts/eligible` (200, or 404 on
+demand) from a JSON file, answers every `/runner/*` request without `X-Runner-Id` with 400 like `requireRunner`, and
+records every request path in `<tmp>/server-calls.jsonl` (rev F7, visits); `THOMHOUSE_SERVER_URL` and
+`THOMHOUSE_CONSOLE_URL` point at it. `THOMHOUSE_CLIPBOARD_CLEAR_S=1`, `THOMHOUSE_HEALTH_WAIT_S=0`. A package may put its
+own fakes in `install/tests/fakes_<prefix>/` and pass them as extra fake dirs. `ssh-keygen`, `shasum`, `tar`, `ps` and
+`/bin/bash` are the real stock tools; none of them uses the network.
+
+Fakes (WP1; each a Python script with `#!/usr/bin/env python3`, records argv, the working folder and the names, never
+the values, of its environment variables, plus the values of `DISABLE_UPDATES`, `DISABLE_AUTOUPDATER`, `no_proxy`,
+`NO_PROXY`, `npm_config_cache` and `CLAUDE_CONFIG_DIR`, to `<tmp>/calls.jsonl`, and takes its behaviour from
+`<tmp>/behaviour.json`):
+
+| Fake | Behaviour |
+|---|---|
+| `curl` | serves files from a fixture folder by URL; truncates, corrupts or fails on demand (exit 7 for "no network", 22 for HTTP); refuses a URL that is not `https://` (exit 22) and logs it |
+| `sw_vers`, `sysctl`, `uname`, `id` | report a chosen macOS version, CPU, OS (`Darwin`, `Linux`, `MINGW64_NT-10.0`, …) and uid |
+| `node`, `npm` | `node --version`; `npm ci --prefix D` creates `D/node_modules/<pkg>/package.json` with the locked version and `.bin` shims, or fails; records `--cache` and the first PATH entry; `npm install --package-lock-only` writes a lock |
+| `pnpm` | `--version`; `install --frozen-lockfile` records the `store-dir` it reads from `./.npmrc` and creates the `wrangler` and `vite` shims (the shims run the fake `wrangler`), or fails (rev F21) |
+| `wrangler` | `d1 migrations apply` writes applied names into a real SQLite file `--persist-to/v3/d1/miniflare-D1DatabaseObject/<64 hex>.sqlite` (table `d1_migrations`, and `catalog_versions` when asked), beside a `metadata.sqlite` without that table and a Durable Object file under `v3/do/thomhouse-bot-ConversationDO/`; can fail at file N after applying the earlier ones (rev F13) |
+| `claude` | `--version`; `auth status` prints `{"loggedIn", "authMethod", "apiProvider": "firstParty"}` plus, only for `authMethod` `claude.ai`, `"email": "x@example.invalid"` and `"subscriptionType"` per `CLAUDE_CONFIG_DIR`, and exits 0 when logged in, 1 otherwise (as 2.1.319); `auth login` sets the state chosen in behaviour (`claude.ai` with `max`, `claude.ai` with null, or `api_key`); `auth logout` clears it; `install <ver>` exits 0 without installing when `DISABLE_UPDATES` is set (as 2.1.319), else writes `~/.local/share/claude/versions/<ver>` (a copy of itself, or chosen bytes) and the link `~/.local/bin/claude`; `-p` exits 2 (rev F1, F8) |
+| `zalo-agent` | `--json login` prints `qr` (synthetic `dataUrl`), `qr_scanned` (`name: "Ten Gia"`), then `login_success` (`ownId: "999000111"`) or `qr_declined`; `--json sync` sleeps 0.1 s and exits with a chosen code; `listen --stop` records |
+| `lsof` | prints a configured LISTEN table, and for `-a -d cwd -p PID -Fn` the configured working folder of that PID (rev F20) |
+| `open`, `pbcopy`, `pbpaste`, `launchctl`, `hdiutil` | record calls; `pbcopy` stores stdin in a file that `pbpaste` prints; `hdiutil create` copies `-srcfolder` into a folder named like the image, `attach` mounts it by copy |
+| `fake_installer.sh` (fixture, served by the fake `curl` as `install.sh`) | runs `"$HOME/.local/share/claude/versions/<v>" install <v>` the way Anthropic's script ends, with the fake `claude` as that binary (rev F1) |
+
+`install/tests/fake_tree/` (WP1): a minimal release: `VERSION.json`, `MANIFEST.json` and `MANIFEST.sha256` generated
+at test time, `package.json`, `pnpm-lock.yaml`, stub `scripts/start_local.sh` and `scripts/stop_local.sh` (print the
+nine real step titles; start spawns `python3 -c 'import time; time.sleep(300)' <ROOT>/apps/server/` style sleepers
+and writes `<name>.pid` and `<name>.start` like `start_local.sh:96-102`; start writes its environment variable names
+and the values of `no_proxy` and `DISABLE_UPDATES` to `<tmp>/start-env.json`, and, when behaviour asks, runs the real
+backup hook line of 16.3.2 before a fake migration call; exit code from behaviour), a stub `apps/zalo-bridge/bridge/`
+package (`init-env` writes the three env files with synthetic tokens; `doctor --json` prints `{"checks": […]}`;
+`listener start|status|stop`, `sync-labels [--dry-run]`, `rooms-node` from behaviour; the doctor's `zalo_login` detail
+contains `999000111`), stub analyzers (the visit analyzer can print `(HTTP 404)` on stderr and exit 1), a stub
+`scripts/build_menu_images.py`; the real `scripts/runner/claude_pool.py` is copied in at test time.
+
+| Test file | Package | What it proves |
+|---|---|---|
+| `test_core_paths.py` | WP1 | defaults and overrides; whitespace in `APP_HOME`/`BOT_HOME` refused; installed versus checkout mode; `code_root` keeps the logical `app` path; the support guard catches a real-home path |
+| `test_core_cli.py` | WP1 | `[sys.executable, "-I", "<tmp release>/install/thomhouse.py", "--version"]` with cwd `/` exits 0 and prints the version (rev F2); a command whose module is missing exits 2 with the "not built" line; checkout mode refuses `install` with exit 3 and accepts `move-out`; an `InstallerError` subclass raised by a fake handler gives its code and text; any other exception gives exit 2 and only its type name; `test_dispatcher_refusals`: with `moved-out.json`, `start`, `login-zalo`, `restore` and `update` exit 3 with `core.moved_out` while `doctor`, `stop` and `move-back` reach their handlers; with an update journal `running`, `repair`, `continue` and `restart` exit 3 with `core.update_open` while `update`, `rollback` and `doctor` reach theirs (rev check) |
+| `test_core_consent.py` | WP1 | `c/k` and `c/s` parsing; non-TTY answers `k`/`s`; `--yes` prints and answers `c` but never a typed word and never a question with `allow_yes=False`; `dong y`/`đồng ý` accepted |
+| `test_core_download.py` | WP1 | fixture download; SHA-256 mismatch deletes the file and raises; non-https refused; curl exit 7 gives kind `network`; a cached verified file is reused with no curl call; a file under its download name in `cache/downloads` is found by hash and used with no curl call (rev F11) |
+| `test_core_stack.py` | WP1 | PID rule (live sleeper with matching pattern and start time is running; another start time is not); `stop` reports a survivor; the child environment has no `ANTHROPIC_*`, has `PROFILE_LLM_ENABLED=false`, `DISABLE_UPDATES=1` and `npm_config_cache`; `test_child_env_loopback_bypass`: with `http_proxy` set and no `no_proxy`, `child_env()` and the `start_local.sh` child carry `no_proxy` with `127.0.0.1,localhost,::1`, the proxy variable is kept, and a child that calls the stub server with plain `urllib.request.urlopen` gets its answer (rev F4); `test_child_env_claude_install`: `claude_install=True` drops `DISABLE_UPDATES` and `DISABLE_AUTOUPDATER` (rev F1); `start` output reaches only `logs/start.log` (rev F18); `start` raises exit 3 with `moved-out.json` or an open update journal unless `during_update` (rev F12, F14); another stack is detected by command line and by working folder (rev F20); `test_own_stack_not_other`: the installation's own server and console (command lines with the logical `app` path), OpenMausBot (working folder `BOT_HOME/openmausbot`), runner and bridge (working folder under the real release folder) and a cron ticker started from another folder are not reported, while a checkout's runner and server are (rev check) |
+| `test_core_migrations.py` | WP1 | `find_db` picks the newest `<hash>.sqlite` with `d1_migrations` and ignores `metadata.sqlite` and the Durable Object file (rev F13); applied and pending from a real SQLite fixture; `[]` with no database and `None` without the table; `active_catalog` reads the active id; the read-only open leaves the file's mtime and bytes unchanged |
+| `test_core_state.py` | WP1 | atomic writes with mode 0600; a second `InstallLock` from another process raises `Locked`; the same process re-enters; `held_by_us` is true in the holder and in a child that inherited `THOMHOUSE_LOCK_OWNER`; `lock_holder` returns the PID (rev F3); update journal and `moved-out.json` round trips; `list_backups` skips `.partial-` folders |
+| `test_core_accounts.py` | WP1 | `load` sees two different temporary `BOT_HOME`s in one process (no cached module, rev F23); `auth_status().ok` only for `claude.ai` with a subscription (rev F8); `pool` output (with the fake email) never reaches output or logs |
+| `test_core_text.py` | WP1 | every catalog string (except the fixed `doctor.label_*` values of `DOCTOR_LABELS`, rev review), every Vietnamese `say` line of the three shell templates and `scripts/release/DOC-TRUOC.txt.in`: has Vietnamese diacritics, no `bạn`, `mình`, no emoji, at most 100 characters per line; keys unique across catalogs; every `t("…")` key used in code exists; the step titles, the doctor lines and every keyed text equal the text of 16.4, 16.5 and 16.7 |
+| `test_core_static.py` | WP1 | `install/**` and `scripts/release/**` (outside tests and `safety.py`) contain none of `--qr-url`, `--tunnel`, `--lan`, `--relay`, `--domain`, `--public-url`, `--tailscale`, `0.0.0.0`, `sudo `, `ANTHROPIC_API_KEY=`, `PROFILE_LLM_ENABLED=true`, `PUT /staff/flags`, `auto-reply`, `openmausbot login`, `.zshrc`, `.zprofile`, `.bash_profile`, a string literal that starts with `/runner/` (rev F7), `THOMHOUSE_DRAFT_ENGINE=` (rev F16); no Vietnamese letters in `.py` files outside `text_vi/`; every `.py` parses with `ast.parse(…, feature_version=(3, 11))`; `bash -n` and `zsh -n` pass on `selfextract.sh.in`, `bootstrap.sh`, `thomhouse.sh.in` |
+| `test_release_build.py` | WP2 | only allowlisted files ship; planted `.secrets/x`, `apps/server/.dev.vars`, `results/r.json`, `sources/repos/x`, `node_modules/x`, `scripts/tests/wip_x.py`, `design/eval-set.jsonl` are absent; a denylisted file in the allowlist, a mode-0600 file, a planted live token value (and the value is absent from the output), a token planted in a `.secrets` URL file, a phone number and an 18-digit id in a shipped file, the build Mac's home path, and a pin disagreement each exit 1; a placeholder listed in `placeholders.txt` passes; a host name in a `.secrets` URL is not a secret; an allowlist line that matches nothing exits 1 (rev F25, facts); two builds give the same payload SHA-256 (the header's `BUILT_AT` differs, so the whole-file release id differs per build and the owner compares the id of the build he carries, rev check); `__PAYLOAD__` occurs once in the header; the printed release id equals the first 16 hex of `shasum -a 256` of the `.command` and the `.sha256` file; the note beside the file holds the version and no release id (rev F5, F19); refusal in an installed copy (exit 3); the menu tar holds exactly the indexed slides |
+| `test_release_selfextract.py` | WP2 | a corrupted payload exits 3 before anything is written; `--dry-run` leaves the temporary HOME byte-identical; `Linux`, WSL, `MINGW64_NT`, an unknown `uname`, macOS 13.4 and uid 0 exit 3 with the 16.5 sentences and write nothing (rev F19); `k` at the release id exits 4; a throwaway SSH key signs and verifies; `test_installed_device_refuses`: with `installed.json` present the header prints the "already installed" screen and exits 3 without unpacking, also with `--dry-run` (rev F5, rev check); `test_retry_after_failed_bootstrap`: a bootstrap that fails at the download, then an immediate second run passes the lock; a lock folder whose PID is alive and runs `bootstrap.sh` is refused (rev F6); so is one whose PID is a header still before its `exec` (`.command` in its command line) (rev check); `--doctor` on a Mac without `installed.json` prints lines 1 to 5 and writes nothing; `--dry-run` creates no lock folder (rev check) |
+| `test_release_verify.py` | WP2 | `test_header_never_executed`: `verify_file` accepts a file whose header was changed (a line that would write a marker file) while the payload is intact, and the marker never appears; a changed payload exits 3 (`damaged` or `signature`); an update signed with another key exits 3; `older` and `same` are reported; a denylisted MANIFEST path is refused (rev F5) |
+| `test_release_bootstrap.py` | WP2 | the runtime plan lists each missing item with source, size and folder; a `claude` only in an extra PATH folder is not used, the plan includes Claude Code with the "other copy" line (rev F11); `k` exits 4 with the per-item decline text and downloads nothing (rev F11); `c` installs Python from a fixture and links `runtime/python`; a fixture placed in `cache/downloads` under its download name is used with no curl call; a wrong SHA-256 deletes the file and exits 1; curl exit 7 prints the network text (rev F18); a second run downloads nothing; `/usr/bin/python3` is never called, also when a fake `python3` 3.12 is first on the caller's PATH (no runtime is looked up on PATH, rev check); `--python-only` on an installed device reinstalls only Python after `c` and starts no CLI (rev F5) |
+| `test_release_runtimes.py` | WP2 | Node, pnpm and Claude Code from fixtures; an interrupted unpack leaves no switched symlink; a present `~/.local/bin/claude` ≥ min is reused and linked as `runtime/bin/claude`; an older one is planned for install; `test_claude_installer_env_lacks_disable_updates`: the installer runs without `DISABLE_UPDATES` and `DISABLE_AUTOUPDATER` while stack children keep `DISABLE_UPDATES=1`, and with the variable forced on, the fake `install` no-ops and step 5 fails with `release.runtime_installer` (rev F1); `test_claude_binary_hash_mismatch`: wrong bytes remove the link and file this run created and exit 1 (rev F22), and a `~/.local/bin/claude` link that existed before points at its old target again (rev check); an item missing from `--consented` is asked, not failed (rev F11) |
+| `test_release_deps.py` | WP2 | the exact commands and options of step 7; the release's `.npmrc` holds `store-dir=<APP_HOME>/cache/pnpm-store` and the fake `pnpm` of a later stub `start_local.sh` reads the same store (rev F21); the stamp; a changed platform or lock SHA-256 triggers a reinstall; an OpenMausBot failure is a warning |
+| `test_release_repair.py` | WP2 | a changed shipped file is restored from the cached `.command`; `runtime_written` is skipped; `--paths` and `--env` act only after `c` and never print a value |
+| `test_release_launcher.py` | WP2 | `test_launcher_reads_pin_at_run_time`: a rendered launcher holds `APP_HOME` and `BOT_HOME` and no version; after `versions.env` changes `PY_VERSION` and `runtime/python` is switched, the launcher still starts the CLI; with a missing Python, or one older than 3.11, it runs the bash doctor and exits 1; with a 3.11 or newer Python that prints another version than `PY_VERSION` it still starts the CLI (rev check); it sets `no_proxy` with the loopback names; `~/.local/bin` is not on its PATH (rev F4, F10, F15) |
+| `test_release_pins.py` | WP2 | on the real project files: pnpm lock equals `packageManager`; `pins.agreement()` is empty for `start_local.sh:28`, `bridge/config.py:38`, `tools/zalo-agent/package.json` and its lock, and the OpenMausBot package and lock; `versions.json` has the schema of 16.2.5 and no `features` (rev visits) |
+| `test_setup_sequence.py` | WP3 | a full install against the fakes with the real `InstallLock` calls the steps in the order of 16.4.3 (R4 order checked from `calls.jsonl`) and reaches exit 0 when every human step is done (rev F3); step 2 and the final doctor check 6 pass under the command's own lock; a failure injected at each step followed by `continue` ends in the same state as a clean run; `test_skip_human_exits_10`: `--skip-human` exits 10, no doctor line is `LỖI`, and `claude_login`, `zalo_login`, `staff_token` are pending (rev F9); `--dry-run` writes nothing and prints every title; the pool is `main` with its own config folder and disabled until login; the shared-data question appears when `BOT_HOME/d1` holds data and is not answered by `--yes` (rev F20); the shortcuts step prints the Desktop line first (rev F18); `test_declined_notice_asked_again`: Enter at the licence notice exits 4, the journal has step 6 `pending` with reason `declined`, and the next run asks again and never reaches `npm ci --prefix tools/zalo-agent` before `dong y` (rev check); with no menu archive step 11 stays `pending` and is tried again by `continue` (rev check); after a move-in with accounts `default` and `acc2`, step 14 runs the login for each label (rev check) |
+| `test_setup_claude.py` | WP3 | postponed login leaves `main` disabled; a `claude.ai` login with a subscription enables and resets it and prints the browser logout line (rev F17); `test_console_login_stays_disabled`: an `api_key` login keeps `main` disabled, runs `auth logout` with the same `CLAUDE_CONFIG_DIR`, shows the Console text, and doctor check 30 is `LỖI` (rev F8); a `claude.ai` login with a null subscription stays disabled without logout, and once enabled by hand with `claude_pool.py enable` it counts as done for step 14 (rev check); the fake email never appears in any output or log |
+| `test_setup_zalo.py` | WP3 | the `qr` event opens the loopback page, or the file when 18927 is busy; the `dataUrl`, `name` and `ownId` never appear in output or logs; `--qr-url` is never passed and `ZALO_AGENT_NO_UPDATE_CHECK=1` is set; listener exit 4 offers the stop |
+| `test_setup_misc.py` | WP3 | sync countdown and retry with `-F`; both analyzers run with `PROFILE_LLM_ENABLED=false` while the parent has `true`; contacts and visits skipped without `zalo.db`; `test_visits_404_pending`: with the stub's `/staff/chat-facts/eligible` at 404 the step prints exactly `setup.visits_server_404`, is `pending` with `server_404`, and a later `continue` with the route present runs the analyzer and marks it `done`; an analyzer exit 1 with `(HTTP 404)` on stderr is handled the same way (rev visits); label counts from the dry-run JSON; the staff token reaches the clipboard, is cleared, never appears in output, and the clipboard-history line is shown (rev F17) |
+| `test_doctor_checks.py` | WP4 | before install: exit 1, `release` LỖI, checks 9 to 48 not `ĐẠT`; after a fake install: all `ĐẠT`, exit 0; each check's failure prints its exact line and status; `--strict`; `--json` schema; `--offline` makes no `claude auth status` and no bridge doctor call; checkout mode, with `{tb}` as `python3 -I install/thomhouse.py` (rev F20), checks 44 to 46 and 48 `BỎ QUA`, and no fix naming a command that checkout mode refuses (rev check); check 9 with an update journal `running` names `update` (rev check); `test_doctor_never_calls_runner_api`: no path in `server-calls.jsonl` starts with `/runner/`, check 34 reads the catalog id from the fixture D1 file, and check 33 passes only when the row of this device's `RUNNER_ID` is online (rev F7); `test_postponed_logins_are_todo`: all accounts disabled and the Zalo login missing give `CHƯA LÀM` for checks 29, 30, 36 and 37 and exit 0 without `--strict` (rev F9); two runs with two temporary `BOT_HOME`s in one process each read their own pool (rev F23); a subprocess run of `-I install/thomhouse.py doctor --json` from cwd `/` prints JSON (rev F2) |
+| `test_doctor_safety.py` | WP4 | a `*:8787` listener, a `*:8800` listener of the OpenMausBot group and a non-loopback listener daemon each give `LỖI` (rev F16); a forbidden platform option gives `LỖI` while `--data-dir /Users/a/login-x/…` and `--label thomhouse` do not (rev F16); an API key in an env file, `PROFILE_LLM_ENABLED=true` each give `LỖI`; planted token strings, the fake email and the fake Zalo id never appear in text or JSON |
+| `test_doctor_bash.py` | WP4 | the bash doctor of the launcher and of the header print lines 1 to 5 exactly as 16.7 |
+| `test_ops_backup.py` | WP5 | SQLite with WAL content survives a round trip with `integrity_check` ok; excluded items, `moved-out.json` included, are absent; modes; `backup.json` hashes; `--if-pending-migrations` skips when nothing is pending; `--stopped` refuses while the server runs; `test_backup_ignores_install_lock`: a backup runs while another process holds `InstallLock`, and two backups never overlap (`backups/.lock`) (rev F3); retention |
+| `test_ops_restore.py` | WP5 | current data set aside, never deleted; journal kept on the same device; env files restored only for the same `device_id`; `accounts.json` paths rewritten; the typed word is required; a mid-way failure moves the data back; the restart runs the real hook under the restore's lock (rev F3) |
+| `test_ops_update.py` | WP5 | phase order; a dependency failure never stops the running stack; a migration failure restores `d1` with the same `iterdump()` per database (rev F13), switches back and starts the old release, exit 1; when copying `d1` back fails, nothing is started and the backup folder is named (rev F14), and a later `update FILE` copies `d1` from the journal's backup again and finishes the rollback with no `migrations apply` call (rev check); the same version prints `ops.update_same` and exits 0 without importing `steps` (rev check); U4 runs the new pnpm when U3 installed one (rev check); a start failure does the same rollback; a health gate failure does not roll back, still stamps `previous_version` and exits 1; downgrade and a bad signature are refused; `test_update_start_runs_real_hook`: the new release's start runs the real backup hook with one pending migration under the update's lock and succeeds (rev F3); `test_update_rewrites_launcher`: after an update that changes `PY_VERSION`, `bin/thomhouse doctor` still runs, and `rollback` writes the old launcher back (rev F10); `test_interrupted_update_blocks_start`: a simulated power cut after U9 makes `start` and `continue` exit 3 with `core.update_open`, and `update FILE` resumes at U10 (rev F14); a power cut in U3 leaves `start` working and the next `update FILE` begins at U1 (rev check); a simulated power cut after each other phase resumes or rolls back |
+| `test_ops_move.py` | WP5 | `move-out` marks the device with `moved-out.json`, stops the listener without `--only-ours`, builds the image with no `env/`, only the allowlisted settings and no `THOMHOUSE_DRAFT_ENGINE` (rev F16); `start` is refused afterwards; `test_move_out_checkout_mode`: in checkout mode `move-out` runs the checkout's stop script, builds the same image and writes `moved-out.json` (rev F12); `test_move_in_default_account_disabled`: an image whose `accounts.json` has `default` with `config_dir: null` arrives as `accounts/default`, `enabled: false` (rev F12); `test_move_in_checkout_image`: an image with `app_version` `checkout` is accepted when every migration it names exists in the release and refused (exit 3) when it names one the release lacks (rev check); `move-in` keeps new secrets, recreates the pool disabled, uses the image's journal and prints the `continue` line; `install --move-in`; `move-back` removes the mark |
+| `test_ops_uninstall.py` | WP5 | default keeps `BOT_HOME`; `--data` needs the typed words; with a writable temporary Trash, logout and listener stop happen before the move and `BOT_HOME` lands in the Trash; with a Trash that refuses the probe, `BOT_HOME` lands in `~/thomhouse-bot-da-xoa-<stamp>` and the line is shown; when both probes fail, nothing is logged out (rev F24); LaunchAgent and shortcuts removed only when their content matches; `--dry-run` only lists |
+| `test_ops_autostart.py` | WP5 | the plist and the three Desktop files hold the installation's `APP_HOME`, also a non-default one (rev F15); `start --quiet` from the LaunchAgent exits 3 during an unfinished update (rev F14) |
+| `test_ops_start_local.py` | WP5 | runs the changed `scripts/start_local.sh` and `scripts/stop_local.sh` in a temporary root with stubs (the pattern of `apps/zalo-bridge/tests/test_local_scripts.py`): `npm ci --prefix … --no-fund --no-audit` when the engine lock exists, `npm install … --save-exact` without it; the runtime PATH only with `VERSION.json`, without `~/.local/bin`, in both scripts (rev F15); `test_hook_runs_real_cli`: the backup hook runs the real `install/thomhouse.py` with `python3 -I` before `d1 migrations apply` (rev F2); a failing hook stops the start (exit 1) with no migration call; no hook without `install/thomhouse.py`; `test_refuses_when_moved_out`: with `$BOT_HOME/moved-out.json` the start exits 1 before any service starts (rev F12) |
+
+Critical and major findings and the tests that cover them (rev iface):
+
+| Finding | Test |
+|---|---|
+| F1 | `test_release_runtimes.py::test_claude_installer_env_lacks_disable_updates`, `test_core_stack.py::test_child_env_claude_install` |
+| F2 | `test_core_cli.py` (`--version` with `-I` from cwd `/`), `test_ops_start_local.py::test_hook_runs_real_cli`, the subprocess run in `test_doctor_checks.py` |
+| F3 | `test_setup_sequence.py` (full install with the real lock), `test_ops_backup.py::test_backup_ignores_install_lock`, `test_ops_update.py::test_update_start_runs_real_hook`, `test_core_state.py` |
+| F4 | `test_core_stack.py::test_child_env_loopback_bypass`, `test_release_launcher.py` |
+| F5 | `test_release_verify.py::test_header_never_executed`, `test_release_selfextract.py::test_installed_device_refuses` |
+| F6 | `test_release_selfextract.py::test_retry_after_failed_bootstrap` |
+| F7 | `test_doctor_checks.py::test_doctor_never_calls_runner_api` |
+| F8 | `test_setup_claude.py::test_console_login_stays_disabled`, `test_core_accounts.py` |
+| F9 | `test_setup_sequence.py::test_skip_human_exits_10`, `test_doctor_checks.py::test_postponed_logins_are_todo` |
+| F10 | `test_ops_update.py::test_update_rewrites_launcher`, `test_release_launcher.py::test_launcher_reads_pin_at_run_time` |
+| F11 | `test_release_bootstrap.py` (detection and decline text), `test_core_download.py` (file found by hash), `test_release_runtimes.py` (item missing from `--consented`) |
+| F12 | `test_ops_move.py::test_move_out_checkout_mode`, `test_ops_move.py::test_move_in_default_account_disabled`, `test_ops_start_local.py::test_refuses_when_moved_out` |
+
+Existing tests: after the `start_local.sh` and `stop_local.sh` changes, WP5 runs `cd apps/zalo-bridge && python3 -m
+unittest tests.test_local_scripts` once, only when no other build is running its suites. No other existing test is
+affected. Not covered offline: real downloads, real checksums, Anthropic's real installer and binary, the real
+Claude and Zalo logins, pnpm's reading of `store-dir` from `.npmrc`, `hdiutil` and `launchctl` behaviour, Terminal's
+access to `~/.Trash`, the English macOS prompts, and a real Mac without developer tools (16.9).
+
+### 16.11 Work packages
+
+Each package owns a disjoint set of files; no file is edited by two packages, and every file of 16.3.1 and 16.3.2 has
+exactly one owner below. The build runs WP1 first. When WP1's tests pass, WP2, WP3, WP4 and WP5 are built in
+parallel against 16.3.3; a call into a package that is not there yet is a test skip, never an edit of another
+package's file. They integrate in the order WP1, WP2, WP4, WP5, WP3, which follows the dependencies: WP2 needs only
+WP1; WP4 needs WP1 and WP2; WP5 needs WP1, WP2 and WP4; WP3 needs all four. No dependency points the other way:
+the backup listing that the doctor needs is `state.list_backups` in WP1, the commands `start`, `stop` and `restart`
+that call the doctor live in WP5, and `move-in` prints the `continue` line instead of calling WP3 (rev iface). Each
+package is done when its tests pass with the command of 16.10 and
+`python3 -m unittest discover -s install/tests -t install` still passes.
+
+| Key | Goal | Owns | Depends on |
+|---|---|---|---|
+| WP1 `core` | Paths, platform, pins and their agreement, consent, child environment, state, update journal, moved-out mark, backup listing and lock, downloads, stack start and stop, migrations and the active catalog, the Claude pool, bridge CLI calls, env file reads, text catalog base, CLI dispatch with exit codes and errors, test support and fakes | `install/thomhouse.py`; `install/thomhouse_installer/{__init__,context,paths,platforms,pins,consent,proc,state,download,stack,migrations,accounts,bridgecli,envs}.py`; `install/thomhouse_installer/text_vi/{__init__,core}.py`; `install/versions.json`; `install/tests/{__init__,support}.py`; `install/tests/fake_bin/**`; `install/tests/fake_tree/**`; `install/tests/test_core_*.py` | none |
+| WP2 `release` | Build the release, the `.command` header and bootstrap, the launcher template, read and verify release files, unpack, runtimes, dependencies, repair | `scripts/release/{make_release.py,refresh_pins.py,allowlist.txt,placeholders.txt,DOC-TRUOC.txt.in}`; `install/denylist.txt`; `install/{selfextract.sh.in,bootstrap.sh,thomhouse.sh.in}`; `install/lock/pnpm/package.json` (the lock is generated by the owner); `install/thomhouse_installer/{release,runtimes,deps,repair}.py`; `install/thomhouse_installer/text_vi/release.py`; `install/tests/test_release_*.py`; `install/tests/fakes_release/**` | WP1 |
+| WP4 `doctor` | The 48 checks, `doctor.passes`, safety helpers, all documentation | `install/thomhouse_installer/{doctor,safety}.py`; `install/thomhouse_installer/text_vi/doctor.py`; `install/tests/test_doctor_*.py`; `docs/cai-dat-may-moi.md`; `docs/run-local.md`; `docs/chay-local-zalo-ca-nhan.md`; `docs/contracts.md`; `README.md` | WP1; WP2 (`release.verify_manifest`, `denylist`, `denylisted`, `menu_slides_ok`, `deps.stamp_ok`, `runtimes.found`) |
+| WP5 `ops` | Backup, restore, update, rollback, move, uninstall, autostart and shortcuts, the `start`/`stop`/`restart` commands, the `start_local.sh` and `stop_local.sh` changes | `install/thomhouse_installer/{backup,update,move,uninstall,autostart,service}.py`; `install/thomhouse_installer/text_vi/ops.py`; `install/templates/**`; `scripts/start_local.sh`; `scripts/stop_local.sh`; `install/tests/test_ops_*.py`; `install/tests/fakes_ops/**` | WP1; WP2 (`release`, `runtimes`, `deps`); WP4 (`doctor.run_checks` for the health gate and the restore) |
+| WP3 `setup` | The install sequence and the human steps | `install/thomhouse_installer/{steps,human}.py`; `install/thomhouse_installer/text_vi/setup.py`; `install/tests/test_setup_*.py`; `install/tests/fakes_setup/**` | WP1; WP2; WP4 (`run_checks`, `passes`, `exit_code`); WP5 (`backup.make`, `move.place_moved_data`, `autostart.enable`, `autostart.shortcuts`) |
+
+The guide `docs/cai-dat-may-moi.md` (WP4) now also covers: only Macs; the `shasum -a 256` check before a first install
+and where the reference id comes from; updates with `thomhouse update FILE`, never by running the file again; the
+English macOS prompts (removable volume, Desktop, `hdiutil` passphrase, the Claude login page); logging out of
+claude.ai in the browser after the Claude login; clipboard managers and Universal Clipboard; setting
+`THOMHOUSE_DRAFT_ENGINE=rooms` again by hand after a move; moving the build Mac's data with
+`python3 -I install/thomhouse.py move-out --to DIR` (rev F5, F12, F16, F17, F18, owner); enabling a Claude account by
+hand when Claude reports no plan although the owner checked it (16.6.1, rev check); removing a `moved-out.json`
+left by an uninstall before a new install on the same Mac (16.8.5, rev check).
+
+Rules for every builder: write only the files your package owns; read 16.3.3 for the other packages' functions and
+code against them (a missing module is a test skip, not an edit of someone else's file); never run the real stack,
+`claude`, `zalo-agent`, `openmausbot`, npm, pnpm or a network command; the other builds are writing `apps/runner`,
+`apps/server` and `scripts/` today, so do not run their test suites; WP4 edits `docs/contracts.md` only as the last
+step of the whole build, after re-reading it, and finds 14.10 by its heading; WP5 edits `scripts/start_local.sh` and
+`scripts/stop_local.sh` only after re-reading them, because other builds changed them today, and places each change by
+the surrounding text, not by the line numbers of 16.3.2.
+
+As built (rev review): WP5 created `service.py` although its task list left it out, because 16.3.1 and this
+subsection assign it to WP5. The documentation edits of WP4 (`docs/run-local.md`, `docs/chay-local-zalo-ca-nhan.md`,
+`README.md`, `docs/contracts.md`) were written by WP4 as pending texts and applied by a separate documentation step
+after the review, placed by the surrounding text. The review repair also edited the WP1 core modules `stack.py`,
+`download.py` and `text_vi/core.py`, with its tests in `test_hardening.py` instead of a `test_core_*.py` file.
+
+### 16.12 Decisions for the owner
+
+"Taken by the owner" marks the answers of 2026-11-12 (rev owner); the other rows are defaults of this contract that the
+owner may still change.
+
+| Decision | Status | Taken | Alternative |
+|---|---|---|---|
+| Which systems are targets | Taken by the owner | Only Macs: macOS 13.5 or newer on Apple Silicon supported; Intel Macs untested; Linux and Windows not supported, refused with one Vietnamese sentence (16.5, 16.9) | A Linux or Windows port (16.9 keeps the facts) |
+| What "several devices" means | Taken by the owner | Independent installations, each with its own Zalo account, data, secrets and Claude login; the console stays on 127.0.0.1; nothing synchronises devices | One stack serving several reception computers: needs the console on the local network, which invariant 1 forbids |
+| Zalo engine licence (CC BY-NC-SA 4.0; its NOTICE says use in a company's business operations is not licensed, `NOTICE:16-17`) | Taken by the owner, who was told | The installer shows the notice and needs `dong y` once per device; the engine is installed from the npm registry on each device, never shipped in the release | Hold off multi-device installs until the author grants a commercial licence |
+| Visit analyzer in the install | Taken (task of 2026-11-12) | Runs by default (step 19); a 404 from the server skips it with one line and leaves it `pending` for `continue`; the `features.chat_facts_import` flag is removed (rev visits) | Gate it on a release flag |
+| One Claude subscription on several devices | Default | Not decided by the installer; each device logs in with the account the owner chooses (usage limits and terms not checked) | One subscription per device, added as pool accounts |
+| Release signing | Default | SSH signature of the payload with a key on the build Mac; trust on first use on each device; the release id is the hash of the whole file, compared by the owner with `shasum` before a first install; updates only through `thomhouse update FILE`, which never executes the file (rev F5) | Checksums only (simpler; no tamper protection on updates); or a passphrase on the key (asked at every release) |
+| Runtime policy | Default | Private pinned Python, Node and pnpm in `~/ThomHouse/runtime` (about 300 MB per device, estimate); Claude Code reused when `~/.local/bin/claude` is new enough, otherwise installed there; a Claude Code from Homebrew or npm is ignored (rev F11) | Accept system runtimes that meet the minimums (less disk, devices differ) |
+| Claude Code updates | Default | Pinned: every child except Anthropic's installer gets `DISABLE_UPDATES=1`; a new version comes with a new release (rev F1) | Let Claude Code update itself (security fixes sooner; a new version could change a flag the runner passes, on every device at once) |
+| Claude account of the bot | Default | A dedicated pool account `main` with its own config folder under `~/.thomhouse-bot/accounts`, enabled only for a `claude.ai` login with a paid plan (rev F8) | `add-default` with `~/.claude` as today (session files mix with the person's own Claude Code) |
+| Proxies | Default | Proxy variables are passed on, loopback always bypasses them (invariant 11, rev F4) | Remove proxy variables from the stack (safer against a misread `no_proxy`, but a Mac that needs a proxy cannot reach Claude) |
+| Staff token | Default | Clipboard for at most 120 s (at most 300), pasted in the browser console | The Electron shell reads the token from `.dev.vars` (about 800 lines of window code and a 260 MB Electron download per device, from the guided design) |
+| Menu images | Default | A separate 173 MB slide archive; JPEGs built on each Mac with `sips` | Ship the 21 MB of JPEGs and change `build_menu_images.py` |
+| Backups | Default | In `~/.thomhouse-bot/backups`, newest 5 plus 30 days of pre-update backups | Also copy to an external drive on a schedule |
+| Autostart | Default | Offered in the install, installed only after `c` | Always installed; or never offered |
+| Python version | Default | 3.14.6, the build Mac's version and the chat-facts draft's (`chat-facts/contract.md:6`); the installer code itself runs on 3.11 or newer | 3.12 or 3.13 (the project floor is 3.11) |
+| Releases kept for rollback | Default | One previous release (about 400 MB, estimate) | More |
+| Uninstall with data | Default | Move `~/.thomhouse-bot` to the Trash (or a home-folder fallback) after a typed confirmation | Permanent deletion |
+| Command on PATH | Default | No shell profile change; commands are typed as `~/ThomHouse/bin/thomhouse …` or run from the Desktop files | One PATH line in `~/.zprofile` after consent |
+
+### 16.13 Known weaknesses
+
+1. Trust at first install rests on the owner comparing the 16-character release id with `shasum -a 256` before the
+   first run. A person who skips it, or compares it with a copy that travelled with the file, runs whatever the file
+   contains: the header of a not-yet-installed device is not covered by the signature (rev F5). A lost or stolen
+   release key means every device must be re-trusted by uninstalling the program (data kept) and installing again.
+2. Pinning delays security fixes of Node, Python and Claude Code until the next release, and an Anthropic change that
+   requires a newer Claude Code stops drafting on every device until the owner ships one. The bot's Claude Code is the
+   person's `~/.local/bin/claude`; when the person also uses Claude Code on that Mac without `DISABLE_UPDATES`, its
+   own updater can move the bot to another version (check 14 then shows CHÚ Ý).
+3. Anthropic's installer script is not pinned by a hash; the binary it leaves is compared with the SHA-256 of the
+   build Mac's own copy of the same version (rev F22). That assumes Anthropic ships byte-identical binaries per
+   version and platform, which was not checked; the GPG-signed `manifest.json` that the setup page mentions is not
+   used, because its address was not checked. On Intel Macs the binary is not checked.
+4. The python-build-standalone file names, the Node tarball names and the hashes are filled by `refresh_pins.py`;
+   none was checked in this design, and the first release needs the owner to run it with network.
+5. Restoring an older backup on the same device keeps the current journal, which blocks repeat sends for 7 days
+   (`KEEP_MS`); a row sent more than 7 days after the backup and then requeued by the restore could be sent again.
+   The installer does not switch `outbound_enabled` off; the restore screen asks staff to look at the queue.
+6. Backups sit on the same disk as the data; a disk failure loses both.
+7. The backup and doctor checks 26, 27 and 34 open miniflare's SQLite files read-only while `wrangler dev` may hold
+   them; whether a lock or WAL mode makes that fail was not tested (check 34 then shows CHÚ Ý). The migration check
+   depends on the table name `d1_migrations` and on miniflare's folder `miniflare-D1DatabaseObject` (rev F7, F13).
+8. Two devices on one Zalo account are prevented only when the old device ran `move-out`; a device restored from a
+   disk image or a second install with the same Zalo login is not detected.
+9. Reception staff still see Terminal: the `.command` file, the Desktop files and every human step run there; the
+   Claude login needs the owner's account anyway.
+10. The staff token stays in clear text in the browser's localStorage (`docs/run-local.md:154`) and passes through
+    the clipboard for up to 120 s; a clipboard manager keeps its own history, which `pbcopy </dev/null` does not
+    clear, and Universal Clipboard can copy it to the owner's other Apple devices (general knowledge, not checked).
+    The screen asks the person to clear the clipboard manager (rev F17).
+11. `env -i` in the launcher may hide something a child needs (for example how `claude auth login` opens the
+    browser); not checked.
+12. The engine's `sync` exit codes, the launchd behaviour of the LaunchAgent, `hdiutil` passphrase prompts,
+    `claude auth logout` and whether Claude Code keys its Keychain item by the config path were not checked; the
+    design relies on exit 0 and on general knowledge.
+13. Whether the engine delivers Zalo messages that arrive during an update's downtime was not checked.
+14. The installer is large for the program: about 4,300 lines of Python and bash plus about 3,000 lines of tests
+    (estimate), five packages to review.
+15. The build Mac keeps its own layout (`~/Projects/lulu-thomhouse`), so the owner tests two layouts: the checkout
+    and `~/ThomHouse/app` with symlinks.
+16. The Zalo engine version stays written in four files (`start_local.sh:28`, `bridge/config.py:38`,
+    `tools/zalo-agent/package.json`, its lock); a test and doctor check `pins` enforce agreement instead of removing
+    the copies, so that no app code changes in this build.
+17. Every doctor run that is not `--offline` makes one `zalo-agent status` login to Zalo through the bridge doctor
+    (`doctor.py:4`), which adds traffic on an unofficial API.
+18. After `claude auth login` the owner's claude.ai session stays in the reception Mac's browser until the owner logs
+    out there; the installer can only remind (rev F17).
+19. Loopback bypass relies on every HTTP client honouring `no_proxy`. Python's `urllib` and curl do (checked for
+    `urllib` with Python 3.14.6); a client that honours `http_proxy` but not `no_proxy` would still send loopback
+    traffic to the proxy (rev F4).
+20. pnpm is expected to read `store-dir` from the release's `.npmrc` for `start_local.sh`'s own `pnpm install`; that
+    was not run (rev F21).
+21. Whether `claude -p` on a Mac without the developer tools runs `/usr/bin/git` and opens the developer-tools
+    dialog was not checked (16.9 real test, rev F19).
+22. The Zalo engine's licence does not allow use in a company's business operations; the owner was told and chose
+    to show the notice on each device (16.12). The installer does not resolve that.
+23. A Mac whose `BOT_HOME` already holds data from another installation is installed over that data after the
+    owner answers `c` (step 2); the other installation then shares the data and must not run again (rev F20).
+24. An update that brings a new Claude Code switches `~/.local/bin/claude` already in U3, while the old stack still
+    runs, and a rollback does not switch it back (Anthropic's installer owns that link; general knowledge, not
+    checked). The old release then drafts with the newer Claude Code, and check 14 shows CHÚ Ý (rev check).
+25. A Claude login whose `subscriptionType` stays null keeps the account disabled; the owner can enable it only by
+    hand with `claude_pool.py enable` and `reset` (16.6.1). Whether, and when, Claude Code reports null for a valid
+    paid plan was not checked (rev check).
+26. Other-stack detection (check 8, step 2) relies on the logical `app` path appearing in the command lines of the
+    server, console and OpenMausBot, and on the working folder of the runner and bridge; a stack started by hand in a
+    way that changes either (for example through another symlink) is judged by the rule of 16.3.3 and may be
+    reported as another installation (rev check).
+
+27. A failed step 12 copy leaves the mark `BOT_HOME/d1.restore-needed.json` and blocks every start until a
+    `continue` or a `restore` puts `d1` back. When writing that mark itself fails (ENOSPC on a tiny file), `d1` stays
+    half-migrated in place with no mark; this matches the behaviour before the repair and has no test. The doctor
+    does not report the mark (rev review).
+28. `core.update_open` and `ops.update_same` print the literal `~/ThomHouse/bin/thomhouse`, which is wrong when
+    `THOMHOUSE_APP_HOME` names another folder (16.4.7, rev review).
+29. The `start_local.sh` backup hook also runs on the build Mac: at the next hand-run start with a pending
+    migration it backs up `~/.thomhouse-bot` into its own `backups/` folder, and a failed backup stops the start.
+    The real script was not run on the build Mac (rev review).
+30. Before the first real release the owner still has to run `scripts/release/refresh_pins.py` with network access
+    (real pins in `install/versions.json` and `install/lock/pnpm/package-lock.json`) and
+    `make_release.py --init-key` (the release key and `install/trust/allowed_signers`); until then a real build stops
+    at the placeholder pins (rev review).
+
+In the fewest words: each Mac gets its own independent installation from one release file built from an explicit
+list of files; the owner checks the file's id with `shasum` and runs one Terminal command for the first install, and
+`thomhouse update FILE` for every update, which reads the file as data and checks its signature. The installer asks
+once before it installs its own pinned runtimes, installs libraries only from lockfiles, backs the database up before
+every migration without blocking itself, starts the stack through the existing start script with loopback traffic
+kept off any proxy, and then guides the Claude login (a paid Claude plan only), the Zalo QR login, the history sync,
+the analyzers, the labels and the staff token in Vietnamese, all resumable; postponed human steps end with exit 10,
+not an error. `thomhouse doctor` proves the state with 48 one-line checks and never touches the runner API. Only
+macOS 13.5 or newer on Apple Silicon is supported; Intel Macs are untested; Linux and Windows are refused by the
+owner's decision. (rev owner)

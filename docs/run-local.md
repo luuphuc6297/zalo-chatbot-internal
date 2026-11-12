@@ -34,10 +34,14 @@ Cài thư viện cho cả ba app JavaScript bằng một lệnh ở thư mục g
 
 ```bash
 cd ~/Projects/lulu-thomhouse
-pnpm install
+pnpm install --frozen-lockfile
 ```
 
 Runner chỉ dùng thư viện chuẩn của Python, nên không cần `pip install`.
+
+## Cài lên máy khác thế nào?
+
+Hướng dẫn này dành cho máy có thư mục dự án. Muốn chạy chatbot trên một máy Mac khác của studio, anh không chép thư mục dự án sang máy đó. Anh tạo file cài bằng `scripts/release/make_release.py` trên máy này, rồi cài chatbot lên máy kia bằng file cài; `docs/cai-dat-may-moi.md` mô tả từng bước, từ lúc tạo file cài tới lúc cập nhật, chuyển máy và gỡ chatbot.
 
 ## Cấu hình thế nào?
 

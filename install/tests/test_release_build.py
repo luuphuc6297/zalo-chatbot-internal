@@ -246,6 +246,24 @@ class BuildTest(ReleaseTestCase):
         self.append("design/system-prompt-draft.md", "id 123456789012345678\n")
         self.check_fails("run of 15 to 20 digits")
 
+    def test_phone_number_with_separators_fails_unless_listed(self) -> None:
+        for written in ("0389 123 456", "038.912.3456", "+84 389-123-456", "84 389 123 456"):
+            with self.subTest(written=written):
+                self.append("design/system-prompt-draft.md", f"\nGọi {written} nhé\n")
+                out = self.check_fails("design/system-prompt-draft.md:", "phone number")
+                self.assertNotIn(written, out)
+                self.assertNotIn("0389123456", out)
+                lines = (self.project / "design/system-prompt-draft.md").read_text(encoding="utf-8").splitlines()
+                (self.project / "design/system-prompt-draft.md").write_text("\n".join(lines[:-1]) + "\n",
+                                                                          encoding="utf-8")
+        # One line for the national form covers every written form of the same number.
+        self.append("design/system-prompt-draft.md", "\nGọi 0389 123 456, 038.912.3456 hay +84 389-123-456\n")
+        digest = hashlib.sha256(b"0389123456").hexdigest()
+        self.append("scripts/release/placeholders.txt", f"{digest}  test placeholder\n")
+        self.assertEqual(self.build("--check-only").returncode, 0)
+        self.append("design/system-prompt-draft.md", "và 0912 345 679\n")
+        self.check_fails("design/system-prompt-draft.md:", "phone number")
+
     def test_hex_digests_are_not_ids(self) -> None:
         self.append("design/system-prompt-draft.md", "\nsha a0389123456b and 1234567890123456789abc\n")
         self.assertEqual(self.build("--check-only").returncode, 0)

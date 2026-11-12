@@ -534,10 +534,51 @@ def cmd_update(ctx, args) -> int:
             return _finish_rollback(ctx, opened, phase=None, command="update")
         if "U9" in phases:
             return _resume(ctx, args, file, opened)
+        return _start_again(ctx, args, file, opened)
     return _start(ctx, args, file)
 
 
-def _start(ctx, args, file: Path) -> int:
+def _still_open(paths, opened: dict) -> bool:
+    current = state.update_open(paths)
+    return current is not None and current.get("started_at") == opened.get("started_at")
+
+
+def _start_again(ctx, args, file: Path, opened: dict) -> int:
+    """An update interrupted before U9 (a power cut or a closed window): `app` still points at the old release, but
+    the stack may be down since U7 and `start` is refused while the journal is open. `update FILE` asks again and
+    starts at U1; any other outcome (k, a file that does not verify, the same or an older version) closes the old
+    journal as "rolled_back" and starts the old release, so the bot does not stay off. A dry run changes nothing."""
+    try:
+        code = _start(ctx, args, file, unfinished=True)
+    except InstallerError:
+        if not ctx.dry_run and _still_open(ctx.paths, opened):
+            _close_unfinished(ctx, opened)
+        raise
+    if not ctx.dry_run and _still_open(ctx.paths, opened):
+        if _close_unfinished(ctx, opened) != EXIT_OK and code == EXIT_OK:
+            code = EXIT_FAILED
+    return code
+
+
+def _close_unfinished(ctx, journal: dict) -> int:
+    """Close an update journal that never reached U9 (nothing was switched) and start the old release."""
+    from . import stack
+
+    paths = ctx.paths
+    journal["state"] = "rolled_back"
+    state.update_set(paths, journal)
+    _history(paths, journal, "rolled_back")
+    _ulog(ctx, "unfinished_closed", phases=sorted(journal.get("phases") or {}))
+    code = stack.start(ctx, during_update=True)
+    if code == 0:
+        say("ops.update_unfinished_closed", old=journal.get("from"))
+        return EXIT_OK
+    say("ops.update_unfinished_start_failed", old=journal.get("from"), log=tilde(paths.logs / "start.log", paths),
+        tb=tb(paths))
+    return EXIT_FAILED
+
+
+def _start(ctx, args, file: Path, *, unfinished: bool = False) -> int:
     from . import consent, release
 
     paths = ctx.paths
@@ -561,7 +602,7 @@ def _start(ctx, args, file: Path) -> int:
             say("ops.update_dry_phase", phase=name, title=_title(name))
         return EXIT_OK
     if consent.ask(ctx, "ops.update_confirm", "ck", old=current, new=info.version) != "c":
-        say("ops.update_declined")
+        say("ops.update_declined_unfinished" if unfinished else "ops.update_declined")
         return EXIT_DECLINED
     journal = {"from": current, "to": info.version, "file": str(file), "from_runtimes": _from_runtimes(ctx),
                "to_runtimes": None, "new_runtimes": [], "backup": None, "phases": {}, "state": "running",

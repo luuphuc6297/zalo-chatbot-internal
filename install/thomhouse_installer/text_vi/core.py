@@ -14,13 +14,16 @@ TEXTS: dict[str, str] = {
     "Anh báo người gửi file.",
     "core.download_network": "Chưa tải được {name} từ {host} vì máy không kết nối được mạng.\n"
     "Anh kiểm tra mạng rồi chạy lại: {cmd}",
+    "core.download_disk": "Ổ đĩa của máy không đủ chỗ trống để tải {name}.\n"
+    "Anh xóa bớt tệp rồi chạy lại: {cmd}",
     "core.download_http": "Máy chủ {host} chưa trả file {name}. Anh chờ một lúc rồi chạy lại: {cmd}",
     "core.download_size": "File {name} tải về không đúng mã kiểm tra nên chương trình đã xóa file đó. "
     "Anh chạy lại: {cmd}",
     "core.download_checksum": "File {name} tải về không đúng mã kiểm tra nên chương trình đã xóa file đó. "
     "Anh chạy lại: {cmd}",
     "core.update_open": "Lần cập nhật trước chưa xong, nên chương trình chưa làm lệnh này.\n"
-    "Anh chạy lại: ~/ThomHouse/bin/thomhouse update {file}",
+    "Anh chạy lại: ~/ThomHouse/bin/thomhouse update {file}\n"
+    "Hoặc quay về bản cũ: ~/ThomHouse/bin/thomhouse rollback",
     "core.moved_out": "Dữ liệu chatbot của máy này đã chuyển sang máy khác, nên chương trình không bật chatbot ở đây.\n"
     "Muốn chạy lại ở máy này: {tb} move-back",
     "core.interrupted": "Anh đã dừng lệnh giữa chừng. Khi sẵn sàng, anh chạy lại lệnh đó.",

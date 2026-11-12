@@ -396,6 +396,9 @@ def _check_deps(ctx: Ctx) -> bool:
 
 
 def _run_deps(ctx: Ctx) -> StepResult:
+    if not _check_engine_notice(ctx):  # `--only deps` must not install the engine before `dong y` (16.4.3 step 6)
+        say("setup.engine_declined", cmd=_again(ctx))
+        return StepResult("pending", "declined", exit=EXIT_DECLINED)
     result = _wp("deps").install(ctx, ctx.paths.code_root, ctx.paths.runtime / "node" / "bin")
     if isinstance(result, dict) and not result.get("rooms", True):
         say("setup.deps_rooms_warn")  # rooms are optional (14.10): a warning only
@@ -615,28 +618,85 @@ def _check_migrations(ctx: Ctx) -> bool:
     return migrations.pending(_live_root(ctx), ctx.paths.bot_home) == []
 
 
-def _restore_d1(ctx: Ctx, backup) -> None:
-    """Put BOT_HOME/d1 back from `backup` (its d1/ folder); the failed folder is kept as d1.failed-<stamp>."""
-    p = ctx.paths
-    source = Path(backup.path) / "d1"
-    failed = p.bot_home / f"d1.failed-{time.strftime('%Y%m%d-%H%M%S')}"
+RESTORE_MARK = "d1.restore-needed.json"
+
+
+def restore_needed(paths) -> dict | None:
+    """The mark step 12 leaves in BOT_HOME while `d1` is not yet copied back from the backup taken before a failed
+    migration: {"backup", "backup_path", "failed", "at"}, or None. While it exists nothing applies migrations to `d1`
+    and nothing starts the stack, which would otherwise run the bot on an empty or partial database. An unreadable
+    mark still counts (an empty dict)."""
     try:
-        if p.d1_dir.exists():
-            os.rename(p.d1_dir, failed)
-            os.chmod(failed, 0o700)
+        data = json.loads((paths.bot_home / RESTORE_MARK).read_text(encoding="utf-8"))
+    except FileNotFoundError:
+        return None
+    except (OSError, ValueError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def _set_restore_mark(paths, data: dict) -> None:
+    mark = paths.bot_home / RESTORE_MARK
+    tmp = mark.with_name(f".{RESTORE_MARK}.tmp")
+    fd = os.open(tmp, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
+    with os.fdopen(fd, "w", encoding="utf-8") as f:
+        json.dump(data, f, ensure_ascii=False)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp, mark)
+
+
+def _restore_d1(ctx: Ctx, backup_id: str, backup_dir: Path, failed: Path | None = None) -> bool:
+    """Put BOT_HOME/d1 back from `backup_dir` (its d1/ folder). The current d1 is kept as d1.failed-<stamp>.
+
+    The mark of `restore_needed` is written before anything moves and removed only after the copy, so a failed copy
+    (a full disk) or a power cut leaves it, and the next step 12 copies `d1` again before anything else. `failed` is
+    the folder that holds the data of the first failure, kept in the mark across retries."""
+    p = ctx.paths
+    source = backup_dir / "d1"
+    base = p.bot_home / f"d1.failed-{time.strftime('%Y%m%d-%H%M%S')}"
+    aside, n = base, 2
+    while aside.exists() or aside.is_symlink():
+        aside, n = base.with_name(f"{base.name}-{n}"), n + 1
+    failed = failed or aside
+    try:
+        _set_restore_mark(p, {"backup": backup_id, "backup_path": str(backup_dir), "failed": str(failed),
+                              "at": _now()})
+        if p.d1_dir.exists() or p.d1_dir.is_symlink():
+            os.rename(p.d1_dir, aside)
+            os.chmod(aside, 0o700)
         shutil.copytree(source, p.d1_dir, symlinks=True)
         os.chmod(p.d1_dir, 0o700)
+        (p.bot_home / RESTORE_MARK).unlink()
     except OSError:
-        say("setup.migrations_restore_failed", folder=human.tilde(Path(backup.path), p.home),
-            failed=human.tilde(failed, p.home))
-        _log(ctx, "migrations_restore_failed")
-        return
-    say("setup.migrations_restored", folder=human.tilde(Path(backup.path), p.home))
-    _log(ctx, "migrations_restored")
+        say("setup.migrations_restore_failed", folder=human.tilde(backup_dir, p.home),
+            failed=human.tilde(failed, p.home), cmd=_again(ctx))
+        _log(ctx, "migrations_restore_failed", backup=backup_id)
+        return False
+    say("setup.migrations_restored", folder=human.tilde(backup_dir, p.home))
+    _log(ctx, "migrations_restored", backup=backup_id)
+    return True
+
+
+def _restore_failed() -> StepResult:
+    return StepResult("failed", "restore_failed", exit=EXIT_FAILED)
 
 
 def _run_migrations(ctx: Ctx) -> StepResult:
     p = ctx.paths
+    mark = restore_needed(p)
+    if mark is not None:  # an earlier step 12 could not put d1 back: copy it again before anything else
+        given = mark.get("backup_path")
+        backup_dir = Path(given) if isinstance(given, str) and given else None
+        if backup_dir is None or not (backup_dir / "d1").is_dir():
+            say("setup.migrations_restore_missing", folder=human.tilde(backup_dir, p.home) if backup_dir else "?")
+            _log(ctx, "migrations_restore_missing", backup=mark.get("backup"))
+            return _restore_failed()
+        if stack.is_running(p, "server"):
+            stack.stop(ctx)
+        failed = Path(mark["failed"]) if mark.get("failed") else None
+        if not _restore_d1(ctx, str(mark.get("backup") or backup_dir.name), backup_dir, failed):
+            return _restore_failed()
     taken = None
     if migrations.find_db(p.bot_home) is not None or migrations.applied(p.bot_home) is None:
         pending = migrations.pending(p.app, p.bot_home)
@@ -647,7 +707,10 @@ def _run_migrations(ctx: Ctx) -> StepResult:
     if migrations.apply(ctx, p.app) != 0:
         say("setup.migrations_failed", log=human.tilde(p.logs / "migrations.log", p.home))
         if taken is not None:
-            _restore_d1(ctx, taken)
+            backup_dir = Path(taken.path)
+            bid = str(getattr(taken, "id", None) or backup_dir.name)
+            if not _restore_d1(ctx, bid, backup_dir):
+                return _restore_failed()
         return StepResult("failed", exit=EXIT_FAILED)
     installed = state.load_installed(p)
     if installed is not None:
@@ -712,6 +775,12 @@ def _run_staff_token(ctx: Ctx) -> StepResult:
 # ---------------------------------------------------------------- step 15: start (rev F16, F18)
 
 def _run_start(ctx: Ctx) -> StepResult:
+    mark = restore_needed(ctx.paths)
+    if mark is not None:
+        given = mark.get("backup_path")
+        say("setup.restore_needed", folder=human.tilde(Path(given), ctx.paths.home) if isinstance(given, str) and given
+            else "?", tb=human.tb(ctx))
+        return StepResult("failed", "restore_needed", exit=EXIT_FAILED)
     p = ctx.paths
     if stack.start(ctx) != 0:
         say("setup.start_failed", log=human.tilde(p.logs / "start.log", p.home))

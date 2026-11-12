@@ -6,7 +6,7 @@ from __future__ import annotations
 import argparse
 
 from tests.fakes_ops.opscase import OpsTestCase
-from thomhouse_installer import context, service, state
+from thomhouse_installer import context, service, state, steps
 from thomhouse_installer.text_vi import t
 
 
@@ -55,6 +55,16 @@ class ServiceTest(OpsTestCase):
         self.assertEqual(self.quiet(service.cmd_start, self.ctx(), _ns()), 0, self.out)
         self.assertEqual(self.quiet(service.cmd_stop, self.ctx(), _ns(command="stop")), 1)
         self.assertIn(t("ops.stop_survivor", tb="~/ThomHouse/bin/thomhouse"), self.out)
+
+    def test_refused_while_d1_restore_needed(self) -> None:
+        folder = self.bot_home / "backups" / "20261112-120000-before-migration"
+        steps._set_restore_mark(self.paths(), {"backup": folder.name, "backup_path": str(folder), "failed": "x"})
+        for quiet in (False, True):
+            code = self.quiet(service.cmd_start, self.ctx(quiet=quiet), _ns(quiet=quiet))
+            self.assertEqual(code, 3)
+            self.assertIn(t("setup.restore_needed", folder="~/.thomhouse-bot/backups/" + folder.name,
+                            tb="~/ThomHouse/bin/thomhouse"), self.out)
+        self.assertEqual(self.start_calls(), [])
 
     def test_refused_when_moved_out(self) -> None:
         state.set_moved_out(self.paths(), {"image_name": "x.dmg", "image_sha256": "0" * 64})

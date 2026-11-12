@@ -207,7 +207,7 @@ Chatbot tạm tắt vài phút trong lúc cập nhật. Trước khi đổi cơ 
 
 Nếu bộ ảnh menu đổi, anh đặt file `thomhouse-menu-<mã menu>.tar` mới cạnh file cài, hoặc thêm `--menu <file>`. Nếu bản mới cần Claude Code mới hơn, lệnh hỏi anh trước khi cài.
 
-Nếu máy mất điện hoặc cửa sổ bị đóng giữa lúc cập nhật, phần lớn lệnh thomhouse từ chối chạy, và tự bật chatbot khi đăng nhập máy cũng dừng. Anh chạy lại đúng lệnh `update` với cùng file để làm nốt phần còn lại.
+Nếu máy mất điện hoặc cửa sổ bị đóng giữa lúc cập nhật, phần lớn lệnh thomhouse từ chối chạy, và tự bật chatbot khi đăng nhập máy cũng dừng. Anh chạy lại đúng lệnh `update` với cùng file để làm nốt phần còn lại. Nếu lần cập nhật bị ngắt trước khi máy chuyển sang bản mới, lệnh hỏi lại anh có cập nhật không. Khi anh trả lời `k`, lệnh hủy lần cập nhật dở và bật lại chatbot bản cũ.
 
 ## Sao lưu và khôi phục thế nào?
 

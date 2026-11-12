@@ -25,6 +25,7 @@ import sys
 import threading
 import time
 from pathlib import Path
+from urllib.parse import urlsplit
 
 from . import accounts, bridgecli, consent, envs, proc, stack, state
 from .context import EXIT_DECLINED, EXIT_FAILED, EXIT_OK
@@ -598,6 +599,15 @@ def _clear_clipboard(ctx, digest: str) -> None:
     current = ""
 
 
+def _local_console(url: str) -> bool:
+    """The stack's loopback rule (stack.LOOPBACK_HOSTS) for the console page the token is pasted into."""
+    try:
+        parts = urlsplit(url)
+        return parts.scheme in ("http", "https") and parts.hostname in stack.LOOPBACK_HOSTS
+    except ValueError:
+        return False
+
+
 def token_flow(ctx) -> tuple[str, str | None]:
     """16.6.5: STAFF_TOKEN to the clipboard (stdin of pbcopy, never shown), the console opened, the paste
     confirmed with `c`; the clipboard is cleared on the answer or after THOMHOUSE_CLIPBOARD_CLEAR_S seconds."""
@@ -608,13 +618,18 @@ def token_flow(ctx) -> tuple[str, str | None]:
     if not token:
         say("setup.token_missing", tb=tb(ctx))
         return "failed", None
+    console = ctx.env.get("THOMHOUSE_CONSOLE_URL") or stack.DEFAULT_CONSOLE_URL
+    if not _local_console(console):  # checked before the copy: the token is pasted only into a loopback page
+        token = None
+        say("setup.token_console_not_local", url=console, tb=tb(ctx))
+        ctx.log("staff_token_console_refused")
+        return "failed", None
     digest = _digest(token)
     copied = proc.run(ctx, ["pbcopy"], stdin=token, timeout=30).returncode
     token = None
     if copied != 0:
         say("setup.token_copy_failed", tb=tb(ctx))
         return "failed", None
-    console = ctx.env.get("THOMHOUSE_CONSOLE_URL") or stack.DEFAULT_CONSOLE_URL
     proc.run(ctx, ["open", console], timeout=30)
     seconds = _clear_seconds(ctx)
     timer = threading.Timer(seconds, _clear_clipboard, args=(ctx, digest))

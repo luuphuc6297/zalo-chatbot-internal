@@ -127,6 +127,18 @@ class MoveTest(OpsTestCase):
         self.assertIsNone(state.moved_out(self.paths()))
         self.assertIn(t("ops.move_out_image_failed", start="~/ThomHouse/bin/thomhouse start"), self.out)
 
+    def test_move_out_refused_while_d1_restore_needed(self) -> None:
+        self.installed()
+        folder = self.bot_home / "backups" / "20261112-120000-before-migration"
+        (self.bot_home / "d1.restore-needed.json").write_text(
+            json.dumps({"backup": folder.name, "backup_path": str(folder), "failed": "x"}), encoding="utf-8")
+        self.assertEqual(self.move_out(), 1, self.out)
+        self.assertIn(t("setup.restore_needed", folder="~/.thomhouse-bot/backups/" + folder.name,
+                        tb="~/ThomHouse/bin/thomhouse"), self.out)
+        self.assertIsNone(state.moved_out(self.paths()))
+        self.assertEqual(self.stop_calls(), [])
+        self.assertEqual(self.calls("hdiutil"), [])
+
     # ------------------------------------------------------------ move-in
 
     def test_move_in_default_account_disabled_and_secrets_kept(self) -> None:

@@ -49,7 +49,7 @@ Lần đầu, script cài zalo-agent, tạo token và secret ngẫu nhiên trong
 tools/zalo-agent/node_modules/.bin/zalo-agent login
 ```
 
-Lệnh này hiện mã QR trong Terminal, và anh cũng xem được mã ở `http://localhost:18927/qr`. Anh mở app Zalo trên điện thoại của tài khoản studio, chọn Quét mã QR trong app (không dùng camera thường) rồi xác nhận. Mã hết hạn sau khoảng 60 giây. Đăng nhập xong, anh chạy lại `scripts/start_local.sh` để bật listener.
+Lệnh này mở trang mã QR ở `http://127.0.0.1:18927/qr`, và anh xem mã trong trình duyệt. Terminal.app của macOS không hiện được mã QR; chỉ các Terminal như iTerm2 mới hiện mã ngay trong cửa sổ. Nếu cổng 18927 đang bận, trang dùng cổng 8080, 3000 hoặc 9000. Anh mở app Zalo trên điện thoại của tài khoản studio, chọn Quét mã QR trong app (không dùng camera thường) rồi xác nhận. Mã hết hạn sau khoảng 60 giây. Đăng nhập xong, anh chạy lại `scripts/start_local.sh` để bật listener.
 
 **Bước 3. Mở console.**
 
@@ -108,8 +108,10 @@ Script không gửi tin nhắn cũ cho Claude hay cho bất kỳ model nào. Scr
 zalo-agent chỉ lưu những tin listener nhận được từ lúc listener chạy. Để có tin của 365 ngày trước đó, anh chạy lệnh đồng bộ một lần trong thư mục dự án:
 
 ```bash
-/Users/luuphuc/Projects/lulu-thomhouse/tools/zalo-agent/node_modules/.bin/zalo-agent sync --days 365 --no-media --no-cloud
+tools/zalo-agent/node_modules/.bin/zalo-agent sync --days 365 --no-media --no-cloud
 ```
+
+Trên máy cài bằng trình cài: `~/ThomHouse/bin/thomhouse sync-history`.
 
 Lệnh này gửi một yêu cầu đồng bộ tới điện thoại đang đăng nhập tài khoản Zalo của studio. Trên điện thoại hiện thông báo có nút "ĐỒNG BỘ NGAY"; anh bấm nút đó trong vòng 3 phút, vì lệnh chỉ chờ 180 giây. `--no-media` bỏ qua việc tải ảnh và tệp đính kèm, `--no-cloud` bỏ qua danh mục zCloud; script phân tích không cần hai phần này. Theo mã nguồn `src/commands/sync.js` của bản 2.5.9, khi listener đang chạy, lệnh đồng bộ dùng kết nối của listener, nên anh không cần dừng hệ thống. Tôi mới đọc mã nguồn, chưa chạy lệnh này. Nếu lần đồng bộ thành công gần nhất cách chưa tới một giờ, lệnh bỏ qua bước lấy tin; thêm `-F` để lấy lại.
 

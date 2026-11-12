@@ -80,6 +80,10 @@ TEXTS: dict[str, str] = {
     "ops.update_confirm": "Cập nhật chatbot từ bản {old} lên bản {new}. Chatbot sẽ tạm tắt vài phút.\n"
     "Tiếp tục? [c = có / k = không]",
     "ops.update_declined": "Anh chọn không cập nhật. Máy vẫn chạy bản cũ.",
+    "ops.update_declined_unfinished": "Anh chọn không cập nhật.",
+    "ops.update_unfinished_closed": "Lần cập nhật dở dang trước đó đã được hủy; chatbot bản {old} đã chạy lại.",
+    "ops.update_unfinished_start_failed": "Lần cập nhật dở dang trước đó đã được hủy, nhưng chatbot bản {old} chưa "
+    "chạy lại được;\nchi tiết ở {log}. Anh chạy: {tb} start",
     "ops.update_not_installed": "Máy này chưa có bản cài hoàn chỉnh, nên chương trình chưa cập nhật.\n"
     "Anh chạy {tb} doctor để xem còn thiếu gì.",
     "ops.update_bad_version": "File cập nhật ghi số phiên bản sai dạng, nên chương trình không cập nhật. "

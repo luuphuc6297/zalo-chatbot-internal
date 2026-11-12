@@ -303,6 +303,48 @@ class UpdateTest(UpdateBase):
         self.assertEqual(code, 0, self.out)
         self.assertEqual(phases, ALL)
 
+    def test_k_after_a_power_cut_in_u8_starts_the_old_release(self) -> None:
+        f = self.new_release(migrations=("0004_new.sql",))
+        with mock.patch.object(update, "_after_phase", cut_at("U8")):
+            with self.assertRaises(PowerCut):
+                self.update(f)
+        self.assertNotIn("server", self.alive_services())
+        code = self.update(f, yes=False, dry_run=True)  # a dry run changes nothing, the journal stays open
+        self.assertEqual(code, 0, self.out)
+        self.assertIsNotNone(state.update_open(self.paths()))
+        starts = len(self.start_calls())
+        code = self.update(f, yes=False)  # nobody types: the answer is k
+        self.assertEqual(code, 4, self.out)
+        self.assertIn(t("ops.update_declined_unfinished"), self.out)
+        self.assertNotIn(t("ops.update_declined"), self.out)
+        self.assertIn(t("ops.update_unfinished_closed", old="1.4.0"), self.out)
+        self.assertIsNone(state.update_open(self.paths()))
+        self.assertEqual(self.journal()["state"], "rolled_back")
+        self.assertEqual(len(self.start_calls()), starts + 1)
+        self.assertEqual(self.started_from()[-1], self.old_real)
+        self.assertTrue({"server", "runner", "console"} <= self.alive_services())
+        self.assertEqual(self.app_target(), "releases/1.4.0")
+        self.assertEqual(state.load_installed(self.paths())["version"], "1.4.0")
+        res = self.run_cli(None, "start")
+        self.assertEqual(res.returncode, 0, res.stdout + res.stderr)
+        code = self.update(f)  # a later `update FILE` runs from U1
+        self.assertEqual(code, 0, self.out)
+        self.assertEqual(state.load_installed(self.paths())["version"], "1.5.0")
+
+    def test_file_that_fails_after_a_power_cut_in_u7_starts_the_old_release(self) -> None:
+        f = self.new_release()
+        with mock.patch.object(update, "_after_phase", cut_at("U7")):
+            with self.assertRaises(PowerCut):
+                self.update(f)
+        self.assertIsNotNone(state.update_open(self.paths()))
+        stub = sys.modules["thomhouse_installer.release"]
+        with mock.patch.object(stub, "verify_file", side_effect=context.InstallerError("core.failed", 1)):
+            with self.assertRaises(context.InstallerError):
+                self.update(f)
+        self.assertIsNone(state.update_open(self.paths()))
+        self.assertIn(t("ops.update_unfinished_closed", old="1.4.0"), self.out)
+        self.assertTrue({"server", "runner", "console"} <= self.alive_services())
+
     def test_dry_run_changes_nothing(self) -> None:
         f = self.new_release(migrations=("0004_new.sql",))
         code = self.update(f, dry_run=True)

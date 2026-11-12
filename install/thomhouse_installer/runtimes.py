@@ -298,7 +298,8 @@ def _install_claude(ctx, item: RuntimeItem) -> None:
                        log=paths.logs / "runtimes.log")
         if res.returncode != 0 or not part.is_file():
             part.unlink(missing_ok=True)
-            raise DownloadError("http" if res.returncode == 22 else "network", "Claude Code", host=host)
+            kind = "http" if res.returncode == 22 else "disk" if res.returncode == 23 else "network"
+            raise DownloadError(kind, "Claude Code", host=host)
         os.replace(part, script)
         ctx.log("claude_installer", sha256=_sha256_file(script))
         _say(ctx, "release.installing", name=f"Claude Code {version}")

@@ -230,6 +230,48 @@ class BackupTest(OpsTestCase):
         self.assertEqual((caught.exception.code, caught.exception.key), (1, "ops.backup_space"))
         self.assertEqual([p.name for p in (self.bot_home / "backups").iterdir()], [".lock"])
 
+    def test_disk_full_during_sqlite_copy_is_a_space_error(self) -> None:
+        self.installed(start=False)
+        real_connect = sqlite3.connect
+
+        def connect(target, *args, **kwargs):
+            con = real_connect(target, *args, **kwargs)
+            if not kwargs.get("uri"):
+                con.execute("PRAGMA max_page_count=1")  # the copy cannot grow: a real SQLITE_FULL
+            return con
+
+        with mock.patch.object(backup.sqlite3, "connect", connect):
+            with self.assertRaises(backup.BackupError) as caught:
+                backup.make(self.ctx(), mode="stopped", reason="manual")
+        self.assertEqual((caught.exception.kind, caught.exception.key), ("space", "ops.backup_space"))
+        self.assertEqual([p.name for p in (self.bot_home / "backups").iterdir()], [".lock"])
+
+    def test_corrupt_copy_is_still_a_verify_error(self) -> None:
+        self.installed(start=False)
+        with mock.patch.object(backup.sqlite3, "connect", side_effect=sqlite3.DatabaseError("file is not a database")):
+            with self.assertRaises(backup.BackupError) as caught:
+                backup.make(self.ctx(), mode="stopped", reason="manual")
+        self.assertEqual(caught.exception.kind, "verify")
+
+    def test_leftover_partial_folders_are_removed_by_the_next_backup(self) -> None:
+        self.installed(start=False)
+        backups = self.bot_home / "backups"
+        left = backups / ".partial-20261112-234936-before-update-1.5.0"
+        (left / "d1").mkdir(parents=True)
+        (left / "d1" / "x.sqlite").write_bytes(b"x" * 4096)
+        (left / "env").mkdir()
+        (left / "env" / ".dev.vars").write_text("STAFF_TOKEN=secret\n", encoding="utf-8")
+        outside = self.tmp / "outside-partial"
+        outside.mkdir()
+        (backups / ".partial-link").symlink_to(outside)  # a link is never followed or removed
+        info = backup.make(self.ctx(), mode="stopped", reason="manual")
+        self.assertFalse(left.exists())
+        self.assertTrue(outside.is_dir())
+        self.assertTrue((backups / ".partial-link").is_symlink())
+        self.assertEqual([b.id for b in state.list_backups(self.paths())], [info.id])
+        log = (self.paths().logs / "ops.log").read_text(encoding="utf-8")
+        self.assertIn('"backup_partial_removed", "id": "20261112-234936-before-update-1.5.0"', log)
+
     def test_backups_listing(self) -> None:
         self.installed(start=False)
         res = self.run_cli(None, "backups")

@@ -9,17 +9,28 @@ from __future__ import annotations
 
 from . import stack
 from .backup import print_failed_checks, tb, tilde
-from .context import EXIT_FAILED, EXIT_OK
+from .context import EXIT_FAILED, EXIT_OK, EXIT_REFUSED
 from .text_vi import say
 
 SAFETY_CHECKS = ("listen_local_only", "openmausbot_options")
 
 
+def _mark_folder(mark: dict, paths) -> str:
+    given = mark.get("backup_path")
+    return tilde(given, paths) if isinstance(given, str) and given else "?"
+
+
 def cmd_start(ctx, args) -> int:
-    """0 running and healthy, 1 failed, 3 refused (raised by stack.start)."""
+    """0 running and healthy, 1 failed, 3 refused (raised by stack.start, or while step 12 still has to copy `d1`
+    back from a backup)."""
     from . import doctor
+    from .steps import restore_needed
 
     paths = ctx.paths
+    mark = restore_needed(paths)
+    if mark is not None:
+        say("setup.restore_needed", folder=_mark_folder(mark, paths), tb=tb(paths))
+        return EXIT_REFUSED
     quiet = bool(getattr(args, "quiet", False)) or ctx.quiet
     code = stack.start(ctx, quiet=quiet)
     if code != 0:

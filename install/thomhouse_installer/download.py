@@ -6,6 +6,7 @@ downloaded: `fetch` raises `PinError` before any curl call.
 
 from __future__ import annotations
 
+import errno
 import hashlib
 import os
 import re
@@ -19,11 +20,12 @@ _HEX64 = re.compile(r"^[0-9a-f]{64}$")
 _CACHE_NAME = re.compile(r"^[0-9a-f]{64}\.")
 NETWORK_CODES = (6, 7, 28, 35)
 HTTP_CODES = (22,)
-KINDS = ("not_https", "network", "http", "size", "checksum")
+DISK_CODES = (23,)  # curl could not write the file, for example on a full disk
+KINDS = ("not_https", "network", "http", "size", "checksum", "disk")
 
 
 class DownloadError(InstallerError):
-    """A download failed; `kind` is not_https, network, http, size or checksum. Exit code 1, key
+    """A download failed; `kind` is not_https, network, http, size, checksum or disk. Exit code 1, key
     `core.download_<kind>` with {name} and {host}."""
 
     code = 1
@@ -87,8 +89,9 @@ def fetch(ctx, url: str, sha256: str, size: int | None, *, name: str) -> Path:
     `DownloadError("not_https")` for a URL that is not https. Reuses the cache file, or any other regular file in
     `cache/downloads` whose SHA-256 matches (renamed to the cache name), with no curl call (rev F11). Otherwise
     `curl --proto =https --tlsv1.2 -fL --retry 3 -C - -o <sha256>.part <url>` (output in logs/runtimes.log), then
-    the size and hash checks and the rename. curl 6, 7, 28, 35 give `network`, 22 `http`, any other failure
-    `network`; a wrong size or hash deletes the .part file and gives `size` or `checksum`.
+    the size and hash checks and the rename. curl 6, 7, 28, 35 give `network`, 22 `http`, 23 (write error) and
+    ENOSPC on the rename `disk`, any other failure `network`; a wrong size or hash deletes the .part file and gives
+    `size` or `checksum`.
     """
     from . import proc
 
@@ -126,6 +129,8 @@ def fetch(ctx, url: str, sha256: str, size: int | None, *, name: str) -> Path:
             ctx.log("download_failed", name=name, curl_exit=res.returncode)
             if res.returncode in HTTP_CODES:
                 raise DownloadError("http", name, host=host)
+            if res.returncode in DISK_CODES:
+                raise DownloadError("disk", name, host=host)
             raise DownloadError("network", name, host=host)
     if size is not None and (not part.is_file() or part.stat().st_size != size):
         part.unlink(missing_ok=True)
@@ -133,6 +138,11 @@ def fetch(ctx, url: str, sha256: str, size: int | None, *, name: str) -> Path:
     if not part.is_file() or _sha256(part) != want:
         part.unlink(missing_ok=True)
         raise DownloadError("checksum", name, host=host)
-    os.replace(part, target)
+    try:
+        os.replace(part, target)
+    except OSError as e:
+        if e.errno == errno.ENOSPC:
+            raise DownloadError("disk", name, host=host) from e
+        raise
     ctx.log("download_done", name=name)
     return target

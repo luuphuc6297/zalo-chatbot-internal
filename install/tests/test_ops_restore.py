@@ -80,6 +80,16 @@ class RestoreTest(OpsTestCase):
         self.assertEqual(self.stub_calls("doctor.run_checks")[-1]["only"], None)
         self.assertIn("server", self.alive_services())
 
+    def test_restore_clears_the_mark_of_a_failed_step_12_copy(self) -> None:
+        mark = self.bot_home / "d1.restore-needed.json"
+        mark.write_text(json.dumps({"backup": "x", "backup_path": str(self.tmp / "x"), "failed": "y"}),
+                        encoding="utf-8")
+        code = self.restore()
+        self.assertEqual(code, 0, self.out)
+        self.assertFalse(mark.exists())
+        self.assertEqual(self.dumps(), self.before)
+        self.assertIn("server", self.alive_services())
+
     def test_other_device_restore(self) -> None:
         meta = json.loads((self.info.path / "backup.json").read_text(encoding="utf-8"))
         meta["device_id"] = "e" * 32

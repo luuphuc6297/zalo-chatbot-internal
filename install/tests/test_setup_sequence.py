@@ -186,6 +186,19 @@ class SequenceTest(SetupTestCase):
         accepted = self.journal(root)["engine_notice"]["accepted_at"]
         self.assertEqual(self.installed()["engine_notice_accepted_at"], accepted)
 
+    def test_only_deps_refused_while_notice_declined(self) -> None:
+        root = self.new_device()
+        code, out = self.run_steps(root, "install", "--from-bootstrap", answers="\n")
+        self.assertEqual(code, 4, out)
+        for name in ("deps", "7"):
+            code, out = self.run_steps(root, "install", "--only", name, answers="")
+            self.assertEqual(code, 4, out)
+            self.assertIn(t("setup.engine_declined", cmd="bash thomhouse-1.4.0.command").splitlines()[0], out)
+            self.assertFalse([c for c in self.calls("npm") if "zalo-agent" in " ".join(c["argv"])])
+            self.assertNotIn("install", [c[0] for c in self.stub_calls("deps")])
+            self.assertEqual(self.summary(root)["deps"], ("pending", "declined"))
+            self.assertEqual(self.summary(root)["engine_notice"], ("pending", "declined"))
+
     def test_shortcuts_step_prints_desktop_line_first(self) -> None:
         root = self.new_device()
         code, out = self.run_steps(root, *FIRST_INSTALL, answers="dong y\n")

@@ -14,7 +14,7 @@ Các tài liệu dưới đây được viết sau giai đoạn nghiên cứu, k
 - [docs/chay-local-zalo-ca-nhan.md](docs/chay-local-zalo-ca-nhan.md): chạy chatbot trên máy Mac với tài khoản Zalo cá nhân; đây là cách chạy đang dùng.
 - [docs/run-local.md](docs/run-local.md): chạy từng phần bằng tay ở chế độ giả lập Zalo, các lệnh của phòng hai bot, đồng bộ nhãn Zalo, nhập lịch sử buổi làm và các lệnh test.
 - [docs/rooms.md](docs/rooms.md): hai bot trong phòng chat, công tắc Tự động trả lời, nhãn Khách hàng, Quản lý, Nhân viên, trạng thái khách cùng các lần đến, số tiền, số điện thoại và gói suy ra từ tin nhắn cũ mà lễ tân xác nhận hoặc bỏ; viết cho anh và lễ tân (2026-11-12).
-- [docs/contracts.md](docs/contracts.md): hợp đồng kỹ thuật giữa server, runner, bridge và console (tiếng Anh); mục 15 là phần suy ra lần đến và gói từ tin nhắn cũ.
+- [docs/contracts.md](docs/contracts.md): hợp đồng kỹ thuật giữa server, runner, bridge và console (tiếng Anh); mục 15 là phần suy ra lần đến và gói từ tin nhắn cũ, mục 16 là phần cài chatbot lên máy Mac mới.
 
 ## Nghiên cứu (`research/`)
 
@@ -63,3 +63,7 @@ Các script chạy bằng `python3 -I`, không cần thư viện ngoài.
 - [sources/drive/](sources/drive/): bản sao thư mục Google Drive của studio, gồm menu chép từ ảnh, tài liệu thương hiệu và tài liệu cho chatbot.
 - [sources/drive-index.md](sources/drive-index.md): mã file Drive và ngày sửa của từng file trong bản sao.
 - [sources/repos/](sources/repos/): bản clone của ba repo Zalo tham khảo (`zalo-mcp`, `arden-zalo-agent-cli`, `zalo-agent-cli`), chỉ đọc, chưa chạy.
+
+## Cài trên máy của studio
+
+Chatbot được cài lên máy Mac khác của studio bằng một file cài tạo trên máy có thư mục dự án, và máy kia không cần git hay quyền đọc kho mã. Mỗi máy là một bản cài độc lập, với tài khoản Zalo, dữ liệu khách, mã bí mật và tài khoản Claude riêng. Cách tạo file cài, cài, cập nhật, sao lưu, chuyển máy và gỡ chatbot nằm trong [`docs/cai-dat-may-moi.md`](docs/cai-dat-may-moi.md).

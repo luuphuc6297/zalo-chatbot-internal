@@ -58,7 +58,10 @@ _SPLIT = re.compile(r"[\s=:?&/\"',;]+")
 _HOST = re.compile(r"^[A-Za-z0-9.-]+$")
 _ENV_NAME = re.compile(r"^[A-Z][A-Z0-9_]*$")
 # Boundaries are letters and digits, not only digits, so a hex digest never counts as a phone number or an id.
-_PHONE = re.compile(r"(?<![0-9A-Za-z])(\+?84|0)[35789]\d{8}(?![0-9A-Za-z])")
+# The contract's form (16.2.3) plus the written forms "0912 345 678", "091.234.5678" and "+84 912-345-678": one
+# space, dot or hyphen may sit after the country code and between any two digits.
+_PHONE = re.compile(r"(?<![0-9A-Za-z])(\+?84[ .-]?|0)[35789]\d(?:[ .-]?\d){7}(?![0-9A-Za-z])")
+_PHONE_SEPARATORS = re.compile(r"[ .-]")
 _LONG_ID = re.compile(r"(?<![0-9A-Za-z])\d{15,20}(?![0-9A-Za-z])")
 _KEY_BLOCK = re.compile("-----" + "BEGIN [A-Z0-9 ]*PRIVATE KEY-----")
 _PLACEHOLDER = re.compile(r"@[A-Z][A-Z0-9_]*@")
@@ -354,7 +357,11 @@ def scan(files: dict[str, bytes], secrets: set[str], allowed: set[str], homes: l
             if _KEY_BLOCK.search(line):
                 problems.append(f"{path}:{n}: private key block")
             for m in _PHONE.finditer(line):
-                if _sha256(m.group(0).encode("utf-8")) not in allowed:
+                # The hash of the exact text, of its digits without separators, or of the national form with a
+                # leading 0: one placeholders.txt line covers "0912345678", "0912 345 678" and "+84 912 345 678".
+                bare = _PHONE_SEPARATORS.sub("", m.group(0))
+                forms = {m.group(0), bare, "0" + re.sub(r"^\+?84", "", bare) if bare[0] != "0" else bare}
+                if not any(_sha256(f.encode("utf-8")) in allowed for f in forms):
                     problems.append(f"{path}:{n}: Vietnamese phone number")
             for m in _LONG_ID.finditer(line):
                 if _sha256(m.group(0).encode("utf-8")) not in allowed:

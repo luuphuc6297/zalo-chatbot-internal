@@ -43,7 +43,8 @@ KEYED = {
     "nên chương trình đã gỡ bản đó. Anh báo người gửi file.",
     "core.locked": "Một lệnh cài hoặc cập nhật khác đang chạy trên máy này. Anh chờ lệnh đó xong rồi chạy lại.",
     "core.update_open": "Lần cập nhật trước chưa xong, nên chương trình chưa làm lệnh này. / "
-    "Anh chạy lại: ~/ThomHouse/bin/thomhouse update {file}",
+    "Anh chạy lại: ~/ThomHouse/bin/thomhouse update {file} / "
+    "Hoặc quay về bản cũ: ~/ThomHouse/bin/thomhouse rollback",
     "core.moved_out": "Dữ liệu chatbot của máy này đã chuyển sang máy khác, nên chương trình không bật chatbot ở đây. / "
     "Muốn chạy lại ở máy này: {tb} move-back",
     "setup.shared_data": "Máy này đã có dữ liệu chatbot ở {thư mục}, của một bản cài khác hoặc của bản đã gỡ. / "

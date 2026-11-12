@@ -329,6 +329,9 @@ def _source_bytes(src: Path, kind: str) -> int:
     return size
 
 
+SQLITE_FULL = 13  # sqlite3.SQLITE_FULL; the constant exists in the module from Python 3.11 on
+
+
 def _sqlite_copy(src: Path, dest: Path) -> None:
     """Copy one SQLite file with the backup API (read-only source) and check the copy with integrity_check."""
     ok = False
@@ -344,7 +347,9 @@ def _sqlite_copy(src: Path, dest: Path) -> None:
                 target.close()
         finally:
             source.close()
-    except sqlite3.Error:
+    except sqlite3.Error as e:
+        if getattr(e, "sqlite_errorcode", None) == SQLITE_FULL or "disk is full" in str(e):
+            raise BackupError("space") from None  # the disk filled while copying: free space, not a broken copy
         ok = False
     if not ok:
         raise BackupError("verify")
@@ -380,6 +385,7 @@ def make(ctx, *, mode: str, reason: str) -> state.BackupInfo:
         oplog(ctx, "backup_lock_failed", error=type(e).__name__)
         raise BackupError("copy") from None
     try:
+        _remove_partials(ctx)
         info = _make_locked(ctx, mode, reason)
         try:
             _retention(ctx)
@@ -389,6 +395,26 @@ def make(ctx, *, mode: str, reason: str) -> state.BackupInfo:
         lock.__exit__(None, None, None)
     oplog(ctx, "backup_made", id=info.id, mode=mode, reason=reason, bytes=info.bytes)
     return info
+
+
+def _remove_partials(ctx) -> None:
+    """Delete the `.partial-*` folders that an interrupted backup left (a power cut, a kill, a closed window).
+
+    Called under BOT_HOME/backups/.lock, so no other backup is writing one. They are hidden from `backups` and from
+    the retention pass, and each holds a copy of d1, profiles, sessions and the env files."""
+    paths = ctx.paths
+    root = os.path.realpath(paths.backups)
+    try:
+        entries = sorted(paths.backups.iterdir())
+    except OSError:
+        return
+    for entry in entries:
+        if not entry.name.startswith(".partial-") or entry.is_symlink() or not entry.is_dir():
+            continue
+        if os.path.dirname(os.path.realpath(entry)) != root:
+            continue
+        shutil.rmtree(entry, ignore_errors=True)
+        oplog(ctx, "backup_partial_removed", id=entry.name[len(".partial-"):])
 
 
 def _make_locked(ctx, mode: str, reason: str) -> state.BackupInfo:
@@ -743,6 +769,15 @@ def cmd_backup(ctx, args) -> int:
 
     paths = ctx.paths
     if getattr(args, "if_pending_migrations", False):
+        from .steps import restore_needed
+
+        mark = restore_needed(paths)
+        if mark is not None:  # the start_local.sh hook: d1 is not restored, so no migration and no start
+            oplog(ctx, "backup_refused_restore_needed", backup=mark.get("backup"))
+            given = mark.get("backup_path")
+            say("setup.restore_needed", folder=tilde(given, paths) if isinstance(given, str) and given else "?",
+                tb=tb(paths))
+            return EXIT_FAILED
         pend = migrations.pending(paths.code_root, paths.bot_home)
         if pend is not None and (pend == [] or migrations.find_db(paths.bot_home) is None):
             oplog(ctx, "backup_not_needed", pending=len(pend))
@@ -801,6 +836,17 @@ def print_failed_checks(results) -> int:
     return n
 
 
+def _clear_restore_mark(ctx) -> None:
+    """A restore replaced `d1` from a verified backup, so the mark of a failed step 12 copy (steps.restore_needed)
+    no longer applies; without this the start_local.sh hook would refuse the start that follows."""
+    from .steps import RESTORE_MARK
+
+    mark = ctx.paths.bot_home / RESTORE_MARK
+    if mark.exists():
+        mark.unlink()
+        oplog(ctx, "restore_mark_cleared")
+
+
 def cmd_restore(ctx, args) -> int:
     """`thomhouse restore ID [--dry-run]` (16.8.3): 0 done, 1 failed, 2 unknown ID, 3 newer backup, 4 declined."""
     from . import consent, stack
@@ -836,6 +882,7 @@ def cmd_restore(ctx, args) -> int:
         return EXIT_FAILED
     try:
         _restore_into(ctx, info.path, same_device=same, aside=aside)
+        _clear_restore_mark(ctx)
     except (OSError, InstallerError) as e:
         oplog(ctx, "restore_failed", backup=info.id, error=type(e).__name__)
         say("ops.restore_failed", log=tilde(paths.logs / "ops.log", paths))

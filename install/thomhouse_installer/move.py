@@ -105,6 +105,14 @@ def cmd_move_out(ctx, args) -> int:
     if not folder.is_dir():
         say("ops.move_out_no_dir", folder=tilde(folder, paths))
         return EXIT_USAGE
+    from .steps import restore_needed
+
+    mark = restore_needed(paths)
+    if mark is not None:  # d1 is empty or partial after a failed step 12 copy: it must not reach the new Mac
+        given = mark.get("backup_path")
+        say("setup.restore_needed", folder=tilde(given, paths) if isinstance(given, str) and given else "?",
+            tb=tb(paths))
+        return EXIT_FAILED
     if consent.ask(ctx, "ops.move_out_confirm", "ck") != "c":
         say("ops.move_out_declined")
         return EXIT_DECLINED

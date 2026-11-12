@@ -313,6 +313,9 @@ download_failed() {
   host="$(host_of "$PY_URL")"
   if [ "$1" = 22 ]; then
     say "Máy chủ $host chưa trả file $name. Anh chờ một lúc rồi chạy lại: $CMD"
+  elif [ "$1" = 23 ]; then
+    say "Ổ đĩa của máy không đủ chỗ trống để tải $name."
+    say "Anh xóa bớt tệp rồi chạy lại: $CMD"
   else
     say "Chưa tải được $name từ $host vì máy không kết nối được mạng."
     say "Anh kiểm tra mạng rồi chạy lại: $CMD"

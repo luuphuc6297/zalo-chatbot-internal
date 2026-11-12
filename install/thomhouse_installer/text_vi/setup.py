@@ -112,7 +112,13 @@ TEXTS: dict[str, str] = {
     "setup.migrations_failed": "Chưa cập nhật được cơ sở dữ liệu; chi tiết ở {log}.",
     "setup.migrations_restored": "Chương trình đã trả dữ liệu về bản sao lưu vừa tạo ({folder}).",
     "setup.migrations_restore_failed": "Chưa trả được dữ liệu về bản sao lưu {folder}.\n"
-    "Dữ liệu lúc lỗi nằm ở {failed}. Anh báo người phụ trách trước khi bật chatbot.",
+    "Dữ liệu lúc lỗi nằm ở {failed}. Anh báo người phụ trách trước khi bật chatbot.\n"
+    "Chatbot chưa bật. Lệnh {cmd} sẽ chép lại dữ liệu từ bản sao lưu trước tiên.",
+    "setup.migrations_restore_missing": "Chương trình không tìm thấy bản sao lưu {folder} để trả dữ liệu về,\n"
+    "nên chưa cập nhật cơ sở dữ liệu và chưa bật chatbot. Anh báo người phụ trách.",
+    "setup.restore_needed": "Lần cập nhật cơ sở dữ liệu trước bị lỗi, và dữ liệu chatbot chưa được chép lại\n"
+    "từ bản sao lưu {folder}, nên chương trình chưa làm lệnh này và chưa bật chatbot.\n"
+    "Anh chạy: {tb} continue",
     "setup.pool_failed": "Chưa đăng ký được tài khoản Claude cho chatbot. Anh chạy lại: {cmd}",
     # ------------------------------------------------------------ step 14: Claude login (16.6.1, rev F8, F17)
     "setup.claude_account": "Tài khoản Claude của chatbot: {label}.",
@@ -195,6 +201,9 @@ TEXTS: dict[str, str] = {
     "Nếu máy có ứng dụng lưu lịch sử bộ nhớ tạm, anh xóa mục này trong ứng dụng đó.\n"
     "[c = đã dán / s = để sau]",
     "setup.token_missing": "Chưa có mã nhân viên trong file cấu hình. Anh chạy: {tb} continue",
+    "setup.token_console_not_local": "Địa chỉ trang quản lý trong THOMHOUSE_CONSOLE_URL ({url}) không nằm trên máy này,\n"
+    "nên chương trình không chép mã nhân viên.\n"
+    "Anh bỏ biến THOMHOUSE_CONSOLE_URL rồi chạy lại: {tb} staff-token",
     "setup.token_copy_failed": "Chưa chép được mã nhân viên vào bộ nhớ tạm. Anh chạy lại: {tb} staff-token",
     "setup.token_done": "Đã xóa mã nhân viên khỏi bộ nhớ tạm.",
     "setup.token_later": "Đã xóa mã nhân viên khỏi bộ nhớ tạm. Khi sẵn sàng, anh chạy: {tb} staff-token",

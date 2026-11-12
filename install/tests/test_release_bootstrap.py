@@ -128,12 +128,16 @@ class BootstrapTest(ReleaseTestCase):
     def test_curl_failures_print_their_text(self) -> None:
         for code, expected in ((7, "Chưa tải được Python 3.14.6 từ github.com vì máy không kết nối được mạng."),
                                (22, "Máy chủ github.com chưa trả file Python 3.14.6. Anh chờ một lúc rồi chạy lại: "
-                                    f"bash {self.release}")):
+                                    f"bash {self.release}"),
+                               (23, "Ổ đĩa của máy không đủ chỗ trống để tải Python 3.14.6.\n"
+                                    f"Anh xóa bớt tệp rồi chạy lại: bash {self.release}")):
             with self.subTest(code=code):
                 self.behave(curl={"fail": {PY_URL: code}})
                 res = self.bootstrap("--release-file", str(self.release), "--yes")
                 self.assertEqual(res.returncode, 1)
                 self.assertIn(expected, res.stdout)
+                if code == 23:
+                    self.assertNotIn("không kết nối được mạng", res.stdout)
 
     def test_second_run_downloads_nothing(self) -> None:
         self.assertEqual(self.bootstrap("--release-file", str(self.release), "--yes").returncode, 0)

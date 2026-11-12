@@ -207,6 +207,22 @@ class StartLocalScriptTest(OpsTestCase):
         self.assertEqual(len(self.migration_applies()), calls_before)
         self.assertFalse((self.bot_home / "run" / "server.pid").exists())
 
+    def test_hook_refuses_while_d1_restore_needed(self) -> None:
+        self.install_engine()
+        # Step 12 left an empty d1 behind (the copy from its backup failed): no database, so the hook alone would
+        # skip the backup and wrangler would create a new, empty database.
+        (self.bot_home / "d1").mkdir(parents=True, exist_ok=True)
+        folder = self.bot_home / "backups" / "20261112-120000-before-migration"
+        (self.bot_home / "d1.restore-needed.json").write_text(json.dumps(
+            {"backup": folder.name, "backup_path": str(folder), "failed": "x"}), encoding="utf-8")
+        calls_before = len(self.migration_applies())
+        res = self.run_script("start_local.sh")
+        self.assertEqual(res.returncode, 1, res.stdout[-2000:])
+        self.assertIn("chưa sao lưu được dữ liệu nên chưa áp migration", res.stderr)
+        self.assertEqual(len(self.migration_applies()), calls_before)
+        self.assertFalse((self.bot_home / "run" / "server.pid").exists())
+        self.assertIn("chưa được chép lại", (self.bot_home / "logs" / "backup.log").read_text(encoding="utf-8"))
+
     def test_no_hook_without_install(self) -> None:
         self.install_engine()
         shutil.rmtree(self.root / "install")

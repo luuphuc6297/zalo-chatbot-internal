@@ -263,6 +263,13 @@ def _check_loopback(url: str) -> None:
         raise ValueError("only loopback hosts are allowed")
 
 
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    """Refuse every redirect: urllib would copy the Authorization header to the new host (invariant 4)."""
+
+    def redirect_request(self, req, fp, code, msg, headers, newurl):  # noqa: D401 - urllib hook
+        return None
+
+
 def http_json(
     ctx, method: str, path: str, *, token: str | None = None, body: object | None = None, timeout: float = 3.0
 ) -> tuple[int, object | None]:
@@ -270,7 +277,8 @@ def http_json(
 
     A `path` starting with "/" is appended to THOMHOUSE_SERVER_URL (default http://127.0.0.1:8787); otherwise it
     is a full URL. ValueError for a host other than 127.0.0.1, localhost or ::1. The opener has no proxy
-    (invariant 11). `token` is sent as a Bearer header. Returns (status, JSON or None); (0, None) without a
+    (invariant 11) and follows no redirect, so a 30x answer is returned as its status and the token never reaches
+    another host. `token` is sent as a Bearer header. Returns (status, JSON or None); (0, None) without a
     connection.
     """
     base = ctx.env.get("THOMHOUSE_SERVER_URL") or DEFAULT_SERVER_URL
@@ -284,7 +292,7 @@ def http_json(
     if token:
         headers["Authorization"] = f"Bearer {token}"
     req = urllib.request.Request(url, data=data, method=method.upper(), headers=headers)
-    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), _NoRedirect())
     try:
         with opener.open(req, timeout=timeout) as resp:
             status, raw = resp.status, resp.read()

@@ -248,6 +248,19 @@ class StaffTokenTest(SetupTestCase):
         self.assertEqual(code, 0)
         self.assertTrue(seen["full"] and seen["empty"], seen)  # emptied by the timer before the answer came
 
+    def test_console_url_off_this_mac_is_refused_before_the_copy(self) -> None:
+        for url in ("https://console.example.invalid/", "http://127.1:5173/", "file:///tmp/x.html"):
+            ctx = self.human_ctx()
+            ctx.env = dict(ctx.env, THOMHOUSE_CONSOLE_URL=url)
+            code, out = self.run_flow(human.cmd_staff_token, ctx, ns("staff-token"), answers="c\n")
+            self.assertEqual(code, 1, out)
+            self.assertIn(t("setup.token_console_not_local", url=url, tb=TB), out)
+            self.assertEqual(self.copies(), [])
+            self.assertEqual(self.calls("open"), [])
+            self.assertNotEqual(self.summary()["staff_token"], ("done", None))
+        for url in ("http://localhost:5173/", "http://[::1]:5173"):
+            self.assertTrue(human._local_console(url), url)
+
     def test_other_clipboard_content_is_kept(self) -> None:
         ctx = self.human_ctx()
         self.clipboard.write_bytes(b"something the person copied")

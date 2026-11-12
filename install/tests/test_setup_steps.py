@@ -4,7 +4,10 @@ consent steps 22 and 23, `--only` exit codes and dry-run markers."""
 
 from __future__ import annotations
 
+import errno
 import os
+import shutil
+import sqlite3
 import stat
 import subprocess
 import sys
@@ -245,6 +248,69 @@ class StepUnitTest(SetupTestCase):
         self.assertIn(t("setup.migrations_failed", log="~/ThomHouse/logs/migrations.log"), out)
         backup = next(self.bot_home.glob("backups/*-before-migration"))
         self.assertIn(t("setup.migrations_restored", folder="~/" + str(backup.relative_to(self.home))), out)
+
+    def test_failed_restore_blocks_until_d1_is_copied_back(self) -> None:
+        root, app = self.installed_run()
+        ctx = self.step_ctx(app, "continue")
+        con = sqlite3.connect(migrations.find_db(self.bot_home))
+        con.execute("CREATE TABLE customers (name TEXT)")
+        con.execute("INSERT INTO customers VALUES ('khach-1')")
+        con.commit()
+        con.close()
+        (app / "apps" / "server" / "migrations" / "0004_new.sql").write_text("CREATE TABLE t4 (id INTEGER);\n",
+                                                                             encoding="utf-8")
+        self.behave(wrangler={"fail_at": "0004_new.sql"})
+        real_copytree = shutil.copytree
+        d1 = self.bot_home / "d1"
+
+        def full_disk(src, dst, *args, **kwargs):
+            if os.path.abspath(dst) != str(d1):
+                return real_copytree(src, dst, *args, **kwargs)  # the stand-in's backup copy still works
+            os.makedirs(dst)
+            raise OSError(errno.ENOSPC, "No space left on device")
+
+        with mock.patch("shutil.copytree", full_disk):
+            res, out = self.run_flow(steps._run_migrations, ctx)
+        self.assertEqual((res.status, res.reason, res.exit), ("failed", "restore_failed", 1))
+        mark = steps.restore_needed(self.paths(app))
+        backup = next(self.bot_home.glob("backups/*-before-migration"))
+        failed = next(self.bot_home.glob("d1.failed-*"))
+        self.assertEqual((mark["backup_path"], mark["failed"]), (str(backup), str(failed)))
+        self.assertIn(t("setup.migrations_restore_failed", folder="~/" + str(backup.relative_to(self.home)),
+                        failed="~/" + str(failed.relative_to(self.home)), cmd=f"{TB} continue"), out)
+        self.assertIsNone(migrations.find_db(self.bot_home))  # d1 is empty now
+        # Nothing starts the bot on the empty d1 while the mark exists.
+        self.behave(wrangler={"fail_at": None})
+        starts = len(self.calls("start_local.sh"))
+        res, out = self.run_flow(steps._run_start, ctx)
+        self.assertEqual((res.status, res.exit), ("failed", 1))
+        self.assertIn(t("setup.restore_needed", folder="~/" + str(backup.relative_to(self.home)), tb=TB), out)
+        self.assertEqual(len(self.calls("start_local.sh")), starts)
+        # `continue`: d1 is copied again from the recorded backup before any migration; the partial copy is set aside.
+        backups_before = len(list(self.bot_home.glob("backups/*-before-migration*")))
+        res, out = self.run_flow(steps._run_migrations, ctx)
+        self.assertEqual(res.status, "done", out)
+        self.assertIsNone(steps.restore_needed(self.paths(app)))
+        self.assertEqual(len(list(self.bot_home.glob("d1.failed-*"))), 2)
+        self.assertEqual(len(list(self.bot_home.glob("backups/*-before-migration*"))), backups_before + 1)
+        live = sqlite3.connect(migrations.find_db(self.bot_home))
+        self.assertEqual(live.execute("SELECT count(*) FROM customers").fetchone()[0], 1)
+        live.close()
+        self.assertIn("0004_new.sql", migrations.applied(self.bot_home))
+
+    def test_restore_mark_without_its_backup_refuses(self) -> None:
+        root, app = self.installed_run()
+        ctx = self.step_ctx(app, "continue")
+        steps._set_restore_mark(self.paths(app), {"backup": "x", "backup_path": str(self.tmp / "gone"),
+                                                  "failed": str(self.tmp / "f")})
+        (app / "apps" / "server" / "migrations" / "0004_new.sql").write_text("CREATE TABLE t4 (id INTEGER);\n",
+                                                                             encoding="utf-8")
+        before, makes = migrations.applied(self.bot_home), len(self.stub_calls("backup"))
+        res, out = self.run_flow(steps._run_migrations, ctx)
+        self.assertEqual((res.status, res.reason, res.exit), ("failed", "restore_failed", 1))
+        self.assertIn(t("setup.migrations_restore_missing", folder=str(self.tmp / "gone")), out)
+        self.assertEqual(migrations.applied(self.bot_home), before)  # 0004 not applied
+        self.assertEqual(len(self.stub_calls("backup")), makes)
 
     def test_start_failure_prints_the_doctor_lines(self) -> None:
         root, app = self.installed_run()
